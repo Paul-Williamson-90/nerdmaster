@@ -1,0 +1,9 @@
+langchain==0.1.13
+langchain_openai==0.1.1
+langchainhub==0.1.15
+python_dotenv==1.0.1
+bs4==0.0.2
+faiss_cpu==1.8.0
+streamlit==1.32.2
+opencv_python==4.9.0.80
+pygame==2.5.2
