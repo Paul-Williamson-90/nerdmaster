@@ -4,6 +4,8 @@ This repo is for a little fun side-project using generative AI to create a compl
 
 The only limit is your own imagination!
 
+![alt text](image.png)
+
 ## How it works
 - LangChain Agents act as a Games Master in the background, using player interactions alongside a set of pre-defined tools that control elements of the game environment, such as spawning NPC's, monsters, items, etc.
 - OpenAI GPT3.5 is used as an 'Art Director' that tells Dalle-3 what images to create.
