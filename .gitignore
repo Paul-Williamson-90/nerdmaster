@@ -3,3 +3,4 @@
 /scraped_documentation/*
 */__pycache__/*
 .DS_Store
+/nerdmaster/*
