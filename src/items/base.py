@@ -9,6 +9,7 @@ class Item:
             name: str, 
             description: str, 
             value: int,
+            mass: float,
             equipable: bool = False,
             equip_slot: str|None = None, # TODO: Replace with EquipSlot class
             min_proficiency: ProficiencyNames|str|None = None,
@@ -18,6 +19,7 @@ class Item:
         self.name = name
         self.description = description
         self.value = value
+        self.mass = mass
         self.equipable = equipable
         self.equip_slot = equip_slot
         self.min_proficiency: ProficiencyNames|None = self._handle_proficiency(min_proficiency)

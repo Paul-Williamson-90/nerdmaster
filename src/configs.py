@@ -1,0 +1,1 @@
+ITEM_DATA_PATH = "./src/items/items.json"

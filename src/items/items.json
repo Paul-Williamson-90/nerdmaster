@@ -3,6 +3,7 @@
         "name": "Standard Blaster",
         "description": "A standard blaster. Pew pew.",
         "value": 100,
+        "mass": 0.1,
         "equipable": true,
         "equip_slot": "hand",
         "min_proficiency": "untrained",
