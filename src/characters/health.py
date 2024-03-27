@@ -9,8 +9,8 @@ class HealthConfig(Enum):
 
 class HealthDescriptions(Enum):
     HEALTHY: str = "is healthy."
-    INJURED: str = "is injured, you are recovering."
-    DYING: str = "is dying, get healing soon or you will die!"
+    INJURED: str = "is injured, but recovering."
+    DYING: str = "is dying, they need healing soon or they will die!"
     DEAD: str = "is dead."
 
 class HealthDisadvantages(Enum):
