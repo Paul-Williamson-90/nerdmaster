@@ -55,7 +55,7 @@ class NerdMasterAgent:
     
     def _prepare_system(self):
         return f"""{self.system_message}
-**Here is the game's world narrative_context**:
+**Here is the game's world narrative**:
 {self.narrative_context}"""
     
     def _setup_agent(self):
