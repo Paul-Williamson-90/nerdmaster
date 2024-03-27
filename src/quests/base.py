@@ -1,6 +1,8 @@
 import json
 from src.configs import QUEST_DATA_PATH
 
+### Quests
+# - quests use triggers as updates that can unlock other triggers
 
 class Quest:
     def __init__(
