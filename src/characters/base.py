@@ -152,6 +152,27 @@ class Character(ABC):
         if isinstance(backpack, Backpack):
             return backpack
         return Backpack(item_ids=backpack)
+    
+    def get_background_full(self):
+        return self.background.__str__()
+    
+    def get_factions(self):
+        return self.background.get_factions()
+    
+    def get_backstory(self):
+        return self.background.get_backstory()
+    
+    def get_personality(self):
+        return self.background.get_personality()
+    
+    def get_views_beliefs(self):
+        return self.background.get_views_beliefs()
+    
+    def add_to_factions(self, addition: str):
+        return self.background.add_to_factions(addition)
+    
+    def remove_from_factions(self, addition: str):
+        return self.background.remove_from_factions(addition)
 
     @abstractmethod
     def get_agent_tools(self):
