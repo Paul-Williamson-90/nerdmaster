@@ -26,8 +26,10 @@ class Character:
             backpack: Backpack|List[str] = [], 
             equipped_items: Equipped|Dict[str, str] = DEFAULT_SLOT_ITEMS, 
             with_player: bool = False,
+            voice: str = "alloy",
     )->None:
         self.name = name
+        self.voice = voice
         self.visual_description = visual_description
         self.backpack = self._handle_backpack(backpack)
         self.equipped_items = self._handle_equipped_items(equipped_items)
