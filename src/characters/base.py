@@ -6,6 +6,7 @@ from src.characters.health import Health
 from src.characters.skills.skill_tree import SkillTree
 from src.characters.backpack import Backpack
 from src.characters.equipped import Equipped
+from src.characters.background import Background
 
 class Character(ABC):
 
@@ -15,7 +16,7 @@ class Character(ABC):
             backpack: Backpack|List[str], 
             equipped_items: Equipped|Dict[str, str], 
             gold: int,
-            background: str, # TODO: Replace with Background class
+            background: Background|dict,
             memory: str, # TODO: Replace with Memory class
             avatar: np.ndarray|None, # TODO: Replace with Avatar class
             health: Health = Health(),
@@ -27,11 +28,19 @@ class Character(ABC):
         self.equipped_items = self._handle_equipped_items(equipped_items)
         self.gold = gold
         self.health = health
-        self.background = background
+        self.background = self._handle_background(background)
         self.memory = memory
         self.avatar = avatar
         self.with_player = with_player
         self.skills = skills
+
+    def _handle_background(
+            self,
+            background: Background|dict,
+    )->Background:
+        if isinstance(background, Background):
+            return background
+        return Background(**background)
 
     def add_item_to_backpack(
             self,
