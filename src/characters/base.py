@@ -9,6 +9,7 @@ from src.characters.equipped import Equipped, DEFAULT_SLOT_ITEMS
 from src.characters.background import Background
 from src.characters.prompts import VISUAL_DESCRIPTION
 from src.characters.memory.base import Memory
+from src.characters.avatars.base import Avatar
 
 class Character(ABC):
 
@@ -19,7 +20,7 @@ class Character(ABC):
             background: Background|dict,
             visual_description: str,
             memory: Memory|Dict[str, List[str]|str], 
-            avatar: np.ndarray|None, # TODO: Replace with Avatar class
+            avatar: Avatar|np.ndarray|None, 
             health: Health|dict = DEFAULT_HEALTH,
             skills: SkillTree|Dict[str, str] = DEFAULT_SKILL_TREE,
             backpack: Backpack|List[str] = [], 
@@ -34,26 +35,23 @@ class Character(ABC):
         self.health = self._handle_health(health)
         self.background = self._handle_background(background)
         self.memory = self._handle_memory(memory)
-        self.avatar = avatar
+        self.avatar = self._handle_avatar(avatar)
         self.with_player = with_player
         self.skills = self._handle_skills(skills)
 
-    def add_short_term_memory(
+    def _handle_avatar(
             self,
-            memory: str
-    )->str:
-        self.memory.add_to_short_term(memory)
-        
-    def store_short_term_memory(
-            self,
-    )->str:
-        self.memory.reduce_short_term()
-
-    def search_memory(
-            self,
-            query: str
-    )->str:
-        return self.memory.search_memory(query)
+            avatar: Avatar|np.ndarray|None,
+    )->Avatar:
+        if isinstance(avatar, Avatar):
+            return avatar
+        return Avatar(avatar=avatar, visual_description=self.visual_description)
+    
+    def create_avatar(self):
+        self.avatar.create_avatar()
+    
+    def get_avatar(self):
+        return self.avatar.get_avatar()
     
     def _handle_memory(
             self,
@@ -221,6 +219,23 @@ class Character(ABC):
             equipped_description=equipped_description,
         )
         return description
+    
+    def add_short_term_memory(
+            self,
+            memory: str
+    )->str:
+        self.memory.add_to_short_term(memory)
+        
+    def store_short_term_memory(
+            self,
+    )->str:
+        self.memory.reduce_short_term()
+
+    def search_memory(
+            self,
+            query: str
+    )->str:
+        return self.memory.search_memory(query)
 
     @abstractmethod
     def get_agent_tools(self):
