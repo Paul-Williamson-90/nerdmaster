@@ -15,14 +15,14 @@ load_dotenv()
 class NerdMasterAgent:
     def __init__(
             self,
-            narrative: str = DEFAULT_NARRATIVE,
+            narrative_context: str = DEFAULT_NARRATIVE,
             system_message: str = CUSTOM_SYSTEM_MESSAGE,
             prompt_id: str = "hwchase17/openai-tools-agent",
             openai_api_key: str = os.getenv("OPENAI_API_KEY"),
             verbose: bool = True,
     )->None:
         self.llm: ChatOpenAI = self._setup_llm(openai_api_key)
-        self.narrative = narrative
+        self.narrative_context = narrative_context
         self.prompt_id = prompt_id
         self.system_message = system_message
         self.verbose = verbose
@@ -55,8 +55,8 @@ class NerdMasterAgent:
     
     def _prepare_system(self):
         return f"""{self.system_message}
-**Here is the game's world narrative**:
-{self.narrative}"""
+**Here is the game's world narrative_context**:
+{self.narrative_context}"""
     
     def _setup_agent(self):
         tools = self._prepare_tools()
@@ -89,6 +89,5 @@ class NerdMasterAgent:
             }
         )
         self.history += [f"Human: {user_input}\nAI: {response['output']}\n"]
-        self.generate_image()
         self.last_response = response["output"]
         return self.last_response
