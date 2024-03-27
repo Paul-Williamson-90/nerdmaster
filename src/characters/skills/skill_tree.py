@@ -1,40 +1,32 @@
 from src.characters.skills.base import Skill
-from src.characters.skills.skills import (
-    Dexterity,
-    Aim,
-    Athletics,
-    Brawl,
-    Lockpick,
-    Medicine,
-    Mechanics,
-    Computers,
-    Driving,
-    Stealth,
-    Perception
-)
+from src.characters.skills.skills import SkillMap, ProficiencyNames
 from typing import List, Dict
+
+DEFAULT_SKILL_TREE = {
+    "Dexterity": "UNTRAINED",
+    "Aim": "UNTRAINED",
+    "Athletics": "UNTRAINED",
+    "Brawl": "UNTRAINED",
+    "Lockpick": "UNTRAINED",
+    "Medicine": "UNTRAINED",
+    "Mechanics": "UNTRAINED",
+    "Computers": "UNTRAINED",
+    "Driving": "UNTRAINED",
+    "Stealth": "UNTRAINED",
+    "Perception": "UNTRAINED",
+}
 
 class SkillTree:
 
     def __init__(
             self,
-            skills: List[Skill] = [Dexterity(),
-                                   Aim(),
-                                   Athletics(),
-                                   Brawl(),
-                                   Lockpick(),
-                                   Medicine(),
-                                   Mechanics(),
-                                   Computers(),
-                                   Driving(),
-                                   Stealth(),
-                                   Perception()], 
+            skills: List[Skill]|Dict[str, str] = DEFAULT_SKILL_TREE, 
     )->None:
         self.skills = self._unpack_skills(skills)
 
     def _unpack_skills(
             self,
-            skills: list,
+            skills: List[Skill]|Dict[str, str],
     )->Dict[str, Skill]:
         """
         Unpack the skills.
@@ -45,6 +37,10 @@ class SkillTree:
         Returns:
         Dict[str, Skill]: The unpacked skills.
         """
+        if isinstance(skills, dict):
+            skills = [SkillMap[skill](ProficiencyNames[proficiency]) for skill, proficiency in skills.items()]
+        elif isinstance(skills, list):
+            skills = skills
         unpacked_skills = dict()
         for skill in skills:
             unpacked_skills[skill.name] = skill

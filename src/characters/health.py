@@ -38,19 +38,34 @@ class HealthStatusChange(Enum):
     DYING: str = "DEAD"
     DEAD: str = "DEAD"
 
+DEFAULT_HEALTH = {
+    "status": HealthDescriptions.HEALTHY,
+    "status_turn_count": 0,
+    "description": "",
+    "scars": [],
+}
+
 class Health:
 
     def __init__(
             self,
-            status: HealthDescriptions = HealthDescriptions.HEALTHY,
+            status: HealthDescriptions|str = HealthDescriptions.HEALTHY,
             status_turn_count: int = 0,
             description: str = "",
             scars: List[str|None] = [],
     )->None:
-        self.status = status
+        self.status = self._handle_status(status)
         self.status_turn_count = status_turn_count
         self.description = description
         self.scars = scars
+
+    def _handle_status(
+            self,
+            status: HealthDescriptions|str,
+    )->HealthDescriptions:
+        if isinstance(status, str):
+            return HealthDescriptions[status]
+        return status
 
     def get_health_status(
             self,

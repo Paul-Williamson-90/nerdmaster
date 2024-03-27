@@ -2,10 +2,10 @@ from abc import ABC, abstractmethod
 from typing import List, Dict
 import numpy as np
 
-from src.characters.health import Health
-from src.characters.skills.skill_tree import SkillTree
+from src.characters.health import Health, DEFAULT_HEALTH
+from src.characters.skills.skill_tree import SkillTree, DEFAULT_SKILL_TREE
 from src.characters.backpack import Backpack
-from src.characters.equipped import Equipped
+from src.characters.equipped import Equipped, DEFAULT_SLOT_ITEMS
 from src.characters.background import Background
 
 class Character(ABC):
@@ -13,26 +13,42 @@ class Character(ABC):
     def __init__(
             self,
             name: str,
-            backpack: Backpack|List[str], 
-            equipped_items: Equipped|Dict[str, str], 
             gold: int,
             background: Background|dict,
             memory: str, # TODO: Replace with Memory class
             avatar: np.ndarray|None, # TODO: Replace with Avatar class
-            health: Health = Health(),
-            skills: SkillTree = SkillTree(),
+            health: Health|dict = DEFAULT_HEALTH,
+            skills: SkillTree|Dict[str, str] = DEFAULT_SKILL_TREE,
+            backpack: Backpack|List[str] = [], 
+            equipped_items: Equipped|Dict[str, str] = DEFAULT_SLOT_ITEMS, 
             with_player: bool = False,
     )->None:
         self.name = name
         self.backpack = self._handle_backpack(backpack)
         self.equipped_items = self._handle_equipped_items(equipped_items)
         self.gold = gold
-        self.health = health
+        self.health = self._handle_health(health)
         self.background = self._handle_background(background)
         self.memory = memory
         self.avatar = avatar
         self.with_player = with_player
-        self.skills = skills
+        self.skills = self._handle_skills(skills)
+
+    def _handle_skills(
+            self,
+            skills: SkillTree|Dict[str, str],
+    )->SkillTree:
+        if isinstance(skills, SkillTree):
+            return skills
+        return SkillTree(skills=skills)
+
+    def _handle_health(
+            self,
+            health: Health|dict,
+    )->Health:
+        if isinstance(health, Health):
+            return health
+        return Health(**health)
 
     def _handle_background(
             self,
