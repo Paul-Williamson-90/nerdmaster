@@ -15,21 +15,21 @@ load_dotenv()
 class NerdMasterAgent:
     def __init__(
             self,
-            narrative:str = DEFAULT_NARRATIVE,
-            system_message:str = CUSTOM_SYSTEM_MESSAGE,
-            prompt_id:str = "hwchase17/openai-tools-agent",
-            openai_api_key:str=os.getenv("OPENAI_API_KEY"),
-            verbose:bool=True,
+            narrative: str = DEFAULT_NARRATIVE,
+            system_message: str = CUSTOM_SYSTEM_MESSAGE,
+            prompt_id: str = "hwchase17/openai-tools-agent",
+            openai_api_key: str = os.getenv("OPENAI_API_KEY"),
+            verbose: bool = True,
     )->None:
-        self.llm:ChatOpenAI = self._setup_llm(openai_api_key)
+        self.llm: ChatOpenAI = self._setup_llm(openai_api_key)
         self.narrative = narrative
         self.prompt_id = prompt_id
         self.system_message = system_message
         self.verbose = verbose
-        self.last_response:str|None = None
-        self.agent:AgentExecutor|None = None
+        self.last_response: str|None = None
+        self.agent: AgentExecutor|None = None
         self.history: List[str|None] = []
-        self.tools:Dict[str, StructuredTool|Dict[str, StructuredTool]] = []
+        self.tools: Dict[str, StructuredTool|Dict[str, StructuredTool]] = []
 
     def _setup_llm(
             self, 
