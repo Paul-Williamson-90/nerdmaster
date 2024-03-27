@@ -9,3 +9,7 @@ BACKGROUND_STR = """Backstory: {backstory}
 Personality: {personality}
 Views and Beliefs: {views_beliefs}
 Affiliations: {factions}"""
+
+## CHARACTER ##
+VISUAL_DESCRIPTION = """Looks: {visual_description}
+Equipped: {equipped_description}"""

@@ -7,6 +7,8 @@ from src.characters.skills.skill_tree import SkillTree, DEFAULT_SKILL_TREE
 from src.characters.backpack import Backpack
 from src.characters.equipped import Equipped, DEFAULT_SLOT_ITEMS
 from src.characters.background import Background
+from src.characters.prompts import VISUAL_DESCRIPTION
+from src.characters.memory.base import Memory
 
 class Character(ABC):
 
@@ -16,7 +18,7 @@ class Character(ABC):
             gold: int,
             background: Background|dict,
             visual_description: str,
-            memory: str, # TODO: Replace with Memory class
+            memory: Memory|Dict[str, List[str]|str], 
             avatar: np.ndarray|None, # TODO: Replace with Avatar class
             health: Health|dict = DEFAULT_HEALTH,
             skills: SkillTree|Dict[str, str] = DEFAULT_SKILL_TREE,
@@ -31,10 +33,32 @@ class Character(ABC):
         self.gold = gold
         self.health = self._handle_health(health)
         self.background = self._handle_background(background)
-        self.memory = memory
+        self.memory = self._handle_memory(memory)
         self.avatar = avatar
         self.with_player = with_player
         self.skills = self._handle_skills(skills)
+
+    def _handle_memory(
+            self,
+            memory: Memory|Dict[str, List[str]|str],
+    )->Memory:
+        if isinstance(memory, Memory):
+            return memory
+        return Memory(**memory)
+
+    def get_visual_description(self)->str:
+        """
+        Get a visual description of the character to send to a character.
+
+        Returns:
+        str: The visual description of the character.
+        """
+        equipped_description = self.equipped_items.get_equipped_items_str()
+        description = VISUAL_DESCRIPTION.format(
+            visual_description=self.visual_description,
+            equipped_description=equipped_description,
+        )
+        return description
 
     def _handle_skills(
             self,

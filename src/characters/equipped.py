@@ -91,6 +91,12 @@ class Equipped:
     )->Dict[str, str]:
         return {k: v.__str__ if v else None for k, v in self.equipped.items()}
     
+    def get_equipped_items_str(
+            self,
+    )->str:
+        equipped_items = self.get_equipped_items()
+        return "\n".join([f"{k}: {v}" for k, v in equipped_items.items()])
+    
     def get_equipped_item_id_by_slot(
             self,
             slot: str,
