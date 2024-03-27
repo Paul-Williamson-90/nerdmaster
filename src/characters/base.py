@@ -159,6 +159,11 @@ class Character(ABC):
     def get_factions(self):
         return self.background.get_factions()
     
+    def check_faction(self, faction: str):
+        if faction in self.get_factions():
+            return True
+        return False
+    
     def get_backstory(self):
         return self.background.get_backstory()
     
