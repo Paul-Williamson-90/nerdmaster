@@ -3,6 +3,7 @@ from typing import List
 import numpy as np
 
 from src.characters.health import Health
+from src.characters.skills.skill_tree import SkillTree
 
 class Character(ABC):
 
@@ -16,8 +17,8 @@ class Character(ABC):
             memory: str, # TODO: Replace with Memory class
             avatar: np.ndarray|None, # TODO: Replace with Avatar class
             health: Health = Health(),
+            skills: SkillTree = SkillTree(),
             with_player: bool = False,
-            skills: List[str] = [], # TODO: Replace with Skill class
     )->None:
         self.name = name
         self.inventory = inventory
