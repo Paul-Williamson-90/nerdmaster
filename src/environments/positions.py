@@ -1,6 +1,6 @@
 from src.characters.base import Character
 from src.items.base import Item
-from src.environments.triggers.base import Trigger
+from src.triggers.base import Trigger
 from typing import List
 
 class Position:

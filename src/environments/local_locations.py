@@ -1,4 +1,4 @@
-from src.environments.triggers.base import Trigger
+from src.triggers.base import Trigger
 
 class LocalLocation:
 

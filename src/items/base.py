@@ -1,6 +1,7 @@
 from src.characters.skills.base import Skill, ProficiencyNames, ProficiencyModifiers
 from src.characters.skills.skills import SkillMap
 from src.characters.skills.skill_tree import SkillTree
+from src.triggers.base import Trigger
 
 class Item:
     def __init__(
@@ -14,6 +15,7 @@ class Item:
             equip_slot: str|None = None, # TODO: Replace with EquipSlot class
             min_proficiency: ProficiencyNames|str|None = None,
             skill: Skill|dict|None = None,
+            trigger: Trigger|None = None,
     )->None:
         self.item_id = item_id
         self.name = name
@@ -24,6 +26,7 @@ class Item:
         self.equip_slot = equip_slot
         self.min_proficiency: ProficiencyNames|None = self._handle_proficiency(min_proficiency)
         self.skill: Skill|None = self._handle_skill(skill)
+        self.trigger = trigger
 
     def _handle_skill(
             self,

@@ -10,6 +10,7 @@ from src.characters.background import Background
 from src.characters.prompts import VISUAL_DESCRIPTION
 from src.characters.memory.base import Memory
 from src.characters.avatars.base import Avatar
+from src.triggers.base import Trigger
 
 class Character:
 
@@ -27,6 +28,7 @@ class Character:
             equipped_items: Equipped|Dict[str, str] = DEFAULT_SLOT_ITEMS, 
             with_player: bool = False,
             voice: str = "alloy",
+            triggers: List[Trigger] = [],
     )->None:
         self.name = name
         self.voice = voice
@@ -40,6 +42,7 @@ class Character:
         self.avatar = self._handle_avatar(avatar)
         self.with_player = with_player
         self.skills = self._handle_skills(skills)
+        self.triggers = triggers
 
     def _handle_avatar(
             self,
