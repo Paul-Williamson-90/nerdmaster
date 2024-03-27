@@ -1,0 +1,14 @@
+{
+    "blaster_1": {
+        "name": "Standard Blaster",
+        "description": "A standard blaster. Pew pew.",
+        "value": 100,
+        "equipable": true,
+        "equip_slot": "hand",
+        "min_proficiency": "untrained",
+        "skill": {
+            "name": "aim",
+            "proficiency": "trained"
+        }
+    }
+}

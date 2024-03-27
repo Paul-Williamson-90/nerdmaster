@@ -1,4 +1,6 @@
 from src.characters.skills.base import Skill, ProficiencyNames
+from enum import Enum
+
 
 class Dexterity(Skill):
 
@@ -131,3 +133,16 @@ class Perception(Skill):
             description="Perception is a measure of how well you can notice things.",
             proficiency=proficiency,
         )
+
+class SkillMap(Enum):
+    DEXTERITY = Dexterity
+    AIM = Aim
+    ATHLETICS = Athletics
+    BRAWL = Brawl
+    LOCKPICK = Lockpick
+    MEDICINE = Medicine
+    MECHANICS = Mechanics
+    COMPUTERS = Computers
+    DRIVING = Driving
+    STEALTH = Stealth
+    PERCEPTION = Perception

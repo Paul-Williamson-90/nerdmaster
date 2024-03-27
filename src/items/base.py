@@ -1,4 +1,5 @@
 from src.characters.skills.base import Skill, ProficiencyNames, ProficiencyModifiers
+from src.characters.skills.skills import SkillMap
 from src.characters.skills.skill_tree import SkillTree
 
 class Item:
@@ -10,8 +11,8 @@ class Item:
             value: int,
             equipable: bool = False,
             equip_slot: str|None = None, # TODO: Replace with EquipSlot class
-            min_proficiency: ProficiencyNames|None = None,
-            skill: Skill|None = None,
+            min_proficiency: ProficiencyNames|str|None = None,
+            skill: Skill|dict|None = None,
     )->None:
         self.item_id = item_id
         self.name = name
@@ -19,8 +20,31 @@ class Item:
         self.value = value
         self.equipable = equipable
         self.equip_slot = equip_slot
-        self.min_proficiency = min_proficiency
-        self.skill = skill
+        self.min_proficiency: ProficiencyNames|None = self._handle_proficiency(min_proficiency)
+        self.skill: Skill|None = self._handle_skill(skill)
+
+    def _handle_skill(
+            self,
+            skill: Skill|str|None,
+    )->Skill|None:
+        if skill is None:
+            return None
+        if isinstance(skill, dict):
+            skill_name = skill.get("name")
+            skill_object = SkillMap[skill_name].value
+            skill_proficiency = skill.get("proficiency")
+            return skill_object(proficiency=skill_proficiency)
+        return skill 
+
+    def _handle_proficiency(
+            self,
+            min_proficiency: ProficiencyNames|str|None,
+    )->ProficiencyNames|None:
+        if min_proficiency is None:
+            return None
+        if isinstance(min_proficiency, str):
+            return ProficiencyNames[min_proficiency]
+        return min_proficiency
 
     def equip_skill_check(
             self,
