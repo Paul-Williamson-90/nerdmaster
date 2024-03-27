@@ -11,7 +11,7 @@ from src.characters.prompts import VISUAL_DESCRIPTION
 from src.characters.memory.base import Memory
 from src.characters.avatars.base import Avatar
 
-class Character(ABC):
+class Character:
 
     def __init__(
             self,
@@ -237,6 +237,6 @@ class Character(ABC):
     )->str:
         return self.memory.search_memory(query)
 
-    @abstractmethod
     def get_agent_tools(self):
+        # TODO: Implement agent tools
         pass
