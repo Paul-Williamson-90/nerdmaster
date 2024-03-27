@@ -58,7 +58,10 @@ class Equipped:
     )->Dict[str, Item]:
         equipped = {}
         for slot, item_id in slot_items.items():
-            equipped[slot] = self._unpack_item(item_id)
+            if item_id:
+                equipped[slot] = self._unpack_item(item_id)
+            else:
+                equipped[slot] = None
         return equipped
 
     def _get_item_data(

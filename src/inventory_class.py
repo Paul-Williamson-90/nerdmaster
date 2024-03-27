@@ -14,6 +14,12 @@ class InventoryManagement:
         self.capacity: float = 1.0
         self.items = self._load_items(item_ids)
 
+    def show_items_str(self, name:str):
+        items_str = f"{name}'s items:\n"
+        for item in self.items:
+            items_str += f"- unique_id: {item.unique_id}, Item Name: {item.name}, Description: {item.description}"
+        return items_str
+
     def _get_item_data(
             self,
     )->dict:

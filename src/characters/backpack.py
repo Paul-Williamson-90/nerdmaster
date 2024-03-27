@@ -14,3 +14,11 @@ class Backpack(InventoryManagement):
             item_id: str,
     )->Item:
         return self._unpack_item(item_id)
+    
+    def use_item_by_unique_id(
+            self,
+            unique_id: str,
+    )->str:
+        # item = self.get_item_by_unique_id(unique_id)
+        # return item.use()
+        pass

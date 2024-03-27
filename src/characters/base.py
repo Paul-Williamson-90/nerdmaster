@@ -12,7 +12,7 @@ from src.characters.memory.base import Memory
 from src.characters.avatars.base import Avatar
 from src.triggers.base import Trigger
 
-class Character:
+class Character(ABC):
 
     def __init__(
             self,
@@ -94,6 +94,12 @@ class Character:
             self,
             item_id: str
     )->str:
+        """
+        <desc>Add an item to the character's backpack.</desc>
+
+        Args:
+        str - item_id: The id of the item to add to the backpack.
+        """
         status, message = self.backpack.add_item(item_id)
         message += " backpack"
         return message
@@ -102,6 +108,12 @@ class Character:
             self,
             item_id: str
     )->str:
+        """
+        <desc>Remove an item from the character's backpack.</desc>
+
+        Args:
+        str - item_id: The id of the item to remove from the backpack.
+        """
         status, message = self.backpack.remove_item(item_id)
         message += " backpack"
         return message
@@ -133,6 +145,12 @@ class Character:
             self,
             item_id: str
     )->str:
+        """
+        <desc>Equip an item from the character's backpack.</desc>
+
+        Args:
+        str - item_id: The id of the item to equip from the backpack.
+        """
         status, message = self._equip_item_checks(item_id)
         if not status:
             return message
@@ -147,6 +165,12 @@ class Character:
             self,
             slot: str
     )->str:
+        """
+        <desc>Unequip an item from the character's equipped items.</desc>
+
+        Args:
+        str - slot: The slot of the item to unequip from the equipped items.
+        """
         equipped_item_id = self.equipped_items.get_equipped_item_id_by_slot(slot)
         if not equipped_item_id:
             return "No item equipped in slot"
@@ -163,6 +187,12 @@ class Character:
             self, 
             amount: int
     )->tuple[bool, str]:
+        """
+        <desc>Modify the character's gold.</desc>
+
+        Args:
+        int - amount: The amount of gold to add to the character's gold.
+        """
         updated_gold = self.gold + amount
         if updated_gold < 0:
             return False, "Insufficient gold"
@@ -186,34 +216,61 @@ class Character:
         return Backpack(item_ids=backpack)
     
     def get_background_full(self):
+        """
+        <desc>Get the full background of the character.</desc>
+        """
         return self.background.__str__()
     
     def get_factions(self):
+        """
+        <desc>Get a list of factions the character belongs to.</desc>
+        """
         return self.background.get_factions()
     
     def check_faction(self, faction: str):
+        """
+        <desc>Check if the character belongs to a faction.</desc>
+
+        Args:
+        str - faction: The faction to check if the character belongs to.
+        """
         if faction in self.get_factions():
             return True
         return False
     
     def get_backstory(self):
+        """
+        <desc>Get the backstory of the character.</desc>
+        """
         return self.background.get_backstory()
     
     def get_personality(self):
+        """
+        <desc>Get the personality of the character.</desc>
+        """
         return self.background.get_personality()
     
     def get_views_beliefs(self):
+        """
+        <desc>Get the views and beliefs of the character.</desc>
+        """
         return self.background.get_views_beliefs()
     
     def add_to_factions(self, addition: str):
+        """
+        <desc>Add the character to a faction.</desc>
+        """
         return self.background.add_to_factions(addition)
     
     def remove_from_factions(self, addition: str):
+        """
+        <desc>Remove the character from a faction.</desc>
+        """
         return self.background.remove_from_factions(addition)
     
     def get_visual_description(self)->str:
         """
-        Get a visual description of the character to send to a character.
+        <desc>Get a visual description of the character to send to a character.</desc>
 
         Returns:
         str: The visual description of the character.
@@ -225,23 +282,55 @@ class Character:
         )
         return description
     
+    def get_name(self):
+        """
+        <desc>Get the name of your own character.</desc>
+        """
+        return self.name
+    
     def add_short_term_memory(
             self,
             memory: str
     )->str:
+        """
+        <desc>Add a memory to the character's short term memory.</desc>
+        """
         self.memory.add_to_short_term(memory)
         
     def store_short_term_memory(
             self,
     )->str:
+        """
+        <desc>Store the character's short term memory into long term memory.</desc>
+        """
         self.memory.reduce_short_term()
 
     def search_memory(
             self,
             query: str
     )->str:
-        return self.memory.search_memory(query)
+        """
+        <desc>Search the character's memory using a query/thought/question. Be as detailed with your query as possible.</desc>
 
+        Args
+        str - query: The query/thought/question to search the character's memory with.
+        """
+        return self.memory.search_memory(query, self.name)
+    
+    def use_item(
+            self,
+            unique_id: str,
+            character_name: str,
+    )->str:
+        """
+        <desc>Use an item on a character.</desc>
+
+        Args:
+        str - unique_id: The id of the item to use on the character.
+        str - character_name: The name of the character to use the item on.
+        """
+        return self.backpack.use_item_by_unique_id(unique_id, character_name)
+
+    @abstractmethod
     def get_agent_tools(self):
-        # TODO: Implement agent tools
-        pass
+        ...

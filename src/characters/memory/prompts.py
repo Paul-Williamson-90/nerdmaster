@@ -10,21 +10,27 @@ SEARCH_SHORT_TERM = """Short Term Memories:
 {short_term}
 
 Based on the short-term memories, does the character remember anything related to the following query?
-{query}
-
-Recall:
 """
 
-SEARCH_MEMORY = """**Short Term Memories**:
-{short_term}
+# SEARCH_MEMORY = """**Short Term Memories**:
+# {short_term}
 
-**Long Term Memories**:
+# **Long Term Memories**:
+# {long_term}
+
+# **Query**:
+# {query}
+
+# **Write the character's recall in first-person perspective, like inner-thoughts:**
+# """
+
+SEARCH_MEMORY = """Here are some memories for a character you are playing called {name} in a text-based game. 
+Based on the character's memories, does the character remember anything related to the following query?
+{query}
+
+**Memories**:
+{short_term}
 {long_term}
 
-**Query**:
-{query}
-
-**Write the character's recall in first-person perspective, like inner-thoughts:**
+**Answer**:
 """
-
-SEARCH_MEMORY_SYSTEM = """Based on the character's memories, does the character remember anything related to the following query?"""

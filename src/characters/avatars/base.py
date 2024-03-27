@@ -12,7 +12,7 @@ class Avatar:
             avatar: np.ndarray|Path|None,
             image_model: Dalle = Dalle,
     )->None:
-        self.image_model = image_model
+        self.image_model = image_model()
         self.visual_description = visual_description
         self.avatar = self._load_avatar(avatar)
 
@@ -26,7 +26,7 @@ class Avatar:
             elif isinstance(avatar, Path):
                 return np.load(avatar)
         else:
-            self.create_avatar()
+            pass #self.create_avatar()
 
     def create_avatar(
             self,

@@ -3,6 +3,8 @@ from src.characters.skills.skills import SkillMap
 from src.characters.skills.skill_tree import SkillTree
 from src.triggers.base import Trigger
 
+from uuid import uuid4
+
 class Item:
     def __init__(
             self, 
@@ -17,6 +19,7 @@ class Item:
             skill: Skill|dict|None = None,
             trigger: Trigger|None = None,
     )->None:
+        self.unique_id = uuid4()
         self.item_id = item_id
         self.name = name
         self.description = description
@@ -85,10 +88,20 @@ class Item:
     )->str:
         return self.name
     
-    def get_id(
+    def get_item_id(
             self,
     )->str:
         return self.item_id
+    
+    def get_unique_id(
+            self,
+    )->str:
+        return self.unique_id
+    
+    def get_mass(
+            self,
+    )->float:
+        return self.mass
 
     def __str__(self):
         return f"{self.name}\n{self.description}"

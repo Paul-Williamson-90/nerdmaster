@@ -38,7 +38,7 @@ class SkillTree:
         Dict[str, Skill]: The unpacked skills.
         """
         if isinstance(skills, dict):
-            skills = [SkillMap[skill](ProficiencyNames[proficiency]) for skill, proficiency in skills.items()]
+            skills = [SkillMap[skill].value(ProficiencyNames[proficiency]) for skill, proficiency in skills.items()]
         elif isinstance(skills, list):
             skills = skills
         unpacked_skills = dict()

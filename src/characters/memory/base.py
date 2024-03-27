@@ -4,8 +4,7 @@ from src.characters.background import Background
 from src.characters.memory.prompts import (
     ADD_TO_LONG_TERM, 
     SEARCH_SHORT_TERM, 
-    SEARCH_MEMORY,
-    SEARCH_MEMORY_SYSTEM
+    SEARCH_MEMORY
 )
 from src.gpt import StandardGPT
 from src.characters.memory.memory_agent import MemoryAgent
@@ -25,7 +24,7 @@ class Memory:
     )->None:
         self.background = background
         self.short_term = short_term
-        self.model = model
+        self.model = model()
         self.long_term = self._load_long_term(long_term)
 
     def _load_long_term(
@@ -71,26 +70,27 @@ class Memory:
             self,
             query: str,
     )->str:
-        prompt = SEARCH_SHORT_TERM.format(
-            query=query,
+        system_message = SEARCH_SHORT_TERM.format(
             short_term='\n'.join(self.short_term),
         )
-        response = self._call_model(prompt)
+        response = self._call_model(query, system_message)
         return response
     
     def search_memory(
             self,
             query: str,
+            name: str,
     )->str:
         short_term = self.search_short_term(query)
         long_term = self.long_term.search_memory(query)
         prompt = SEARCH_MEMORY.format(
             query=query,
             short_term=short_term,
-            long_term=long_term,
+            long_term="",#long_term,
+            name=name,
         )
-        system_prompt = SEARCH_MEMORY_SYSTEM
-        response = self._call_model(prompt, system_prompt)
+        system_prompt = "---"
+        response = self._call_model(prompt=prompt, system_prompt=system_prompt)
         return response
     
     def _call_model(
@@ -99,7 +99,6 @@ class Memory:
             system_prompt: str,
             max_tokens: int = 200,
     )->str:
-        model = self.model(system_prompt=system_prompt)
-        response = model.generate(prompt, max_tokens)
+        response = self.model.generate(prompt=prompt, max_tokens=max_tokens, system_prompt=system_prompt)
         return response
     

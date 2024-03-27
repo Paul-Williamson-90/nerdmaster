@@ -1,0 +1,1 @@
+ATTACK_TEMPLATE = """**Use this in your response to Player:** <stage>{name} prepares to attack {character_name}!</stage>"""
