@@ -15,6 +15,7 @@ class Character(ABC):
             name: str,
             gold: int,
             background: Background|dict,
+            visual_description: str,
             memory: str, # TODO: Replace with Memory class
             avatar: np.ndarray|None, # TODO: Replace with Avatar class
             health: Health|dict = DEFAULT_HEALTH,
@@ -24,6 +25,7 @@ class Character(ABC):
             with_player: bool = False,
     )->None:
         self.name = name
+        self.visual_description = visual_description
         self.backpack = self._handle_backpack(backpack)
         self.equipped_items = self._handle_equipped_items(equipped_items)
         self.gold = gold
