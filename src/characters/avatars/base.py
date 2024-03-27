@@ -32,7 +32,7 @@ class Avatar:
             self,
     )->np.ndarray:
         prompt = AVATAR_PROMPT.format(self.visual_description)
-        response = self._call_image_model(prompt)
+        response = self._call_image_model(prompt=prompt, size="1024x1024", scale=0.6)
         self.avatar = response
 
     def get_avatar(
