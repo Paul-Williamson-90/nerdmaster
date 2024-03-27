@@ -5,6 +5,8 @@ from langchain import hub
 
 from typing import List, Dict
 
+from src.agents.prompts import CUSTOM_SYSTEM_MESSAGE, DEFAULT_NARRATIVE
+from src.utils.tools import create_tool
 import os 
 from dotenv import load_dotenv
 
@@ -13,10 +15,16 @@ load_dotenv()
 class NerdMasterAgent:
     def __init__(
             self,
+            narrative:str = DEFAULT_NARRATIVE,
+            system_message:str = CUSTOM_SYSTEM_MESSAGE,
+            prompt_id:str = "hwchase17/openai-tools-agent",
             openai_api_key:str=os.getenv("OPENAI_API_KEY"),
             verbose:bool=True,
     )->None:
         self.llm:ChatOpenAI = self._setup_llm(openai_api_key)
+        self.narrative = narrative
+        self.prompt_id = prompt_id
+        self.system_message = system_message
         self.verbose = verbose
         self.last_response:str|None = None
         self.agent:AgentExecutor|None = None
@@ -38,17 +46,27 @@ class NerdMasterAgent:
             if isinstance(v, dict):
                 tools = self._prepare_tools(v, tools)
             else:
-                tools += [v]
+                tools += [create_tool(v)]
         return tools
     
     def _get_history(self)->List[str|None]:
         # TODO: control the length of the history
         return self.history
     
+    def _prepare_system(self):
+        return f"""{self.system_message}
+**Here is the game's world narrative**:
+{self.narrative}"""
+    
     def _setup_agent(self):
         tools = self._prepare_tools()
-        prompt = hub.pull("hwchase17/openai-tools-agent")
-        agent = create_openai_tools_agent(self.llm, tools, prompt)
+        prompt = hub.pull(self.prompt_id)
+        prompt.messages[0].prompt.template = self._prepare_system()
+        agent = create_openai_tools_agent(
+            self.llm, 
+            tools, 
+            prompt
+        )
         self.agent = AgentExecutor(
             agent=agent, 
             tools=tools, 
