@@ -91,6 +91,13 @@ class Equipped:
     )->Dict[str, str]:
         return {k: v.__str__ if v else None for k, v in self.equipped.items()}
     
+    def get_equipped_item_id_by_slot(
+            self,
+            slot: str,
+    )->str:
+        item = self.equipped[slot]
+        return item.item_id if item else None
+    
     def get_equipped_item_modifier(
             self,
             slot: str,

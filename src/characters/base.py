@@ -33,6 +33,85 @@ class Character(ABC):
         self.with_player = with_player
         self.skills = skills
 
+    def add_item_to_backpack(
+            self,
+            item_id: str
+    )->str:
+        status, message = self.backpack.add_item(item_id)
+        message += " backpack"
+        return message
+    
+    def remove_item_from_backpack(
+            self,
+            item_id: str
+    )->str:
+        status, message = self.backpack.remove_item(item_id)
+        message += " backpack"
+        return message
+    
+    def _equip_item_checks(
+            self,
+            item_id: str,
+    )->tuple[bool, str]:
+        if item_id not in [x.item_id for x in self.backpack.items]:
+            return False, "Item not in backpack"
+        # equipable
+        item_stats = self.backpack.get_item_stats(item_id)
+        if not item_stats.equipable:
+            return False, "Item not equipable"
+        # skill check
+        if not item_stats.equip_skill_check(self.skills):
+            return False, "Insufficient proficiency to equip item"
+        # mass check
+        slot = item_stats.equip_slot
+        mass = item_stats.mass
+        equipped_item_id = self.equipped_items.get_equipped_item_id_by_slot(slot)
+        if equipped_item_id:
+            equipped_item = self.backpack.get_item_stats(equipped_item_id)
+            if not self.backpack.add_item_mass_check(equipped_item, mass):
+                return False, "Not enough capacity in backpack to unequip item in replace of item to equip"
+        return True, ""
+    
+    def equip_item(
+            self,
+            item_id: str
+    )->str:
+        status, message = self._equip_item_checks(item_id)
+        if not status:
+            return message
+        status, message, id_unequipped = self.equipped_items.equip_item(item_id)
+        if id_unequipped:
+            self.add_item_to_backpack(id_unequipped)
+        status, message = self.backpack.remove_item(item_id)
+        message += " equipped items"
+        return message
+    
+    def unequip_item(
+            self,
+            slot: str
+    )->str:
+        equipped_item_id = self.equipped_items.get_equipped_item_id_by_slot(slot)
+        if not equipped_item_id:
+            return "No item equipped in slot"
+        equipped_item = self.backpack.get_item_stats(equipped_item_id)
+        equipped_item_mass = equipped_item.mass
+        if not self.backpack.add_item_mass_check(equipped_item_mass):
+            return "Not enough capacity in backpack to unequip item"
+        status, message, id_unequipped = self.equipped_items.unequip_item(slot)
+        if id_unequipped:
+            message+=self.add_item_to_backpack(id_unequipped)
+        return message
+
+    def modify_gold(
+            self, 
+            amount: int
+    )->tuple[bool, str]:
+        updated_gold = self.gold + amount
+        if updated_gold < 0:
+            return False, "Insufficient gold"
+        self.gold = updated_gold
+        return True, f"{amount} gold added, {self.name} now has {updated_gold} gold"
+
     def _handle_equipped_items(
             self,
             equipped_items: Equipped|Dict[str, str],

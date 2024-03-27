@@ -50,16 +50,27 @@ class InventoryManagement:
             skill=item["skill"],
         )
     
+    def add_item_mass_check(
+            self,
+            item_id: str,
+            modifier: float=0.0,
+    )->bool:
+        item = self._unpack_item(item_id)
+        if self.capacity + modifier - item.mass < 0:
+            return False
+        return True
+    
     def add_item(
             self,
             item_id: str,
     )->None:
         item = self._unpack_item(item_id)
+        name = item.name
         if self.capacity - item.mass < 0:
-            return False, "Not enough capacity"
+            return False, f"Not enough capacity for adding {name} to"
         self.items.append(item)
         self.capacity -= item.mass
-        return True, "Item added"
+        return True, f"{name} added to"
     
     def remove_item(
             self,
@@ -69,5 +80,5 @@ class InventoryManagement:
             if item.item_id == item_id:
                 self.items.remove(item)
                 self.capacity += item.mass
-                return True, "Item removed"
-        return False, "Item not found"
+                return True, "Item removed from"
+        return False, "Item not found in"
