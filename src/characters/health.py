@@ -240,6 +240,28 @@ class Health:
         self.description = self._call_gpt(prompt)
         return self.description
     
+    def get_scars(
+            self,
+    )->List[str]:
+        """
+        Get the scars of the character.
+
+        Returns:
+        List[str]: The scars of the character.
+        """
+        return self.scars
+    
+    def get_injury_description(
+            self,
+    )->str:
+        """
+        Get the injury description of the character.
+
+        Returns:
+        str: The injury description.
+        """
+        return self.description
+    
     def _call_gpt(
             self,
             prompt: str,
