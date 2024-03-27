@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from typing import List
 import numpy as np
 
+from src.characters.health import Health
+
 class Character(ABC):
 
     def __init__(
@@ -10,10 +12,10 @@ class Character(ABC):
             inventory: List[str], # TODO: Replace with Item class
             equipped_items: List[str], # TODO: Replace with Item/Equip class
             gold: int,
-            health: str, # TODO: Replace with Health class
             background: str, # TODO: Replace with Background class
             memory: str, # TODO: Replace with Memory class
             avatar: np.ndarray|None, # TODO: Replace with Avatar class
+            health: Health = Health(),
             with_player: bool = False,
             skills: List[str] = [], # TODO: Replace with Skill class
     )->None:
