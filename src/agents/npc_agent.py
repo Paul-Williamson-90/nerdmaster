@@ -25,8 +25,9 @@ class NPCAgent(NerdMasterAgent):
             openai_api_key: str = os.getenv("OPENAI_API_KEY"),
             verbose: bool = True,
             event_outcome_format: str = DEFAULT_EVENT_OUTCOME_FORMAT,
+            model: str = "gpt-4-turbo-preview"
     )->None:
-        super().__init__(system_message, prompt_id, openai_api_key, verbose, event_outcome_format)
+        super().__init__(system_message, prompt_id, openai_api_key, verbose, event_outcome_format, model)
 
     def _prepare_system(self, background: Background, name: str)->str:
         personality = background.get_personality()

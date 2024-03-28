@@ -13,6 +13,8 @@ from src.characters.memory.memory_agent import MemoryAgent
 from pathlib import Path
 import tempfile
 
+MODEL = "gpt-3.5-turbo"
+
 
 class Memory:
 
@@ -25,7 +27,7 @@ class Memory:
     )->None:
         self.background = background
         self.short_term = short_term
-        self.model = model()
+        self.model = model(model=MODEL)
         self.long_term = self._load_long_term(long_term)
 
     def _load_long_term(

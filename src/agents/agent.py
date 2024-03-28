@@ -25,7 +25,9 @@ class NerdMasterAgent(ABC):
             openai_api_key: str = os.getenv("OPENAI_API_KEY"),
             verbose: bool = True,
             event_outcome_format: str = DEFAULT_EVENT_OUTCOME_FORMAT,
+            model: str = "gpt-4-turbo-preview"
     )->None:
+        self.model = model
         self.llm: ChatOpenAI = self._setup_llm(openai_api_key)
         self.prompt_id = prompt_id
         self.system_message = system_message
@@ -41,7 +43,7 @@ class NerdMasterAgent(ABC):
     )->ChatOpenAI:
         return ChatOpenAI(
             api_key=openai_api_key,
-            model="gpt-4-turbo-preview"
+            model=self.model
         )
     
     def _prepare_tools(
