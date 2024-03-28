@@ -11,14 +11,14 @@ class Environment:
             self,
             name: str,
             location_id: str,
-            connecting_locations: EnvironmentMap, # Replace with location/map
+            connecting_locations: EnvironmentMap, 
             local_locations: List[LocalLocation], 
             character_locations: List[CharacterPosition], 
             description: str,
             visual_description: str,
             scenario_description_tags: List[str],
             object_locations: List[ObjectPosition],
-            triggers: List[Trigger], # Replace with triggers
+            triggers: List[Trigger], 
             turns_in_location: int=0, # Number of turns the player has been here (resets when player leaves location)
     )->None:
         self.name = name
