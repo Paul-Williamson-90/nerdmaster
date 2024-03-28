@@ -310,10 +310,10 @@ class Character(ABC):
             query: str
     )->str:
         """
-        <desc>Search the character's memory using a query/thought/question. Be as detailed with your query as possible.</desc>
+        <desc>Search your own character's memory using a question. For example, "Do I remember anything regarding..."</desc>
 
         Args
-        str - query: The query/thought/question to search the character's memory with.
+        str - <query>: The query/thought/question to search your own character's memory with.
         """
         return self.memory.search_memory(query, self.name)
     
@@ -323,11 +323,11 @@ class Character(ABC):
             character_name: str,
     )->str:
         """
-        <desc>Use an item on a character.</desc>
+        <desc>Use an item on a character. It is wise to see what items you have first before using this tool.</desc>
 
         Args:
-        str - unique_id: The id of the item to use on the character.
-        str - character_name: The name of the character to use the item on.
+        str - <unique_id>: The id of the item to use on the character.
+        str - <character_name>: The name of the character to use the item on.
         """
         return self.backpack.use_item_by_unique_id(unique_id, character_name)
 

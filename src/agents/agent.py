@@ -39,7 +39,10 @@ class NerdMasterAgent(ABC):
             self, 
             openai_api_key:str
     )->ChatOpenAI:
-        return ChatOpenAI(api_key=openai_api_key)
+        return ChatOpenAI(
+            api_key=openai_api_key,
+            model="gpt-4-turbo-preview"
+        )
     
     def _prepare_tools(
             self, 

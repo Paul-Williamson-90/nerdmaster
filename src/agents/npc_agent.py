@@ -34,7 +34,7 @@ class NPCAgent(NerdMasterAgent):
         beliefs = background.get_views_beliefs()
         return NPC_SYSTEM_PROMPT.format(
             personality=personality,
-            # backstory=backstory,
+            backstory=backstory,
             beliefs=beliefs,
             system=self.system_message,
             name=name,
@@ -47,6 +47,7 @@ class NPCAgent(NerdMasterAgent):
         tools = self._prepare_tools()
         prompt = hub.pull(self.prompt_id)
         prompt.messages[0].prompt.template = self._prepare_system(background, name)
+        prompt[2].prompt.template = "**Event**:\n{input}" # added
         agent = create_openai_tools_agent(
             self.llm, 
             tools, 

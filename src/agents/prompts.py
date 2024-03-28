@@ -21,13 +21,13 @@ Your character's name is {name}.
 **{name}'s Views and Beliefs:**
 {beliefs}.
 
+**Instructions:**
 Using the **Events** described below, write a short section for a theatre script that includes notes for pauses and actor actions. 
 Only describe the reaction and dialogue of {name} in response to the events.
-If your reaction is attacking, use the attack character tool, always make sure this is the final action in the response.
+If a tool output tells you to do something, follow the instructions closely in your final response.
 
 **Output format**:
 <stage>Stage directions should be wrapped in stage tags</stage>
 <{name}>"Dialogue should be wrapped in dialogue tags"</{name}>
-
-**Events**:
 """
+

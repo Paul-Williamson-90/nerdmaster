@@ -4,7 +4,8 @@ from src.characters.background import Background
 from src.characters.memory.prompts import (
     ADD_TO_LONG_TERM, 
     SEARCH_SHORT_TERM, 
-    SEARCH_MEMORY
+    SEARCH_MEMORY,
+    SEARCH_MEMORY_SYSTEM,
 )
 from src.gpt import StandardGPT
 from src.characters.memory.memory_agent import MemoryAgent
@@ -85,11 +86,12 @@ class Memory:
         long_term = self.long_term.search_memory(query)
         prompt = SEARCH_MEMORY.format(
             query=query,
+        )
+        system_prompt = SEARCH_MEMORY_SYSTEM.format(
             short_term=short_term,
-            long_term="",#long_term,
+            long_term=long_term,
             name=name,
         )
-        system_prompt = "---"
         response = self._call_model(prompt=prompt, system_prompt=system_prompt)
         return response
     

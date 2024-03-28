@@ -4,13 +4,13 @@ from langchain.pydantic_v1 import Field, create_model
 
 def create_tool(callable:Callable):
     method = callable
-    args = {k:v for k,v in method.__annotations__.items() if k != "self"}
+    args = {k:v for k,v in method.__annotations__.items() if k != "self" and k != "return"}
     name = method.__name__
     doc = method.__doc__
     func_desc = doc[doc.find("<desc>") + len("<desc>"):doc.find("</desc>")]
     arg_desc = dict()
     for arg in args.keys():
-        desc = doc[doc.find(f"{arg}: ")+len(f"{arg}: "):]
+        desc = doc[doc.find(f"<{arg}>: ")+len(f"<{arg}>: "):]
         desc = desc[:desc.find("\n")]
         arg_desc[arg] = desc
     arg_fields = dict()
