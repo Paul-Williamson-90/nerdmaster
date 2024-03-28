@@ -5,6 +5,17 @@ from src.configs import DifficultyConfigs
 
 from typing import Dict, List
     
+"""
+NPCActionMap:
+- Controls what actions are available to an NPC at a given time.
+- Collects any triggers as a result of an action being taken.
+- Triggers are resolved by the Game class, post NPC agent output.
+
+NPCAction(Trigger):
+- Abstract class for NPC actions.
+- Contains a reference to the NPCActionMap object for adding triggers.
+- Inherits from Trigger class.
+"""
 
 class NPCActionMap:
 
