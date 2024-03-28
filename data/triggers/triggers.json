@@ -1,0 +1,9 @@
+{
+    "ROOM_01_DIALOGUE": {
+        "trigger_type_id": "trigger_dialogue",
+        "npc_names": [],
+        "narrative_prompt": "",
+        "req_quest_ids": [],
+        "exl_quest_ids": []
+    }
+}

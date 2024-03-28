@@ -1,21 +1,22 @@
-from pathlib import Path
-import json
-from src.configs import MAP_DATA_PATH
+from typing import Dict
+
+class MapLocation:
+
+    def __init__(
+            self,
+            location_id: str,
+            description: str,
+            turns_to_visit: int
+    ):
+        self.location_id = location_id
+        self.description = description
+        self.turns_to_visit = turns_to_visit
 
 class EnvironmentMap:
 
     def __init__(
             self,
-            current_location: str,
-            map_data_path: Path = Path(MAP_DATA_PATH),
+            map: Dict[str, MapLocation],
     )->None:
-        self.current_location = current_location
-        self.map_data_path = map_data_path
-        self.map = self._load_map()
-        self.local_map = self.map[current_location]
-
-    def _load_map(self):
-        with open(self.map_data_path, 'r') as file:
-            global_map = json.load(file)
-        return global_map
+        self.map = map
     

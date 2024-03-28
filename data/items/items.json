@@ -5,11 +5,11 @@
         "value": 100,
         "mass": 0.1,
         "equipable": true,
-        "equip_slot": "hand",
-        "min_proficiency": "untrained",
+        "equip_slot": "HAND",
+        "min_proficiency": "UNTRAINED",
         "skill": {
-            "name": "aim",
-            "proficiency": "trained"
+            "name": "AIM",
+            "proficiency": "TRAINED"
         }
     }
 }

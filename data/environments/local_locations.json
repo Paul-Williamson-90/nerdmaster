@@ -1,0 +1,10 @@
+{
+    "Door": {
+        "name": "Door",
+        "visual_description": "A door",
+        "description": "A door",
+        "hidden": false,
+        "triggers": [
+        ]
+    }
+}

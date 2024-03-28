@@ -1,0 +1,37 @@
+{
+    "The Room": {
+        "name": "Room",
+        "description": "A room",
+        "visual_description": "A room",
+        "scenario_description_tags": ["plain", "uninteresting"],
+        "turns_in_location": 0,
+        "local_locations": ["Door"],
+        "character_locations": [
+            {   
+                "position_type_id": "character_position",
+                "characters": [],
+                "position_description": "A table.",
+                "activity_description": "You see a person sat at a table.",
+                "reveal_description": "",
+                "hidden": false,
+                "triggers": []
+            }
+        ],
+        "object_locations": [
+            {   
+                "position_type_id": "object_position",
+                "object_id": "table_1",
+                "items": [
+                    "blaster_1"
+                ],
+                "position_description": "A table in the corner of the room.",
+                "reveal_description": "You notice a blaster on the table.",
+                "hidden": false,
+                "triggers": []
+            }
+        ],
+        "triggers": [
+            "ROOM_01_DIALOGUE"
+        ]
+    }
+}

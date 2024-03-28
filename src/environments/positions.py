@@ -3,6 +3,7 @@ from src.items.base import Item
 from src.triggers.base import Trigger
 from typing import List
 
+
 class Position:
 
     def __init__(
@@ -10,18 +11,19 @@ class Position:
             position_description: str,
             reveal_description: str|None,
             hidden: bool,
-            trigger: Trigger|None, # Replace with trigger event
+            triggers: List[Trigger|None] = [], # Replace with trigger event
     )->None:
         self.position_description = position_description
         self.hidden = hidden
         self.reveal_description = reveal_description
-        self.trigger = trigger
+        self.triggers = triggers
 
     def get_position_description(self):
         return self.position_description
     
     def get_reveal_description(self):
         return self.reveal_description
+
 
 class CharacterPosition(Position):
 
@@ -32,9 +34,9 @@ class CharacterPosition(Position):
             activity_description: str,
             reveal_description: str|None,
             hidden: bool,
-            trigger: Trigger|None, # Replace with trigger event
+            triggers: List[Trigger|None] = [] # Replace with trigger event
     )->None:
-        super().__init__(position_description, hidden, reveal_description, trigger)
+        super().__init__(position_description, hidden, reveal_description, triggers)
         self.characters = characters
         self.activity_description = activity_description
     
@@ -44,18 +46,21 @@ class CharacterPosition(Position):
     def get_characters(self):
         return self.characters
     
-class ItemPosition(Position):
+    
+class ObjectPosition(Position):
 
     def __init__(
             self,
+            object_id: str,
             items: List[Item],
             position_description: str,
             reveal_description: str|None,
             hidden: bool,
-            trigger: Trigger|None, # Replace with trigger event
+            triggers: List[Trigger|None] = [] # Replace with trigger event
     )->None:
-        super().__init__(position_description, hidden, reveal_description, trigger)
+        super().__init__(position_description, hidden, reveal_description, triggers)
         self.items = items
+        self.object_id = object_id
 
     def get_items(self):
         return self.items
@@ -70,3 +75,4 @@ class ItemPosition(Position):
     def _check_trigger(self, item_id: str):
         # TODO: Implement trigger check
         pass
+
