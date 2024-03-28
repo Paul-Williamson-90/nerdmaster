@@ -19,7 +19,7 @@ class Environment:
             scenario_description_tags: List[str],
             object_locations: List[ObjectPosition],
             triggers: List[Trigger], 
-            turns_in_location: int=0, # Number of turns the player has been here (resets when player leaves location)
+            turns_in_location: int = 0, # Number of turns the player has been here (resets when player leaves location)
     )->None:
         self.name = name
         self.location_id = location_id
