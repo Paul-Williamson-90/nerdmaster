@@ -65,11 +65,15 @@ class NerdMasterAgent(ABC):
     @abstractmethod
     def _prepare_system(self):
         ...
+
+    def _prepare_prompt(self):
+        prompt = hub.pull(self.prompt_id)
+        prompt.messages[0].prompt.template = self._prepare_system()
+        return prompt
     
     def _setup_agent(self):
         tools = self._prepare_tools()
-        prompt = hub.pull(self.prompt_id)
-        prompt.messages[0].prompt.template = self._prepare_system()
+        prompt = self._prepare_prompt()
         agent = create_openai_tools_agent(
             self.llm, 
             tools, 
