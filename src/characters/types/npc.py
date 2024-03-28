@@ -30,7 +30,7 @@ class NPC(Character):
             backpack: Backpack|List[str] = [], 
             equipped_items: Equipped|Dict[str, str] = DEFAULT_SLOT_ITEMS, 
             with_player: bool = False,
-            voice: str = "alloy",
+            voice: str = "alloy", # TODO: Change this for Voice module
             triggers: List[Trigger] = [],
             agent: NPCAgent = NPCAgent,
     )->None:
@@ -68,10 +68,7 @@ class NPC(Character):
             "remove_from_factions": self.remove_from_factions,
 
             # Useful for diaglogues (tell the character about yourself in full)
-            # "get_background_full": self.get_background_full,
-            # "get_backstory": self.get_backstory,
             "get_visual_description": self.get_visual_description,
-            # "get_name": self.get_name,
 
             # Maybe experiment with re-writing character dialogues against the background
             "get_personality": self.get_personality,
@@ -79,11 +76,6 @@ class NPC(Character):
             # Useful for alignment checks
             "get_factions": self.get_factions,
             "check_faction": self.check_faction,
-
-            # Memory management
-            # "add_short_term_memory": self.add_short_term_memory,
-            # "store_short_term_memory": self.store_short_term_memory,
-            # "search_memory": self.search_memory,
 
             # Needed for game end
             "get_avatar": self.get_avatar,
@@ -101,7 +93,6 @@ class NPC(Character):
         self_tools = {
             "search_memory": self.search_memory,
             "attack_character": self.attack_character,
-            # "get_name": self.get_name,
             # "see_items": self.see_items,
             # "use_item": self.use_item, 
         }
@@ -122,12 +113,20 @@ class NPC(Character):
         return output
     
     def _parse_response(self, response: str)->str:
+        """
+        Parses the NPC Dialogue Agent response into a structured format.
+        """
         response = re.findall(rf"<(stage|{self.name})>(.*?)</(stage|{self.name})>", response)
         response = {index: {"type":tag,
             "text": text} for index, (tag, text, _) in enumerate(response)}
         return response
     
     def _prepare_memory_and_response(self, event:str, response: dict)->str:
+        """
+        Parses the structured response from the NPC Dialogue Agent into a memory and response string.
+        The memory is eventually stored in short-term memory
+        The response string is forwarded on to the next stage.
+        """
         formatted_response = ""
         for index in response.keys():
             tag_text = response[index]
@@ -137,6 +136,43 @@ class NPC(Character):
                 formatted_response += f"<{self.name}>: {tag_text['text']}</{self.name}>\n"
         memory = f"""{event}\n{formatted_response}"""
         return memory, formatted_response
+    
+    def _get_agent_reaction(
+            self,
+            event: str,
+            additional_tools: dict = {},
+    )->str:
+        """
+        Activates the NPC Dialogue Agent to get a reaction to an event.
+        """
+        self.agent.update_tools(self.get_npc_agent_tools(additional_tools))
+        response = self.agent.get_reaction(
+            event=event,
+            background=self.background,
+            name=self.name,
+        )
+        return response
+
+    def _parse_actions(
+            self,
+    )->List[str]:
+        """
+        Parses any actions that were activated during the NPC Dialogue Agent's reaction.
+        """
+        actions = self.action_tool_outputs
+        self.action_tool_outputs = [] # Reset the actions
+        return actions
+    
+    def _parse_event(
+            self,
+            event: str,
+            name: str
+    )->str:
+        """
+        Handles the event string in preparation for sending to the NPC Dialogue Agent.
+        """
+        event = event.replace("dialogue", name) # TODO: Event needs names instead of <dialogue>
+        return event
     
     def character_reaction(
             self,
@@ -148,21 +184,15 @@ class NPC(Character):
         <desc>Checks to see what the character's reaction is to a narrative event</desc>
 
         args:
-        str - event: The event that the character is reacting to
+        str - <event>: The event that the character is reacting to
 
         returns:
         str: The character's reaction to the event
         """
-        event = event.replace("dialogue", name) # TODO: Event needs names instead of <dialogue>
-        self.agent.update_tools(self.get_npc_agent_tools(additional_tools))
-        response = self.agent.get_reaction(
-            event=event,
-            background=self.background,
-            name=self.name,
-        )
+        event = self._parse_event(event, name)
+        response = self._get_agent_reaction(event, additional_tools)
         response = self._parse_response(response)
         memory, response = self._prepare_memory_and_response(event, response)
         self.add_short_term_memory(memory)
-        actions = self.action_tool_outputs
-        self.action_tool_outputs = [] # need to add action handling class
+        actions = self._parse_actions(memory)
         return response, actions

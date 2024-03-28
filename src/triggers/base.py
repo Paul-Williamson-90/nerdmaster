@@ -1,9 +1,25 @@
 from abc import ABC, abstractmethod
+from typing import Dict, Any, List
 
 class Trigger(ABC):
     
-    def __init__(
-            self,
-            trigger_id: str,
+    trigger_map: Dict[Any, "Trigger"]
+    attributes: Dict[str, Any]
+
+    def get_attributes(self):
+        return self.attributes
+
+    @abstractmethod
+    def prepare(
     ):
-        self.trigger_id = trigger_id
+        ...
+
+    @abstractmethod
+    def activate(
+    ):
+        ...
+
+class TriggerResponse:
+
+    triggers: Trigger|List[Trigger]|None = None
+    narrative_message: str|None = None
