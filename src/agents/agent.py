@@ -55,7 +55,10 @@ class NerdMasterAgent(ABC):
             if isinstance(v, dict):
                 tools = self._prepare_tools(v, tools)
             else:
-                tools += [create_tool(v)]
+                if isinstance(v, StructuredTool):
+                    tools += [v]
+                else:
+                    tools += [create_tool(v)]
         return tools
     
     def _get_history(self)->List[str|None]:
