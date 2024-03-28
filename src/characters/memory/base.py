@@ -13,8 +13,6 @@ from src.characters.memory.memory_agent import MemoryAgent
 from pathlib import Path
 import tempfile
 
-MODEL = "gpt-3.5-turbo"
-
 
 class Memory:
 
@@ -24,10 +22,11 @@ class Memory:
             long_term: MemoryAgent|Path|None = None,
             short_term: List[str] = [],
             model: StandardGPT = StandardGPT,
+            model_name: str = "gpt-3.5-turbo"
     )->None:
         self.background = background
         self.short_term = short_term
-        self.model = model(model=MODEL)
+        self.model = model(model=model_name)
         self.long_term = self._load_long_term(long_term)
 
     def _load_long_term(

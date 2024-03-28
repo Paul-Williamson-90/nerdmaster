@@ -29,7 +29,11 @@ class NPCAgent(NerdMasterAgent):
     )->None:
         super().__init__(system_message, prompt_id, openai_api_key, verbose, event_outcome_format, model)
 
-    def _prepare_system(self, background: Background, name: str)->str:
+    def _prepare_system(
+            self, 
+            background: Background, 
+            name: str
+    )->str:
         personality = background.get_personality()
         backstory = background.get_backstory()
         beliefs = background.get_views_beliefs()
@@ -41,14 +45,21 @@ class NPCAgent(NerdMasterAgent):
             name=name,
         )
     
-    def update_tools(self, tools: dict):
+    def update_tools(
+            self, 
+            tools: dict
+    ):
         self.tools = tools
 
-    def _setup_agent(self, background: Background, name: str):
+    def _setup_agent(
+            self, 
+            background: Background, 
+            name: str
+    ):
         tools = self._prepare_tools()
         prompt = hub.pull(self.prompt_id)
         prompt.messages[0].prompt.template = self._prepare_system(background, name)
-        prompt[2].prompt.template = "**Event**:\n{input}" # added
+        prompt[2].prompt.template = "**Event**:\n{input}"
         agent = create_openai_tools_agent(
             self.llm, 
             tools, 
@@ -62,9 +73,9 @@ class NPCAgent(NerdMasterAgent):
     
     def invoke(
             self, 
-            user_input:str,
-            background:Background, 
-            name:str,
+            user_input: str,
+            background: Background, 
+            name: str,
     ):
         self._setup_agent(background, name)
         history = self._get_history()
