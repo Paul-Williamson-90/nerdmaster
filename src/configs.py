@@ -1,5 +1,6 @@
 from enum import Enum
 
+# TODO: Put these into an Enum
 ITEM_DATA_PATH = "./data/items/items.json"
 TEMP_IMAGE_DATA_PATH = "./data/images/temp.png"
 TEMP_AUDIO_DATA_PATH = "./data/audio/temp.mp3"
