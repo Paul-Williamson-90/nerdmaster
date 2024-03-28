@@ -163,6 +163,7 @@ class NPCAction(Trigger):
     ):
         self.npc_action_object = npc_action_object
 
+
 class SearchMemory(NPCAction):
 
     trigger_map = {}
