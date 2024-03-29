@@ -8,3 +8,4 @@ dev.md
 scratchpad.ipynb
 
 **/__pycache__/*
+/src/object_creation/*
