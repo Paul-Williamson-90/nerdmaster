@@ -127,6 +127,7 @@ class PlayerLoader:
         triggers = self._load_triggers(player_data)
         player = Player(
             name=player_data["name"],
+            current_location=player_data["current_location"],
             gold=player_data["gold"],
             background=background,
             visual_description=player_data["visual_description"],

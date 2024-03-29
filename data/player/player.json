@@ -1,6 +1,7 @@
 {
     "Dummy Player": {
         "name": "Dummy Player",
+        "current_location": "The Room",
         "gold": 100,
         "background": {
             "backstory": "Wyatt Thompson was born in the small town of Dusty Creek, Texas, in 1850. He grew up on a ranch, learning the ways of the land from his father, who was a respected cattle rancher. From a young age, Wyatt showed an aptitude for handling horses and firearms, quickly earning him the nickname \"Ace.\"\n\nAt the age of 17, tragedy struck when Wyatt's family ranch was attacked by a gang of outlaws looking to seize their land. Wyatt's parents were killed in the attack, and he was left to fend for himself. Fuelled by vengeance, Wyatt embarked on a quest to track down the outlaws responsible for his family's demise.",
