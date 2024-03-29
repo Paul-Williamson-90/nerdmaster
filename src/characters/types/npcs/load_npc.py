@@ -1,6 +1,4 @@
-import json
 from src.game.configs import NPC_DATA_PATH
-
 from src.characters.health import Health
 from src.characters.skills.skill_tree import SkillTree
 from src.characters.backpack import Backpack
@@ -10,6 +8,8 @@ from src.characters.memory.base import Memory
 from src.characters.avatars.base import Avatar
 from src.triggers.trigger_loaders import TriggerLoader
 from src.characters.types.npcs.npc import NPC
+from src.voices.voice import Voice
+
 import json
 from pathlib import Path
 
@@ -50,6 +50,7 @@ class NPCLoader:
         character_data["equipped_items"] = Equipped(slot_items=character_data["equipped_items"])
         character_data["triggers"] = [self.trigger_loader.get_trigger(trigger_id=trigger) 
                                       for trigger in character_data["triggers"]]
+        character_data["voice"] = Voice(voice=character_data["voice"])
 
         npc = NPC(**character_data)
         return npc

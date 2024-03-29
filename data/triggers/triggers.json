@@ -1,9 +1,47 @@
 {
-    "ROOM_01_DIALOGUE": {
-        "trigger_type_id": "trigger_dialogue",
-        "npc_names": [],
-        "narrative_prompt": "",
-        "req_quest_ids": [],
-        "exl_quest_ids": []
+    "the_room_on_entry_description": {
+        "trigger_id": "the_room_on_entry",
+        "trigger_type_id": "OnEntryTrigger",
+        "ids_to_trigger": ["the_room_description"],
+        "narrative_prompt": null,
+        "random_chance": 1.0,
+        "req_active_quest_ids": [],
+        "req_quest_completed_ids": [],
+        "exl_quest_active_ids": [],
+        "exl_quest_completed_ids": [],
+        "req_trigger_ids": [],
+        "exl_trigger_ids": [],
+        "req_characters": []
+    },
+    "the_room_description": {
+        "trigger_id": "the_room_description",
+        "trigger_type_id": "DescribeLocationTrigger",
+        "ids_to_trigger": ["begin_dialogue_wyatt"],
+        "narrative_prompt": null,
+        "random_chance": 1.0,
+        "req_active_quest_ids": [],
+        "req_quest_completed_ids": [],
+        "exl_quest_active_ids": [],
+        "exl_quest_completed_ids": [],
+        "req_trigger_ids": [],
+        "exl_trigger_ids": [],
+        "req_characters": []
+    },
+    "begin_dialogue_wyatt": {
+        "trigger_id": "begin_dialogue_wyatt",
+        "event_type": "dialogue",
+        "trigger_type_id": "TriggerEventAllCharacter",
+        "ids_to_trigger": [],
+        "narrative_prompt": null,
+        "narrative_prompt_player": "Wyatt suddenly appears in front of you, wishing to talk.",
+        "narrative_prompt_npc": "You appear in a random room. There is a weird-looking person in front of you, gawking rudely. You feel a sudden urge to talk to them.",
+        "random_chance": 1.0,
+        "req_active_quest_ids": [],
+        "req_quest_completed_ids": [],
+        "exl_quest_active_ids": [],
+        "exl_quest_completed_ids": [],
+        "req_trigger_ids": [],
+        "exl_trigger_ids": [],
+        "req_characters": ["Wyatt \"Ace\" Thompson"]
     }
 }

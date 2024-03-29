@@ -9,6 +9,7 @@ from src.characters.avatars.base import Avatar
 from src.triggers.base import Trigger
 from src.agents.npc_agent import NPCAgent
 from src.characters.types.npcs.npc_actions import NPCReActionMap
+from src.voices.voice import Voice
 
 from typing import List, Dict
 import numpy as np
@@ -29,7 +30,7 @@ class NPC(Character):
             backpack: Backpack|List[str] = [], 
             equipped_items: Equipped|Dict[str, str] = DEFAULT_SLOT_ITEMS, 
             with_player: bool = False,
-            voice: str = "alloy", # TODO: Change this for Voice module
+            voice: Voice = Voice, 
             triggers: List[Trigger] = [],
             agent: NPCAgent = NPCAgent,
             reactions: NPCReActionMap = NPCReActionMap,
@@ -111,4 +112,10 @@ class NPC(Character):
         event = self._parse_event(event, name)
         response = self.reactions.get_reaction(event, mode, additional_tools, chat_history)
         return response
+    
+    def add_to_narration_queue(
+            self,
+            text: str,
+    ):
+        raise NotImplementedError("add_to_narration_queue method not implemented")
     

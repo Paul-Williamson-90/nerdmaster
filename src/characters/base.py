@@ -11,6 +11,7 @@ from src.characters.prompts import VISUAL_DESCRIPTION
 from src.characters.memory.base import Memory
 from src.characters.avatars.base import Avatar
 from src.triggers.base import Trigger
+from src.voices.voice import Voice
 
 class Character(ABC):
 
@@ -27,11 +28,11 @@ class Character(ABC):
             backpack: Backpack|List[str] = [], 
             equipped_items: Equipped|Dict[str, str] = DEFAULT_SLOT_ITEMS, 
             with_player: bool = False,
-            voice: str = "alloy",
+            voice: Voice = Voice,
             triggers: List[Trigger] = [],
     )->None:
         self.name = name
-        self.voice = voice
+        self.voice: Voice = voice
         self.visual_description = visual_description
         self.backpack = self._handle_backpack(backpack)
         self.equipped_items = self._handle_equipped_items(equipped_items)

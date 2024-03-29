@@ -8,6 +8,7 @@ from src.characters.backpack import Backpack
 from src.characters.equipped import Equipped
 from src.triggers.trigger_loaders import TriggerLoader
 from src.quests.base import QuestLoader
+from src.voices.voice import Voice
 from src.game.configs import PLAYER_DATA_PATH
 
 from pathlib import Path
@@ -121,6 +122,14 @@ class PlayerLoader:
             player_data: dict
     ):
         return self.quest_loader.load_quest_log(player_data["quest_log"])
+    
+    def _load_voice(
+            self,
+            player_data: dict
+    ):
+        return Voice(
+            voice=player_data["voice"]
+        )
 
     def get_player(
             self, 
@@ -136,6 +145,7 @@ class PlayerLoader:
         backpack = self._load_backpack(player_data)
         equipped_items = self._load_equipped_items(player_data)
         triggers = self._load_triggers(player_data)
+        voice = self._load_voice(player_data)
         player = Player(
             name=player_data["name"],
             current_location=player_data["current_location"],
@@ -152,5 +162,6 @@ class PlayerLoader:
             voice=player_data["voice"],
             triggers=triggers,
             quest_log=quest_load,
+            voice=voice
         )
         return player

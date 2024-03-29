@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any
+from src.game.game import Game
 
 class TriggerResponse:
 
@@ -8,10 +9,12 @@ class TriggerResponse:
             triggers: List[str]|None = None,
             narrative_message: str|None = None,
             attributes: Dict[str, Any]|None = None,
+            log_message: str|None = None,
     ):
         self.triggers = triggers
         self.narrative_message = narrative_message
         self.attributes = attributes
+        self.log_message = log_message
 
 class Trigger(ABC):
     
@@ -28,6 +31,8 @@ class Trigger(ABC):
 
     @abstractmethod
     def activate(
+        self,
+        game: Game
     )->TriggerResponse:
         ...
 

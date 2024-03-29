@@ -8,6 +8,7 @@ from src.characters.memory.base import Memory
 from src.characters.avatars.base import Avatar
 from src.triggers.base import Trigger
 from src.quests.base import QuestLog
+from src.voices.voice import Voice
 
 from typing import List, Dict
 import numpy as np
@@ -29,7 +30,7 @@ class Player(Character):
             backpack: Backpack|List[str] = [], 
             equipped_items: Equipped|Dict[str, str] = DEFAULT_SLOT_ITEMS, 
             with_player: bool = False,
-            voice: str = "alloy",
+            voice: Voice = Voice,
             triggers: List[Trigger] = [],
             quest_log: QuestLog = QuestLog([], [], []),
     )->None:

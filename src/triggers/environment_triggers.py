@@ -1,6 +1,7 @@
 from src.triggers.base import Trigger, TriggerResponse
 from src.quests.base import QuestLog
 from src.environments.base import Environment
+from src.game.game import Game
 from abc import ABC, abstractmethod
 
 from typing import List, Dict, Any
@@ -65,6 +66,7 @@ class EnvironmentTrigger(Trigger, ABC):
 
     def activate(
             self,
+            game: Game
     ):
         """
         Game logic for activating the trigger
@@ -75,6 +77,7 @@ class EnvironmentTrigger(Trigger, ABC):
             narrative_message=self.narrative_prompt,
             triggers=self.ids_to_trigger,
             attributes=self.attributes,
+            log_message=f"Trigger {self.trigger_id} activated."
         )
 
     def val_turns_in_location(
@@ -212,6 +215,16 @@ class DescribeLocationTrigger(EnvironmentTrigger):
         self.attributes["location_description"] = environment.get_visual_description()
         environment.arm_trigger(self)
 
+    def activate(
+            self,
+            game: Game
+    ):
+        game.add_to_narrator(text=self.narrative_prompt, ai_generate=True)
+        return TriggerResponse(
+            triggers=self.ids_to_trigger,
+            log_message=f"Trigger {self.trigger_id} activated."
+        )
+
 class TurnsInLocationTrigger(EnvironmentTrigger):
     """
     Trigger another trigger after a certain number of turns in the location
@@ -310,6 +323,40 @@ class TriggerEventAnyCharacter(EnvironmentTrigger):
     """
     Trigger's another trigger when one of the characters specified are present.
     """
+    def __init__(
+            self,
+            trigger_id: str,
+            event_type: str,
+            ids_to_trigger: List[str],
+            narrative_prompt: str|None = None,
+            narrative_prompt_player: str|None = None,
+            narrative_prompt_npc: str|Dict[str,str]|None = None,
+            random_chance: float = 1.0,
+            req_active_quest_ids: List[str] = [], # Quests that need to be active for trigger
+            req_quest_completed_ids: List[str] = [], # Quests that need to be completed for trigger
+            exl_quest_active_ids: List[str] = [], # Quests that can't be active for trigger
+            exl_quest_completed_ids: List[str] = [], # Quests that can't be completed for trigger
+            req_trigger_ids: List[str] = [], # Triggers that need to have been active for trigger
+            exl_trigger_ids: List[str] = [], # Triggers that can't have been active for trigger
+            req_characters: List[str] = [], # Characters that need to be present in the location
+    ):
+        super().__init__(
+            trigger_id=trigger_id,
+            ids_to_trigger=ids_to_trigger,
+            narrative_prompt=narrative_prompt,
+            random_chance=random_chance,
+            req_active_quest_ids=req_active_quest_ids,
+            req_quest_completed_ids=req_quest_completed_ids,
+            exl_quest_active_ids=exl_quest_active_ids,
+            exl_quest_completed_ids=exl_quest_completed_ids,
+            req_trigger_ids=req_trigger_ids,
+            exl_trigger_ids=exl_trigger_ids,
+            req_characters=req_characters,
+        )
+        self.narrative_prompt_player = narrative_prompt_player
+        self.narrative_prompt_npc = narrative_prompt_npc
+        self.event_type = event_type
+        
 
     def validate(
             self,
@@ -325,12 +372,68 @@ class TriggerEventAnyCharacter(EnvironmentTrigger):
         if not self.val_random_chance_trigger():
             return 
         self.attributes["characters"] = self.get_characters_present_names(environment)
+        self.attributes["narrative_prompt_player"] = self.narrative_prompt_player
+        self.attributes["narrative_prompt_npc"] = self.narrative_prompt_npc
         environment.arm_trigger(self)
+
+    def activate(
+            self,
+            game: Game
+    ):
+        game.add_to_narrator(
+            text=self.narrative_prompt_player, 
+            ai_generate=True
+        )
+        game.add_to_characters(
+            characters=self.attributes["characters"],
+        )
+        game.add_to_npc_narrator(
+            text=self.narrative_prompt_npc, 
+            characters=self.attributes["characters"],
+            ai_generate=True
+        )
+        game.switch_game_mode(self.event_type)
+
+        return TriggerResponse(log_message=f"Trigger {self.trigger_id} activated.")
     
 class TriggerEventAllCharacter(EnvironmentTrigger):
     """
     Trigger's another trigger when all of the characters specified are present.
     """
+
+    def __init__(
+            self,
+            trigger_id: str,
+            event_type: str,
+            ids_to_trigger: List[str],
+            narrative_prompt: str|None = None,
+            narrative_prompt_player: str|None = None,
+            narrative_prompt_npc: str|Dict[str, str]|None = None,
+            random_chance: float = 1.0,
+            req_active_quest_ids: List[str] = [], # Quests that need to be active for trigger
+            req_quest_completed_ids: List[str] = [], # Quests that need to be completed for trigger
+            exl_quest_active_ids: List[str] = [], # Quests that can't be active for trigger
+            exl_quest_completed_ids: List[str] = [], # Quests that can't be completed for trigger
+            req_trigger_ids: List[str] = [], # Triggers that need to have been active for trigger
+            exl_trigger_ids: List[str] = [], # Triggers that can't have been active for trigger
+            req_characters: List[str] = [], # Characters that need to be present in the location
+    ):
+        super().__init__(
+            trigger_id=trigger_id,
+            ids_to_trigger=ids_to_trigger,
+            narrative_prompt=narrative_prompt,
+            random_chance=random_chance,
+            req_active_quest_ids=req_active_quest_ids,
+            req_quest_completed_ids=req_quest_completed_ids,
+            exl_quest_active_ids=exl_quest_active_ids,
+            exl_quest_completed_ids=exl_quest_completed_ids,
+            req_trigger_ids=req_trigger_ids,
+            exl_trigger_ids=exl_trigger_ids,
+            req_characters=req_characters,
+        )
+        self.narrative_prompt_player = narrative_prompt_player
+        self.narrative_prompt_npc = narrative_prompt_npc
+        self.event_type = event_type
 
     def validate(
             self,
@@ -346,4 +449,26 @@ class TriggerEventAllCharacter(EnvironmentTrigger):
         if not self.val_random_chance_trigger():
             return 
         self.attributes["characters"] = self.get_characters_present_names(environment)
+        self.attributes["narrative_prompt_player"] = self.narrative_prompt_player
+        self.attributes["narrative_prompt_npc"] = self.narrative_prompt_npc
         environment.arm_trigger(self)
+
+    def activate(
+            self,
+            game: Game
+    ):
+        game.add_to_narrator(
+            text=self.narrative_prompt_player, 
+            ai_generate=True
+        )
+        game.add_to_characters(
+            characters=self.attributes["characters"],
+        )
+        game.add_to_npc_narrator(
+            text=self.narrative_prompt_npc, 
+            characters=self.attributes["characters"],
+            ai_generate=True
+        )
+        game.switch_game_mode(self.event_type)
+
+        return TriggerResponse(log_message=f"Trigger {self.trigger_id} activated.")

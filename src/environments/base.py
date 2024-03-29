@@ -35,11 +35,27 @@ class Environment:
         self.turns_in_location = turns_in_location
         self.armed_triggers: List[Trigger] = []
 
+    def add_turn(self):
+        self.turns_in_location += 1
+
     def get_character_position_descriptions(self):
         return [character.get_position_description() for character in self.character_locations]
+    
+    def get_object_position_descriptions(self):
+        return [object.get_position_description() for object in self.object_locations]
+    
+    def get_exploration_description(self):
+        visual_description = self.get_visual_description()
+        characters = self.get_character_position_descriptions()
+        objects = self.get_object_position_descriptions()
+        return {
+            "visual_description": visual_description,
+            "character_descriptions": characters,
+            "object_descriptions": objects,
+        }
 
     def get_visual_description(self):
-        pass
+        return self.visual_description
 
     def get_description(self):
         return self.description
@@ -50,7 +66,7 @@ class Environment:
     ):
         self.armed_triggers.append(trigger)
     
-    def get_active_triggers(
+    def fetch_active_triggers(
             self,
             quest_log: QuestLog,
     )->List[Trigger]:
@@ -59,6 +75,7 @@ class Environment:
                 quest_log=quest_log,
                 environment=self,
             )
+        return self.armed_triggers
 
     # def add_characters(self, characters: List[CharacterPosition], trigger: Trigger|None=None):
     #     self.character_locations.extend(characters)

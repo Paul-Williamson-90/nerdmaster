@@ -9,12 +9,13 @@
         "character_locations": [
             {   
                 "position_type_id": "character_position",
-                "characters": [],
+                "characters": ["Wyatt \"Ace\" Thompson"],
                 "position_description": "A table.",
                 "activity_description": "You see a person sat at a table.",
                 "reveal_description": "",
                 "hidden": false,
-                "triggers": []
+                "triggers": [
+                    ]
             }
         ],
         "object_locations": [
@@ -31,7 +32,7 @@
             }
         ],
         "triggers": [
-            "ROOM_01_DIALOGUE"
+            "the_room_on_entry"
         ]
     }
 }
