@@ -1,6 +1,3 @@
-from pathlib import Path
-import json
-
 from src.configs import GAME_DATA_PATH, GameDataPaths
 from src.environments.environment_loaders import (
     EnvironmentLoader, 
@@ -14,6 +11,9 @@ from src.characters.types.npcs.load_npc import NPCLoader
 from src.characters.types.player.load_player import PlayerLoader
 from src.triggers.trigger_loaders import TriggerLoader
 from src.characters.types.player.player import Player
+
+from pathlib import Path
+import json
 
 class Game:
 
@@ -37,7 +37,9 @@ class Game:
         self.player: Player = player
         self.environment: Environment = environment
 
-
+    def save_game(self):
+        # TODO: Implement save game
+        pass
 
 
 

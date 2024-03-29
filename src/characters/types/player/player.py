@@ -7,6 +7,7 @@ from src.characters.background import Background
 from src.characters.memory.base import Memory
 from src.characters.avatars.base import Avatar
 from src.triggers.base import Trigger
+from src.quests.base import QuestLog
 
 from typing import List, Dict
 import numpy as np
@@ -30,6 +31,7 @@ class Player(Character):
             with_player: bool = False,
             voice: str = "alloy",
             triggers: List[Trigger] = [],
+            quest_log: QuestLog = QuestLog([], [], []),
     )->None:
         super().__init__(
             name=name,
@@ -47,6 +49,7 @@ class Player(Character):
             triggers=triggers,
         )
         self.current_location = current_location
+        self.quest_log = quest_log
     
     def get_agent_tools(self):
         tools = {

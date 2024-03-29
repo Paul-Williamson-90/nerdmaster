@@ -51,6 +51,11 @@
         },
         "with_player": false,
         "voice": "alloy",
-        "triggers": []
+        "triggers": [],
+        "quest_log": {
+            "active_quest_ids": [],
+            "completed_quest_ids": [],
+            "completed_trigger_ids": []
+        }
     }
 }

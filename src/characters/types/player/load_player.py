@@ -7,9 +7,11 @@ from src.characters.skills.skill_tree import SkillTree
 from src.characters.backpack import Backpack
 from src.characters.equipped import Equipped
 from src.triggers.trigger_loaders import TriggerLoader
+from src.quests.base import QuestLoader
+from src.configs import PLAYER_DATA_PATH
+
 from pathlib import Path
 import json
-from src.configs import PLAYER_DATA_PATH
 
 
 class PlayerLoader:
@@ -18,9 +20,11 @@ class PlayerLoader:
             self,
             player_data_path: Path = Path(PLAYER_DATA_PATH),
             trigger_loader: TriggerLoader=TriggerLoader,
+            quest_loader: QuestLoader=QuestLoader,
     ):
         self.player_data = self._load_player_data(player_data_path)
         self.trigger_loader = trigger_loader()
+        self.quest_loader = quest_loader()
 
     def _load_player_data(
             self,
@@ -111,6 +115,12 @@ class PlayerLoader:
     ):
         return [self.trigger_loader.get_trigger(trigger_id=trigger) 
                 for trigger in player_data["triggers"]]
+    
+    def _load_quests(
+            self,
+            player_data: dict
+    ):
+        return self.quest_loader.load_quest_log(player_data["quest_log"])
 
     def get_player(
             self, 
@@ -119,6 +129,7 @@ class PlayerLoader:
         player_data = self._get_player_data(player_id)
         background = self._get_background(player_data)
         memory = self._get_memory(player_data, background)
+        quest_load = self._load_quests(player_data)
         avatar = self._load_avatar(player_data)
         health = self._load_health(player_data)
         skills = self._load_skills(player_data)
@@ -139,6 +150,7 @@ class PlayerLoader:
             equipped_items=equipped_items,
             with_player=player_data["with_player"],
             voice=player_data["voice"],
-            triggers=triggers
+            triggers=triggers,
+            quest_log=quest_load,
         )
         return player
