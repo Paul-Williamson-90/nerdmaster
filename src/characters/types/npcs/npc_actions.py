@@ -2,7 +2,7 @@ from src.triggers.base import Trigger
 from src.characters.base import Character
 from src.characters.types.prompts import NPC_PERCEPTION_SYSTEM_PROMPT, PERCEPTION_FORMAT
 from src.triggers.npc_triggers import PrepareAttack, SearchMemory, Speak, Attack
-from src.gpt import StandardGPT
+from src.endpoints.gpt import StandardGPT
 
 from typing import Dict, List
 from src.utils.tools import create_npc_action_tool

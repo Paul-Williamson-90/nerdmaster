@@ -1,7 +1,7 @@
 from enum import Enum
 import random
 from typing import List
-from src.gpt import StandardGPT
+from src.endpoints.gpt import StandardGPT
 
 from src.characters.prompts import (
     HEALTH_UPDATE, 

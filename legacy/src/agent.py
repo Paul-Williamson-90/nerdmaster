@@ -1,5 +1,5 @@
 from src.game import NerdMaster
-from src.gpt import StandardGPT
+from src.endpoints.gpt import StandardGPT
 from src.narrator import Narrator
 
 from langchain.agents import AgentExecutor, create_openai_tools_agent

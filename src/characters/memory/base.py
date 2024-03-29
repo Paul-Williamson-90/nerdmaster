@@ -7,7 +7,7 @@ from src.characters.memory.prompts import (
     SEARCH_MEMORY,
     SEARCH_MEMORY_SYSTEM,
 )
-from src.gpt import StandardGPT
+from src.endpoints.gpt import StandardGPT
 from src.characters.memory.memory_agent import MemoryAgent
 
 from pathlib import Path

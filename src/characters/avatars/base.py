@@ -2,7 +2,7 @@ import numpy as np
 from pathlib import Path
 
 from src.characters.avatars.prompts import AVATAR_PROMPT
-from src.image_generation import Dalle
+from src.endpoints.image_generation import Dalle
 
 class Avatar:
 
