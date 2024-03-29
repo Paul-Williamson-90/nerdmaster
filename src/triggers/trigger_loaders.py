@@ -10,7 +10,7 @@ from src.triggers.environment_triggers import (
     TriggerEventAnyCharacter,
     TriggerEventAllCharacter
 )
-from src.configs import TRIGGERS_DATA_PATH
+from src.game.configs import TRIGGERS_DATA_PATH
 
 
 class TriggerTypeMap(Enum):

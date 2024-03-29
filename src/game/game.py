@@ -1,4 +1,4 @@
-from src.configs import GameDataPaths
+from src.game.configs import GameDataPaths
 from src.environments.environment_loaders import (
     EnvironmentLoader, 
 )

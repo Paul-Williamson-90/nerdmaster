@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import os
 import pygame
 from typing import List
-from src.configs import TEMP_AUDIO_DATA_PATH
+from src.game.configs import TEMP_AUDIO_DATA_PATH
 
 load_dotenv()
 

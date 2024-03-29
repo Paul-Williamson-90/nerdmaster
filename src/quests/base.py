@@ -1,5 +1,5 @@
 import json
-from src.configs import QUEST_DATA_PATH
+from src.game.configs import QUEST_DATA_PATH
 from typing import List, Dict
 from pathlib import Path
 

@@ -4,7 +4,7 @@ from src.items.item_loader import ItemLoader
 from src.environments.environment_map import EnvironmentMap, MapLocation
 from src.environments.local_locations import LocalLocation
 from src.environments.base import Environment
-from src.configs import MAP_DATA_PATH, LOCAL_LOCATIONS_PATH, ENVIRONMENT_DATA_PATH
+from src.game.configs import MAP_DATA_PATH, LOCAL_LOCATIONS_PATH, ENVIRONMENT_DATA_PATH
 
 from enum import Enum
 from pathlib import Path

@@ -1,4 +1,4 @@
-from src.configs import ITEM_DATA_PATH
+from src.game.configs import ITEM_DATA_PATH
 from src.items.base import Item
 from pathlib import Path
 import json

@@ -3,7 +3,7 @@ from src.triggers.base import Trigger, TriggerResponse, Dialogue
 from src.characters.base import Character
 from src.characters.types.npcs.npc_actions import NPCReActionMap
 from src.utils.rolls import normal_roll
-from src.configs import DifficultyConfigs
+from src.game.configs import DifficultyConfigs
 
 
 

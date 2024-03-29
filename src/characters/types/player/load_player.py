@@ -8,7 +8,7 @@ from src.characters.backpack import Backpack
 from src.characters.equipped import Equipped
 from src.triggers.trigger_loaders import TriggerLoader
 from src.quests.base import QuestLoader
-from src.configs import PLAYER_DATA_PATH
+from src.game.configs import PLAYER_DATA_PATH
 
 from pathlib import Path
 import json

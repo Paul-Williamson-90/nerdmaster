@@ -5,7 +5,7 @@ from PIL import Image
 import numpy as np
 import os 
 from typing import List
-from src.configs import TEMP_IMAGE_DATA_PATH
+from src.game.configs import TEMP_IMAGE_DATA_PATH
 from dotenv import load_dotenv
 
 load_dotenv()

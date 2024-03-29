@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 from src.items.base import Item
-from src.configs import ITEM_DATA_PATH
+from src.game.configs import ITEM_DATA_PATH
 
 class ItemLoader:
 

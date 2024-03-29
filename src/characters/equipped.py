@@ -4,7 +4,7 @@ from pathlib import Path
 import json
 
 from src.items.base import Item
-from src.configs import ITEM_DATA_PATH
+from src.game.configs import ITEM_DATA_PATH
 from src.characters.skills.skill_tree import SkillTree
 
 class EquipSlotName(Enum):

@@ -1,5 +1,5 @@
 import json
-from src.configs import NPC_DATA_PATH
+from src.game.configs import NPC_DATA_PATH
 
 from src.characters.health import Health
 from src.characters.skills.skill_tree import SkillTree

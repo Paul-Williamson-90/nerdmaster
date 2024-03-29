@@ -1,5 +1,5 @@
 from src.game.game import Game
-from src.configs import GAME_DATA_PATH, GameDataPaths
+from src.game.configs import GAME_DATA_PATH, GameDataPaths
 from src.environments.environment_loaders import (
     EnvironmentLoader, 
     EnvironmentMapLoader, 
