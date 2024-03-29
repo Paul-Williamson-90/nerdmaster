@@ -382,6 +382,7 @@ class TriggerEventAnyCharacter(EnvironmentTrigger):
     ):
         game.add_to_narrator(
             text=self.narrative_prompt_player, 
+            text_tag="stage", # TODO: Replace with Enum
             ai_generate=True
         )
         game.add_to_characters(
@@ -389,6 +390,7 @@ class TriggerEventAnyCharacter(EnvironmentTrigger):
         )
         game.add_to_npc_narrator(
             text=self.narrative_prompt_npc, 
+            text_tag="stage", # TODO: Replace with Enum
             characters=self.attributes["characters"],
             ai_generate=True
         )
@@ -459,6 +461,7 @@ class TriggerEventAllCharacter(EnvironmentTrigger):
     ):
         game.add_to_narrator(
             text=self.narrative_prompt_player, 
+            text_tag="stage", # TODO: Replace with Enum
             ai_generate=True
         )
         game.add_to_characters(
@@ -466,6 +469,7 @@ class TriggerEventAllCharacter(EnvironmentTrigger):
         )
         game.add_to_npc_narrator(
             text=self.narrative_prompt_npc, 
+            text_tag="stage", # TODO: Replace with Enum
             characters=self.attributes["characters"],
             ai_generate=True
         )

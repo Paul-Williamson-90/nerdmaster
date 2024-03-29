@@ -117,14 +117,37 @@ class Game:
     def add_to_npc_narrator(
             self,
             text: str|Dict[str, str],
+            text_tag: str, # stage or character name
+            characters: List[str],
+            ai_generate: bool = False,
     ):
+        # TODO: Tidy this up!
         if isinstance(text, str):
+            if ai_generate:
+                if text_tag == "stage":
+                    system_message = PLAYER_NARRATION_SYSTEM_MESSAGE
+                    response = self.model.generate(prompt=text, system_message=system_message)
+                else:
+                    response = text
+            else:
+                response = text
+            text = f"<{text_tag}>{response}</{text_tag}>"
             for character in self.characters:
                 character.add_to_narration_queue(text)
+
         else:
-            for character, text in text.items():
+            for character, text in characters.items():
                 character = [character for character in self.characters if character.name == character][0]
-                character.add_to_narration_queue(text)
+                if ai_generate:
+                    if text_tag == "stage":
+                        system_message = PLAYER_NARRATION_SYSTEM_MESSAGE
+                        response = self.model.generate(prompt=text, system_message=system_message)
+                    else:
+                        response = text
+                else:
+                    response = text
+                response = f"<{text_tag}>{response}</{text_tag}>"
+                character.add_to_narration_queue(response)
 
     def switch_game_mode(
             self,
