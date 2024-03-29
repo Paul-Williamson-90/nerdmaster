@@ -2,13 +2,31 @@ from pathlib import Path
 import json
 from enum import Enum
 
-from src.triggers.base import Trigger, Dialogue
-from src.triggers.environment_triggers import TriggerDialogue
+from src.triggers.base import Trigger
+from src.triggers.environment_triggers import (
+    OnEntryTrigger,
+    TurnsInLocationTrigger,
+    OnExitTrigger,
+    TriggerEventAnyCharacter,
+    TriggerEventAllCharacter
+)
 from src.configs import TRIGGERS_DATA_PATH
 
+
 class TriggerTypeMap(Enum):
-    dialogue = Dialogue
-    trigger_dialogue = TriggerDialogue
+
+    # Environment Triggers
+    on_entry = OnEntryTrigger
+    trigger_event_any_character = TriggerEventAnyCharacter
+    trigger_event_all_character = TriggerEventAllCharacter
+    turns_in_location = TurnsInLocationTrigger
+    on_exit = OnExitTrigger
+
+    # Interaction Triggers
+
+
+    # dialogue = Dialogue
+    # trigger_dialogue = TriggerDialogue
 
 class TriggerLoader:
     def __init__(

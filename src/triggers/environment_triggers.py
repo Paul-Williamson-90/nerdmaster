@@ -63,6 +63,20 @@ class EnvironmentTrigger(Trigger, ABC):
     ):
         ...
 
+    def activate(
+            self,
+    ):
+        """
+        Game logic for activating the trigger
+        Triggers a dialogue from the NPC.
+        Triggers are resolved by the Game class, post NPC agent output.
+        """
+        return TriggerResponse(
+            narrative_message=self.narrative_prompt,
+            triggers=self.ids_to_trigger,
+            attributes=self.attributes,
+        )
+
     def val_turns_in_location(
             self,
             environment: Environment,
@@ -180,6 +194,77 @@ class EnvironmentTrigger(Trigger, ABC):
         return [character.name for character in environment.character_locations
                 if character.name in self.req_characters]
 
+class TurnsInLocationTrigger(EnvironmentTrigger):
+
+    def __init__(
+            self,
+            trigger_id: str,
+            ids_to_trigger: List[str],
+            narrative_prompt: str|None = None,
+            random_chance: float = 1.0,
+            req_active_quest_ids: List[str] = [], # Quests that need to be active for trigger
+            req_quest_completed_ids: List[str] = [], # Quests that need to be completed for trigger
+            exl_quest_active_ids: List[str] = [], # Quests that can't be active for trigger
+            exl_quest_completed_ids: List[str] = [], # Quests that can't be completed for trigger
+            req_trigger_ids: List[str] = [], # Triggers that need to have been active for trigger
+            exl_trigger_ids: List[str] = [], # Triggers that can't have been active for trigger
+            req_characters: List[str] = [], # Characters that need to be present in the location
+            turns_in_location: int = 0,
+            sign: str = "==",
+    ):
+        super().__init__(
+            trigger_id=trigger_id,
+            ids_to_trigger=ids_to_trigger,
+            narrative_prompt=narrative_prompt,
+            random_chance=random_chance,
+            req_active_quest_ids=req_active_quest_ids,
+            req_quest_completed_ids=req_quest_completed_ids,
+            exl_quest_active_ids=exl_quest_active_ids,
+            exl_quest_completed_ids=exl_quest_completed_ids,
+            req_trigger_ids=req_trigger_ids,
+            exl_trigger_ids=exl_trigger_ids,
+            req_characters=req_characters,
+        )
+        self.turns_in_location = turns_in_location
+        self.sign = sign
+
+    def validate(
+            self,
+            environment: Environment,
+            active_quest_ids: List[str]=[], # Quests that need to be completed before this can be triggered
+            completed_quest_ids: List[str]=[], # Quests that can't be active/already triggered for this to trigger
+            completed_trigger_ids: List[str]=[], # Triggers that can't be active/already triggered for this to trigger
+    ):
+        if not self.val_quest_log_requirements(active_quest_ids, completed_quest_ids, completed_trigger_ids):
+            return
+        if not self.val_turns_in_location(environment, self.turns_in_location, self.sign):
+            return
+        if not self.val_random_chance_trigger():
+            return 
+        environment.arm_trigger(self)
+        
+    
+class OnExitTrigger(EnvironmentTrigger):
+    """
+    DO NOT ATTACH ON ENVIRONMENT MAIN TRIGGERS LIST
+    TODO: Attach triggers to local/connecting locations functionality
+    """
+
+    def validate(
+            self,
+            environment: Environment,
+            active_quest_ids: List[str]=[], # Quests that need to be completed before this can be triggered
+            completed_quest_ids: List[str]=[], # Quests that can't be active/already triggered for this to trigger
+            completed_trigger_ids: List[str]=[], # Triggers that can't be active/already triggered for this to trigger
+    ):
+        if not self.val_quest_log_requirements(active_quest_ids, completed_quest_ids, completed_trigger_ids):
+            return
+        if not self.val_turns_in_location(environment, 0, "=="):
+            return
+        if not self.val_random_chance_trigger():
+            return 
+        environment.arm_trigger(self)
+
 
 class OnEntryTrigger(EnvironmentTrigger):        
 
@@ -199,20 +284,7 @@ class OnEntryTrigger(EnvironmentTrigger):
         environment.arm_trigger(self)
         
 
-    def activate(
-            self,
-    ):
-        """
-        Game logic for activating the trigger
-        Triggers a narrative message when the player enters the location.
-        """
-        return TriggerResponse(
-            triggers=self.ids_to_trigger,
-            narrative_message=self.narrative_prompt,
-        )
-    
-
-class TriggerDialogueAnyCharacter(EnvironmentTrigger):
+class TriggerEventAnyCharacter(EnvironmentTrigger):
     """
     Trigger's an NPC to begin dialogue with the player.
     """
@@ -228,24 +300,12 @@ class TriggerDialogueAnyCharacter(EnvironmentTrigger):
             return
         if not self.val_quest_log_requirements(req_quest_ids, exl_quest_ids, completed_trigger_ids):
             return
+        if not self.val_random_chance_trigger():
+            return 
         self.attributes["characters"] = self.get_characters_present_names(environment)
         environment.arm_trigger(self)
-
-    def activate(
-            self,
-    ):
-        """
-        Game logic for activating the trigger
-        Triggers a dialogue from the NPC.
-        Triggers are resolved by the Game class, post NPC agent output.
-        """
-        return TriggerResponse(
-            narrative_message=self.narrative_prompt,
-            triggers=self.ids_to_trigger,
-            attributes=self.attributes,
-        )
     
-class TriggerDialogueAllCharacter(EnvironmentTrigger):
+class TriggerEventAllCharacter(EnvironmentTrigger):
     """
     Trigger's an NPC to begin dialogue with the player.
     """
@@ -261,19 +321,7 @@ class TriggerDialogueAllCharacter(EnvironmentTrigger):
             return
         if not self.val_quest_log_requirements(req_quest_ids, exl_quest_ids, completed_trigger_ids):
             return
+        if not self.val_random_chance_trigger():
+            return 
         self.attributes["characters"] = self.get_characters_present_names(environment)
         environment.arm_trigger(self)
-
-    def activate(
-            self,
-    ):
-        """
-        Game logic for activating the trigger
-        Triggers a dialogue from the NPC.
-        Triggers are resolved by the Game class, post NPC agent output.
-        """
-        return TriggerResponse(
-            narrative_message=self.narrative_prompt,
-            triggers=self.ids_to_trigger,
-            attributes=self.attributes,
-        )
