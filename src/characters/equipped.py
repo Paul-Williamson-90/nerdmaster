@@ -113,3 +113,27 @@ class Equipped:
     )->int:
         item = self.equipped[slot]
         return item.get_modifier() if item else 0
+    
+    def get_weapon_attack_stats(
+            self,
+    ):
+        main_hand = self.equipped[EquipSlotName.MAIN_HAND.value]
+        off_hand = self.equipped[EquipSlotName.OFF_HAND.value]
+        
+        # Unarmed combat
+        if not main_hand:
+            skill_type = "BRAWL"
+            weapon_name = "Fists"
+            weapon_modifier = 0
+            return skill_type, weapon_name, weapon_modifier
+        
+        # Main hand only
+        skill_type = main_hand.skill
+        weapon_name = main_hand.name
+        weapon_modifier = main_hand.get_modifier()
+
+        if off_hand:
+            weapon_name += f" and {off_hand.name}"
+            weapon_modifier += (off_hand.get_modifier()//2)
+        
+        return skill_type, weapon_name, weapon_modifier

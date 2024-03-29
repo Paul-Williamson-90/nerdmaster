@@ -262,18 +262,18 @@ class Attack(NPCAction):
         Game logic for activating the trigger
         Character and target_character are entered by Game using retrieved attributes and matching.
         """
-        skill = attacking.equipped_items.get_weapon_skill_type() # TODO: Implement this on equipped items
-        weapon_name = attacking.equipped_items.get_weapon_name() # TODO: Implement this on equipped items
-        weapon_modifier = attacking.skills.get_modifier(skill)
-        attack = weapon_modifier + attacking.equipped_items.get_attack_bonus() # TODO: Implement this on equipped items
+        skill, weapon_name, weapon_modifier = attacking.equipped_items.get_weapon_attack_stats()
+        attack_disadvantage = attacking.health.get_roll_modifier()
+        attack = attacking.skills.get_modifier(skill) + weapon_modifier - attack_disadvantage
 
         defense = defending.skills.get_modifier("DEXTERITY") + (1 if defending_coverage else 0)
+        defense += defending.health.get_roll_modifier()
 
         dc = DifficultyConfigs.ATTACK_DC.value
 
         if normal_roll(dc, attack-defense):
             narrative_message = f"{attacking.name} attacks {defending.name} with their {weapon_name} and hits!\n"
-            narrative_message += defending.health.take_damage() # TODO: Implement this on health
+            narrative_message += defending.health.take_damage(narrative_message) # TODO: Implement this on health
             return TriggerResponse(
                 narrative_message=narrative_message,
             )

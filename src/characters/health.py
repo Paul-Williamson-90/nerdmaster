@@ -1,6 +1,7 @@
 from enum import Enum
 import random
 from typing import List
+from src.gpt import StandardGPT
 
 from src.characters.prompts import (
     HEALTH_UPDATE, 
@@ -32,9 +33,15 @@ class HealthStatusChangeTick(Enum):
     DYING: int = 5
     DEAD: int = 0
 
-class HealthStatusChange(Enum):
+class HealthStatusChangeIncrease(Enum):
     HEALTHY: str = "HEALTHY"
     INJURED: str = "HEALTHY"
+    DYING: str = "DEAD"
+    DEAD: str = "DEAD"
+
+class HealthStatusChangeDecrease(Enum):
+    HEALTHY: str = "INJURED"
+    INJURED: str = "DYING"
     DYING: str = "DEAD"
     DEAD: str = "DEAD"
 
@@ -53,11 +60,14 @@ class Health:
             status_turn_count: int = 0,
             description: str = "",
             scars: List[str|None] = [],
+            model_name: str = "gpt-3.5-turbo",
+            model: StandardGPT = StandardGPT,
     )->None:
         self.status = self._handle_status(status)
         self.status_turn_count = status_turn_count
         self.description = description
         self.scars = scars
+        self.model = model(model=model_name)
 
     def _handle_status(
             self,
@@ -132,7 +142,7 @@ class Health:
             if self.status_turn_count >= HealthStatusChangeTick[self.status.name].value:
                 self.status_turn_count = 0
                 prev_status = self.status
-                self.status = HealthDescriptions[HealthStatusChange[self.status.name].value]
+                self.status = HealthDescriptions[HealthStatusChangeIncrease[self.status.name].value]
                 scar = self._check_scarring(prev_status)
                 message = HealthConfig.STATUS_MOVEMENT_MESSAGE.value.format(
                     name=name,
@@ -145,7 +155,7 @@ class Health:
         elif self.status == HealthDescriptions.DYING:
             if self.status_turn_count >= HealthStatusChangeTick[self.status.name].value:
                 self.status_turn_count = 0
-                self.status = HealthDescriptions[HealthStatusChange[self.status.name].value]
+                self.status = HealthDescriptions[HealthStatusChangeIncrease[self.status.name].value]
                 return self._generate_death_message(name)
         return ""
     
@@ -290,4 +300,14 @@ class Health:
         Returns:
         str: The response from the API.
         """
-        raise NotImplementedError("GPT-3 API call not implemented yet.")
+        response = self.model.generate(prompt)
+        return response
+    
+    def take_damage(
+            self,
+            narrative_message: str,
+    ):
+        current_health = self.status
+        new_health = HealthStatusChangeDecrease[current_health.name].value
+        narrative_message = self.update_health_status(HealthDescriptions[new_health], narrative_message)
+        return narrative_message
