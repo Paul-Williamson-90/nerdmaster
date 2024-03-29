@@ -8,7 +8,8 @@ from src.triggers.environment_triggers import (
     TurnsInLocationTrigger,
     OnExitTrigger,
     TriggerEventAnyCharacter,
-    TriggerEventAllCharacter
+    TriggerEventAllCharacter,
+    DescribeLocationTrigger,
 )
 from src.game.configs import TRIGGERS_DATA_PATH
 
@@ -16,11 +17,12 @@ from src.game.configs import TRIGGERS_DATA_PATH
 class TriggerTypeMap(Enum):
 
     # Environment Triggers
-    on_entry = OnEntryTrigger
-    trigger_event_any_character = TriggerEventAnyCharacter
-    trigger_event_all_character = TriggerEventAllCharacter
-    turns_in_location = TurnsInLocationTrigger
-    on_exit = OnExitTrigger
+    OnEntryTrigger = OnEntryTrigger
+    TriggerEventAnyCharacter = TriggerEventAnyCharacter
+    TriggerEventAllCharacter = TriggerEventAllCharacter
+    TurnsInLocationTrigger = TurnsInLocationTrigger
+    OnExitTrigger = OnExitTrigger
+    DescribeLocationTrigger = DescribeLocationTrigger
 
     # Interaction Triggers
 

@@ -193,9 +193,29 @@ class EnvironmentTrigger(Trigger, ABC):
         """
         return [character.name for character in environment.character_locations
                 if character.name in self.req_characters]
+    
+class DescribeLocationTrigger(EnvironmentTrigger):
+    """
+    Trigger the narrator to give a visual description of the location.
+    """
+
+    def validate(
+            self,
+            environment: Environment,
+            active_quest_ids: List[str]=[], # Quests that need to be completed before this can be triggered
+            completed_quest_ids: List[str]=[], # Quests that can't be active/already triggered for this to trigger
+            completed_trigger_ids: List[str]=[], # Triggers that can't be active/already triggered for this to trigger
+    ):
+        if not self.val_quest_log_requirements(active_quest_ids, completed_quest_ids, completed_trigger_ids):
+            return
+        
+        self.attributes["location_description"] = environment.get_visual_description()
+        environment.arm_trigger(self)
 
 class TurnsInLocationTrigger(EnvironmentTrigger):
-
+    """
+    Trigger another trigger after a certain number of turns in the location
+    """
     def __init__(
             self,
             trigger_id: str,
@@ -267,7 +287,9 @@ class OnExitTrigger(EnvironmentTrigger):
 
 
 class OnEntryTrigger(EnvironmentTrigger):        
-
+    """
+    Trigger another trigger on player entry to a location
+    """
     def validate(
             self,
             environment: Environment,
@@ -286,7 +308,7 @@ class OnEntryTrigger(EnvironmentTrigger):
 
 class TriggerEventAnyCharacter(EnvironmentTrigger):
     """
-    Trigger's an NPC to begin dialogue with the player.
+    Trigger's another trigger when one of the characters specified are present.
     """
 
     def validate(
@@ -307,7 +329,7 @@ class TriggerEventAnyCharacter(EnvironmentTrigger):
     
 class TriggerEventAllCharacter(EnvironmentTrigger):
     """
-    Trigger's an NPC to begin dialogue with the player.
+    Trigger's another trigger when all of the characters specified are present.
     """
 
     def validate(
