@@ -8,7 +8,7 @@ from src.characters.equipped import Equipped
 from src.characters.background import Background
 from src.characters.memory.base import Memory
 from src.characters.avatars.base import Avatar
-from src.triggers.base import Trigger
+from src.triggers.trigger_loaders import TriggerLoader
 from src.characters.types.npcs.npc import NPC
 import json
 from pathlib import Path
@@ -18,8 +18,10 @@ class NPCLoader:
     def __init__(
             self,
             data_path: Path = Path(NPC_DATA_PATH),
+            trigger_loader: TriggerLoader = TriggerLoader,
     ):
         self.data = self._load_data(data_path)
+        self.trigger_loader = trigger_loader()
 
     def load_character(
             self,
@@ -46,7 +48,8 @@ class NPCLoader:
         character_data["skills"] = SkillTree(skills=character_data["skills"])
         character_data["backpack"] = Backpack(item_ids=character_data["backpack"])
         character_data["equipped_items"] = Equipped(slot_items=character_data["equipped_items"])
-        character_data["triggers"] = [Trigger(trigger_id=trigger) for trigger in character_data["triggers"]]
+        character_data["triggers"] = [self.trigger_loader.get_trigger(trigger_id=trigger) 
+                                      for trigger in character_data["triggers"]]
 
         npc = NPC(**character_data)
         return npc

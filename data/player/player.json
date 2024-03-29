@@ -1,0 +1,55 @@
+{
+    "Dummy Player": {
+        "name": "Dummy Player",
+        "gold": 100,
+        "background": {
+            "backstory": "Wyatt Thompson was born in the small town of Dusty Creek, Texas, in 1850. He grew up on a ranch, learning the ways of the land from his father, who was a respected cattle rancher. From a young age, Wyatt showed an aptitude for handling horses and firearms, quickly earning him the nickname \"Ace.\"\n\nAt the age of 17, tragedy struck when Wyatt's family ranch was attacked by a gang of outlaws looking to seize their land. Wyatt's parents were killed in the attack, and he was left to fend for himself. Fuelled by vengeance, Wyatt embarked on a quest to track down the outlaws responsible for his family's demise.",
+            "personality": "Wyatt is a stoic and determined individual, with a steely resolve forged by years of hardship and loss. He is fiercely independent and values his freedom above all else. Despite his tough exterior, Wyatt has a compassionate side, especially towards those who have suffered injustice. He is a man of few words, preferring to let his actions speak for him.",
+            "views_beliefs": "Wyatt believes in justice, albeit of the frontier variety. He has little faith in the law to protect the innocent, preferring to take matters into his own hands when necessary. He is a firm believer in the code of the West, which values honor, loyalty, and courage above all else. However, Wyatt also understands that sometimes survival means bending the rules, and he's not afraid to get his hands dirty to achieve his goals.\n\nDespite his rough exterior, Wyatt has a strong moral compass and strives to do what he believes is right, even if it means making difficult choices along the way. He harbors a deep distrust of authority figures, particularly those in positions of power who abuse their influence for personal gain.\n\nWyatt's quest for vengeance has consumed much of his life, but deep down, he yearns for a sense of belonging and purpose beyond his vendetta. He longs for a world where justice isn't just a fleeting ideal but a tangible reality for all who seek it.",
+            "factions": [
+                "Outlaws",
+                "Lawmen",
+                "Frontiersmen"
+            ]
+        },
+        "visual_description": "Wyatt",
+        "memory": {
+                "long_term": null,
+                "short_term": []
+            },
+        "avatar": {
+                "image": null
+            },
+        "health": {
+                "status": "HEALTHY",
+                "status_turn_count": 0,
+                "description": "",
+                "scars": []
+            },
+        "skills": {
+            "DEXTERITY": "UNTRAINED",
+            "AIM": "UNTRAINED",
+            "ATHLETICS": "UNTRAINED",
+            "BRAWL": "UNTRAINED",
+            "LOCKPICK": "UNTRAINED",
+            "MEDICINE": "UNTRAINED",
+            "MECHANICS": "UNTRAINED",
+            "COMPUTERS": "UNTRAINED",
+            "DRIVING": "UNTRAINED",
+            "STEALTH": "UNTRAINED",
+            "PERCEPTION": "UNTRAINED"
+        },
+        "backpack": [],
+        "equipped_items": {
+            "HEAD": null,
+            "CHEST": null,
+            "LEGS": null,
+            "FEET": null,
+            "MAIN_HAND": null,
+            "OFF_HAND": null
+        },
+        "with_player": false,
+        "voice": "alloy",
+        "triggers": []
+    }
+}

@@ -11,6 +11,7 @@ from src.triggers.base import Trigger
 from typing import List, Dict
 import numpy as np
 
+
 class Player(Character):
 
     def __init__(
