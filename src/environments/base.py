@@ -1,8 +1,9 @@
 from typing import List
-from src.environments.positions import CharacterPosition, ItemPosition
+from src.environments.positions import CharacterPosition, ObjectPosition
 from src.environments.local_locations import LocalLocation
 from src.environments.environment_map import EnvironmentMap
-from src.environments.triggers.base import Trigger
+from src.triggers.base import Trigger
+
 
 class Environment:
 
@@ -10,15 +11,15 @@ class Environment:
             self,
             name: str,
             location_id: str,
-            connecting_locations: EnvironmentMap, # Replace with location/map
+            connecting_locations: EnvironmentMap, 
             local_locations: List[LocalLocation], 
             character_locations: List[CharacterPosition], 
             description: str,
             visual_description: str,
             scenario_description_tags: List[str],
-            item_locations: List[ItemPosition],
-            triggers: List[Trigger], # Replace with triggers
-            turns_in_location: int=0, # Number of turns the player has been here (resets when player leaves location)
+            object_locations: List[ObjectPosition],
+            triggers: List[Trigger], 
+            turns_in_location: int = 0, # Number of turns the player has been here (resets when player leaves location)
     )->None:
         self.name = name
         self.location_id = location_id
@@ -28,7 +29,7 @@ class Environment:
         self.description = description
         self.visual_description = visual_description
         self.scenario_description_tags = scenario_description_tags
-        self.item_locations = item_locations
+        self.object_locations = object_locations
         self.triggers = triggers
         self.turns_in_location = turns_in_location
 

@@ -11,11 +11,13 @@ from src.triggers.base import Trigger
 from typing import List, Dict
 import numpy as np
 
+
 class Player(Character):
 
     def __init__(
             self,
             name: str,
+            current_location: str,
             gold: int,
             background: Background|dict,
             visual_description: str,
@@ -44,6 +46,7 @@ class Player(Character):
             voice=voice,
             triggers=triggers,
         )
+        self.current_location = current_location
     
     def get_agent_tools(self):
         tools = {

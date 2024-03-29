@@ -13,6 +13,8 @@ from src.agents.prompts import (
     NPC_SYSTEM_PROMPT
 )
 
+from typing import List
+
 load_dotenv()
 
 
@@ -58,7 +60,7 @@ class NPCAgent(NerdMasterAgent):
     )->str:
         prompt = hub.pull(self.prompt_id)
         prompt.messages[0].prompt.template = self._prepare_system(background, name)
-        prompt[2].prompt.template = "**Event**:\n{input}"
+        prompt[2].prompt.template = "**Events**:\n{input}"
         return prompt
 
     def _setup_agent(
@@ -84,20 +86,22 @@ class NPCAgent(NerdMasterAgent):
             user_input: str,
             background: Background, 
             name: str,
+            chat_history: List[str] = []
     ):
         self._setup_agent(background, name)
-        history = self._get_history()
+        # history = self._get_history()
+        # TODO: maybe replace history with short-term memory
         response = self.agent.invoke(
             {
                 "input": user_input,
-                "chat_history": history
+                "chat_history": chat_history#history
             }
         )
-        event_outcome = self.event_outcome_format.format(
-            input=user_input,
-            output=response["output"]
-        )
-        self.history += [event_outcome]
+        # event_outcome = self.event_outcome_format.format(
+        #     input=user_input,
+        #     output=response["output"]
+        # )
+        # self.history += [event_outcome]
         return response["output"]
 
     def get_reaction(
@@ -105,8 +109,9 @@ class NPCAgent(NerdMasterAgent):
             event: str,
             background: Background,
             name: str,
+            chat_history: List[str] = []
     )->str:
-        response = self.invoke(event, background, name)
+        response = self.invoke(event, background, name, chat_history)
         return response
 
     

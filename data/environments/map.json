@@ -1,0 +1,12 @@
+{
+    "The Room": {
+        "The Other Room": {
+            "description": "A room on the other floor",
+            "turns_to_visit": 1
+        },
+        "The Other Other Room": {
+            "description": "A room on the other other floor",
+            "turns_to_visit": 2
+        }
+    }
+}
