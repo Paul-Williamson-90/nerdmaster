@@ -9,7 +9,7 @@ from src.characters.background import Background
 from src.characters.memory.base import Memory
 from src.characters.avatars.base import Avatar
 from src.triggers.base import Trigger
-from src.characters.types.npc import NPC
+from src.characters.types.npcs.npc import NPC
 import json
 from pathlib import Path
 

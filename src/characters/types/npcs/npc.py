@@ -7,14 +7,12 @@ from src.characters.background import Background
 from src.characters.memory.base import Memory
 from src.characters.avatars.base import Avatar
 from src.triggers.base import Trigger
-from src.characters.types.prompts import ATTACK_TEMPLATE
 from src.agents.npc_agent import NPCAgent
-from src.characters.types.npc_actions import NPCReActionMap
+from src.characters.types.npcs.npc_actions import NPCReActionMap
 
 from typing import List, Dict
 import numpy as np
 
-import re
 
 class NPC(Character):
 
