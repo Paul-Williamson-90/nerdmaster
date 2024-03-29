@@ -1,8 +1,4 @@
 {
-    "player": {
-        "player_id": "player_1",
-        "current_location": "The Room"
-    },
     "data_paths": {
         "item_data_path" : "./data/items/items.json",
         "temp_image_data_path" : "./data/images/",

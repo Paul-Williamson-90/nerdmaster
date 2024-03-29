@@ -38,7 +38,7 @@ class GameDataPaths:
         self.triggers_data_path = triggers_data_path
         self.environments_data_path = environments_data_path
 
-NEW_GAME_DATA_PATH = "./data/game/new_game.json"
+GAME_DATA_PATH = "./data/game/game.json"
 
 
 class DifficultyConfigs(Enum):

@@ -65,8 +65,8 @@ class PositionLoader:
             position_map: Enum = PositionMapper,
     ):
         self.position_map = position_map
-        self.item_loader = item_loader()
-        self.trigger_loader = trigger_loader()
+        self.item_loader = item_loader
+        self.trigger_loader = trigger_loader
 
     def load_position(
             self,
@@ -96,12 +96,14 @@ class EnvironmentLoader:
             environment_map_loader: EnvironmentMapLoader = EnvironmentMapLoader,
             location_loader: LocalLocationLoader = LocalLocationLoader,
             position_loader: PositionLoader = PositionLoader,
+            trigger_loader: TriggerLoader = TriggerLoader,
     ):
         self.environment_data_path = environment_data_path
         self.environment_data = self._load_environment_data()
-        self.environment_map_loader = environment_map_loader()
-        self.location_loader = location_loader()
-        self.position_loader = position_loader()
+        self.environment_map_loader = environment_map_loader
+        self.location_loader = location_loader
+        self.position_loader = position_loader
+        self.trigger_loader = trigger_loader
     
     def _load_environment_data(self):
         with open(self.environment_data_path, 'r') as file:
@@ -142,7 +144,7 @@ class EnvironmentLoader:
     def _get_object_locations(self, env_data: dict):
         object_locations_data = env_data["object_locations"]
         object_locations = []
-        loader = PositionLoader()
+        loader = self.position_loader
         for object_location in object_locations_data:
             object_locations.append(loader.load_position(object_location))
         return object_locations
@@ -150,7 +152,7 @@ class EnvironmentLoader:
     def _get_triggers(self, env_data: dict):
         trigger_data = env_data["triggers"]
         triggers = []
-        loader = TriggerLoader()
+        loader = self.trigger_loader
         for trigger in trigger_data:
             triggers.append(loader.get_trigger(trigger))
         return triggers
