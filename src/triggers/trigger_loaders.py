@@ -3,7 +3,7 @@ import json
 from enum import Enum
 
 from src.triggers.base import Trigger, Dialogue
-from src.environments.environment_triggers import TriggerDialogue
+from src.triggers.environment_triggers import TriggerDialogue
 from src.configs import TRIGGERS_DATA_PATH
 
 class TriggerTypeMap(Enum):
@@ -28,5 +28,8 @@ class TriggerLoader:
     def get_trigger(self, trigger_id: str)->Trigger:
         trigger_type = self.triggers[trigger_id]["trigger_type_id"]
         trigger_object = self.trigger_type_map[trigger_type].value
-        return trigger_object(**{k:v for k,v in self.triggers[trigger_id].items()
-                                 if k not in ["trigger_type_id"]})
+        return trigger_object(
+            trigger_id=trigger_id, 
+            **{k:v for k,v in self.triggers[trigger_id].items()
+                if k not in ["trigger_type_id"]}
+        )

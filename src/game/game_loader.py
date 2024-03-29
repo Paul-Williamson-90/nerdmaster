@@ -1,3 +1,4 @@
+from src.game.game import Game
 from src.configs import GAME_DATA_PATH, GameDataPaths
 from src.environments.environment_loaders import (
     EnvironmentLoader, 
@@ -5,43 +6,13 @@ from src.environments.environment_loaders import (
     LocalLocationLoader, 
     PositionLoader
 )
-from src.environments.base import Environment
 from src.items.item_loader import ItemLoader
 from src.characters.types.npcs.load_npc import NPCLoader
 from src.characters.types.player.load_player import PlayerLoader
 from src.triggers.trigger_loaders import TriggerLoader
-from src.characters.types.player.player import Player
 
 from pathlib import Path
 import json
-
-class Game:
-
-    def __init__(
-            self,
-            # in game data
-            player: Player,
-            environment: Environment,
-            data_paths: GameDataPaths,
-            # loaders
-            environment_loader: EnvironmentLoader,
-            item_loader: ItemLoader,
-            npc_loader: NPCLoader,
-    ):  
-        # loaders
-        self.environment_loader: EnvironmentLoader = environment_loader
-        self.item_loader: ItemLoader = item_loader
-        self.npc_loader: NPCLoader = npc_loader
-        # in game data
-        self.data_paths: GameDataPaths = data_paths
-        self.player: Player = player
-        self.environment: Environment = environment
-
-    def save_game(self):
-        # TODO: Implement save game
-        pass
-
-
 
 class GameLoader:
 

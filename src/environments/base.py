@@ -3,6 +3,7 @@ from src.environments.positions import CharacterPosition, ObjectPosition
 from src.environments.local_locations import LocalLocation
 from src.environments.environment_map import EnvironmentMap
 from src.triggers.base import Trigger
+from src.quests.base import QuestLog
 
 
 class Environment:
@@ -32,6 +33,7 @@ class Environment:
         self.object_locations = object_locations
         self.triggers = triggers
         self.turns_in_location = turns_in_location
+        self.armed_triggers: List[Trigger] = []
 
     def get_character_position_descriptions(self):
         return [character.get_position_description() for character in self.character_locations]
@@ -42,7 +44,23 @@ class Environment:
     def get_description(self):
         return self.description
     
-    def add_characters(self, characters: List[CharacterPosition], trigger: Trigger|None=None):
-        self.character_locations.extend(characters)
-        if trigger:
-            pass
+    def arm_trigger(
+            self,
+            trigger: Trigger,
+    ):
+        self.armed_triggers.append(trigger)
+    
+    def get_active_triggers(
+            self,
+            quest_log: QuestLog,
+    )->List[Trigger]:
+        for trigger in self.triggers:
+            trigger.prepare(
+                quest_log=quest_log,
+                environment=self,
+            )
+
+    # def add_characters(self, characters: List[CharacterPosition], trigger: Trigger|None=None):
+    #     self.character_locations.extend(characters)
+    #     if trigger:
+    #         pass
