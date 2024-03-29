@@ -1,4 +1,4 @@
-from src.inventory_class import InventoryManagement
+from src.items.inventory_class import InventoryManagement
 from src.items.base import Item
 
 class Backpack(InventoryManagement):
