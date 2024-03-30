@@ -3,14 +3,14 @@ from src.characters.base import Character
 from src.triggers.base import TriggerResponse
 from src.utils.rolls import normal_roll
 from src.game.configs import DifficultyConfigs
-from src.game.game import Game, GameMode, Turn, NarrationType
+from src.game.terms import NarrationType, Turn, GameMode
 from src.triggers.base import Trigger
 from src.game.configs import DifficultyConfigs
 
 
 
 def prepare_attack_action(
-        game: Game, 
+        game, 
         trigger_id: str, 
         attacking: Character, 
         defending: Character, 

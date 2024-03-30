@@ -159,7 +159,6 @@ class PlayerLoader:
             backpack=backpack,
             equipped_items=equipped_items,
             with_player=player_data["with_player"],
-            voice=player_data["voice"],
             triggers=triggers,
             quest_log=quest_load,
             voice=voice

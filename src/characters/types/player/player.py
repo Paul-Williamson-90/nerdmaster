@@ -8,7 +8,7 @@ from src.characters.memory.base import Memory
 from src.characters.avatars.base import Avatar
 from src.triggers.base import Trigger
 from src.quests.base import QuestLog
-from src.agents.agent import NerdMasterAgent as Agent
+from src.agents.player_agent import PlayerAgent
 from src.voices.voice import Voice
 from src.characters.types.player.player_actions import PlayerReActionMap
 
@@ -36,7 +36,7 @@ class Player(Character):
             voice: Voice = Voice,
             triggers: List[Trigger] = [],
             quest_log: QuestLog = QuestLog([], [], []),
-            agent: Agent = Agent,
+            agent: PlayerAgent = PlayerAgent,
             reactions: PlayerReActionMap = PlayerReActionMap,
     )->None:
         super().__init__(

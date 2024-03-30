@@ -8,7 +8,7 @@ from src.characters.memory.base import Memory
 from src.characters.avatars.base import Avatar
 from src.triggers.base import Trigger
 from src.agents.npc_agent import NPCAgent
-from src.game.game import GameMode
+from src.game.terms import GameMode
 from src.characters.types.npcs.npc_actions import NPCReActionMap
 from src.voices.voice import Voice
 

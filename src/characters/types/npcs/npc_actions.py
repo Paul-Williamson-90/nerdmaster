@@ -1,8 +1,8 @@
 from src.characters.actions.base import ReActionMap
 from src.triggers.base import Trigger
-from src.characters.types.npcs.npc import NPC
+from src.characters.base import Character
 from src.triggers.npc_triggers import PrepareAttack, SearchMemory, Speak, Attack
-from src.game.game import GameMode
+from src.game.terms import GameMode
 
 from typing import Dict
     
@@ -11,9 +11,9 @@ class NPCReActionMap(ReActionMap):
 
     def __init__(
             self,
-            character: NPC,
+            character: Character,
       ):
-        self.character: NPC = character # needed for accessing character's connected modules
+        self.character: Character = character # needed for accessing character's connected modules
         self.action_map: Dict[str, Dict[str, Trigger]] = {
             GameMode.DIALOGUE.value: {
                 "prepare_attack": PrepareAttack(character=character).prepare,

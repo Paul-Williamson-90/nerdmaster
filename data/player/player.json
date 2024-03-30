@@ -1,6 +1,6 @@
 {
-    "Dummy Player": {
-        "name": "Dummy Player",
+    "Jimmy Beanstork": {
+        "name": "Jimmy Beanstork",
         "current_location": "The Room",
         "gold": 100,
         "background": {
@@ -55,6 +55,7 @@
             "active_quest_ids": [],
             "completed_quest_ids": [],
             "completed_trigger_ids": []
-        }
+        },
+        "triggers": []
     }
 }

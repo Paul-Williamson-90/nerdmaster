@@ -32,7 +32,7 @@
             }
         ],
         "triggers": [
-            "the_room_on_entry"
+            "the_room_on_entry_description"
         ]
     }
 }

@@ -18,17 +18,14 @@ class TriggerTypeMap(Enum):
 
     # Environment Triggers
     OnEntryTrigger = OnEntryTrigger
-    TriggerEventAnyCharacter = TriggerEventAnyCharacter
-    TriggerEventAllCharacter = TriggerEventAllCharacter
     TurnsInLocationTrigger = TurnsInLocationTrigger
     OnExitTrigger = OnExitTrigger
     DescribeLocationTrigger = DescribeLocationTrigger
 
     # Interaction Triggers
+    TriggerEventAnyCharacter = TriggerEventAnyCharacter
+    TriggerEventAllCharacter = TriggerEventAllCharacter
 
-
-    # dialogue = Dialogue
-    # trigger_dialogue = TriggerDialogue
 
 class TriggerLoader:
     def __init__(
@@ -49,7 +46,6 @@ class TriggerLoader:
         trigger_type = self.triggers[trigger_id]["trigger_type_id"]
         trigger_object = self.trigger_type_map[trigger_type].value
         return trigger_object(
-            trigger_id=trigger_id, 
             **{k:v for k,v in self.triggers[trigger_id].items()
                 if k not in ["trigger_type_id"]}
         )

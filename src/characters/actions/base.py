@@ -1,5 +1,5 @@
 from src.triggers.base import Trigger
-from src.characters.base import Character
+# from src.characters.base import Character
 from src.utils.tools import create_action_tool
 
 from typing import Dict
@@ -12,9 +12,9 @@ class ReActionMap(ABC):
 
     def __init__(
             self,
-            character: Character,
+            character#: Character,
     ):
-        self.character: Character = character
+        self.character = character
         self.action_map: Dict[str, Dict[str, Trigger]] = {}
 
     def _get_tools(

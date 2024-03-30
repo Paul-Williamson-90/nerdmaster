@@ -4,16 +4,16 @@ from src.characters.skills.skills import SkillMap
 from src.triggers.base import TriggerResponse
 from src.utils.rolls import normal_roll
 from src.game.configs import DifficultyConfigs
-from src.game.game import NarrationType, Game
+from src.game.terms import NarrationType
 
 from typing import Tuple
 
-def combat(game:Game, trigger_id: str, attacking: Character, defending: Character):
+def combat(game, trigger_id: str, attacking: Character, defending: Character):
     dc, modifier, weapon_name = get_combat_modifiers_and_dc(attacking, defending)
     return combat_resolutions(game, trigger_id, attacking, defending, dc, modifier, weapon_name)
 
 def combat_resolutions(
-        game: Game, 
+        game, 
         trigger_id: str, 
         attacking: Character, 
         defending: Character, 

@@ -1,7 +1,7 @@
 from src.triggers.base import Trigger, TriggerResponse
 from src.quests.base import QuestLog
 from src.environments.base import Environment
-from src.game.game import Game, NarrationType
+from src.game.terms import NarrationType
 from abc import ABC, abstractmethod
 
 from typing import List, Dict, Any
@@ -25,7 +25,7 @@ class EnvironmentTrigger(Trigger, ABC):
             exl_trigger_ids: List[str] = [], # Triggers that can't have been active for trigger
             req_characters: List[str] = [], # Characters that need to be present in the location
     ):
-        super().__init__(trigger_id, attributes={})
+        super().__init__(trigger_id)
         self.narrative_prompt = narrative_prompt
         self.req_active_quest_ids = req_active_quest_ids
         self.req_quest_completed_ids = req_quest_completed_ids
@@ -36,6 +36,7 @@ class EnvironmentTrigger(Trigger, ABC):
         self.ids_to_trigger = ids_to_trigger
         self.req_characters = req_characters
         self.random_chance = random_chance
+        self.attributes: Dict[str, str] = {}
     
     def prepare(
             self,
@@ -66,7 +67,7 @@ class EnvironmentTrigger(Trigger, ABC):
 
     def activate(
             self,
-            game: Game
+            game
     ):
         """
         Game logic for activating the trigger
@@ -74,9 +75,9 @@ class EnvironmentTrigger(Trigger, ABC):
         Triggers are resolved by the Game class, post NPC agent output.
         """
         return TriggerResponse(
-            narrative_message=self.narrative_prompt,
             triggers=self.ids_to_trigger,
-            attributes=self.attributes,
+            narrative_message=self.narrative_prompt,
+            attributes = self.attributes,
             log_message=f"Trigger {self.trigger_id} activated."
         )
 
@@ -217,9 +218,14 @@ class DescribeLocationTrigger(EnvironmentTrigger):
 
     def activate(
             self,
-            game: Game
+            game
     ):
-        game.add_to_narrator(text=self.narrative_prompt, ai_generate=True)
+        game.add_to_player_narrator(
+            text=self.attributes["location_description"],
+            text_tag=NarrationType.stage.value,
+            ai_generate=False,
+        )
+
         return TriggerResponse(
             triggers=self.ids_to_trigger,
             log_message=f"Trigger {self.trigger_id} activated."
@@ -378,13 +384,15 @@ class TriggerEventAnyCharacter(EnvironmentTrigger):
 
     def activate(
             self,
-            game: Game
-    ):
-        game.add_to_narrator(
-            text=self.narrative_prompt_player, 
+            game
+    ):  
+        
+        game.add_to_player_narrator(
+            text=self.narrative_prompt_player,
             text_tag=NarrationType.stage.value,
-            ai_generate=True
+            ai_generate=True,
         )
+        
         game.add_to_characters(
             characters=self.attributes["characters"],
         )
@@ -457,9 +465,9 @@ class TriggerEventAllCharacter(EnvironmentTrigger):
 
     def activate(
             self,
-            game: Game
+            game
     ):
-        game.add_to_narrator(
+        game.add_to_player_narrator(
             text=self.narrative_prompt_player, 
             text_tag=NarrationType.stage.value, 
             ai_generate=True

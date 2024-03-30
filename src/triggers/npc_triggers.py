@@ -1,7 +1,7 @@
 from typing import Dict
 from src.triggers.base import Trigger, TriggerResponse
 from src.characters.base import Character
-from src.game.game import Game, Turn
+from src.game.terms import Turn
 from src.utils.combat import combat
 from src.utils.prepare_attack import prepare_attack_action
 
@@ -64,9 +64,16 @@ class Speak(NPCAction):
 
     def activate(
             self,
-            game: Game,
+            game,
     ):
         dialogue = self.attributes["dialogue"]
+
+        game.add_to_npc_narrator(
+            text=dialogue,
+            characters=[char.name for char in game.characters],
+            text_tag=self.character.name,
+            ai_generate=True,
+        )
         
         game.add_character_dialogue_to_narrator(
             text=dialogue,
@@ -103,7 +110,7 @@ class Attack(NPCAction):
 
     def activate(
             self,
-            game: Game
+            game
     ):
         """
         Game logic for activating the trigger
@@ -143,7 +150,7 @@ class PrepareAttack(NPCAction):
 
     def activate(
             self,
-            game: Game,
+            game,
     ):
         defending = game.get_in_focus_character(self.attributes["target_character"])
         attacking = game.get_in_focus_character(self.attributes["attacking_character"])

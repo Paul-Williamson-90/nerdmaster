@@ -1,6 +1,6 @@
-from src.game.game import Game, GameMode, Turn, NarrationType
+from src.game.terms import NarrationType, Turn, GameMode
 from src.triggers.base import Trigger, TriggerResponse
-from src.characters.types.player.player import Player
+from src.characters.base import Character
 from src.utils.combat import combat
 from src.utils.prepare_attack import prepare_attack_action
 
@@ -11,12 +11,12 @@ class PlayerAction(Trigger, ABC):
     
         def __init__(
                 self,
-                character: Player,
+                character: Character,
                 attributes: dict = {},
         ):
             super().__init__(trigger_id=self.__class__.__name__)
             self.attributes = attributes
-            self.character: Player = character
+            self.character: Character = character
             
     
         @abstractmethod
@@ -28,7 +28,7 @@ class PlayerAction(Trigger, ABC):
         @abstractmethod
         def activate(
                 self,
-                game: Game
+                game
         ):
             ...
 
@@ -50,7 +50,7 @@ class StageDirection(PlayerAction):
 
     def activate(
             self,
-            game: Game
+            game
     ):
         game.add_to_player_narrator(
             text=self.attributes["stage_direction"],
@@ -87,7 +87,7 @@ class Speak(PlayerAction):
 
     def activate(
             self,
-            game: Game
+            game
     ):
         player_name = game.player.name
         dialogue = self.attributes["dialogue"]
@@ -143,7 +143,7 @@ class SearchMemory(PlayerAction):
 
     def activate(
             self,
-            game: Game
+            game
     ):
         response = game.player.search_memory(self.attributes["query"])
 
@@ -179,7 +179,7 @@ class Attack(PlayerAction):
 
     def activate(
             self,
-            game: Game
+            game
     ):
         """
         Game logic for activating the trigger
@@ -219,7 +219,7 @@ class PrepareAttack(PlayerAction):
 
     def activate(
             self,
-            game: Game,
+            game,
     ):
         defending = game.get_in_focus_character(self.attributes["target_character"])
         attacking = game.get_in_focus_character(self.attributes["attacking_character"])

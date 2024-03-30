@@ -1,7 +1,7 @@
 from src.characters.actions.base import ReActionMap
-from src.game.game import GameMode
+from src.game.terms import GameMode
 from src.triggers.base import Trigger
-from src.characters.types.player.player import Player
+from src.characters.base import Character
 from src.triggers.player_triggers import (
     Speak, 
     SearchMemory, 
@@ -10,7 +10,7 @@ from src.triggers.player_triggers import (
     PrepareAttack
 )
 
-from typing import List, Dict
+from typing import Dict
 
 
 
@@ -18,9 +18,9 @@ class PlayerReActionMap(ReActionMap):
 
     def __init__(
             self,
-            character: Player,
+            character: Character,
     ):
-        self.character: Player = character
+        self.character: Character = character
         self.action_map: Dict[str, Dict[str, Trigger]] = {
             GameMode.DIALOGUE.value: {
                 "speak": Speak(character=character).prepare,

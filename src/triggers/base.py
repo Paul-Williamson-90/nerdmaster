@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any
-from src.game.game import Game
 
 class TriggerResponse:
 
@@ -32,7 +31,7 @@ class Trigger(ABC):
     @abstractmethod
     def activate(
         self,
-        game: Game
+        game,
     )->TriggerResponse:
         ...
 

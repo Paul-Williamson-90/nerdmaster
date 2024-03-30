@@ -1,6 +1,6 @@
 {
     "the_room_on_entry_description": {
-        "trigger_id": "the_room_on_entry",
+        "trigger_id": "the_room_on_entry_description",
         "trigger_type_id": "OnEntryTrigger",
         "ids_to_trigger": ["the_room_description"],
         "narrative_prompt": null,
