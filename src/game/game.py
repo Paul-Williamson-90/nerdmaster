@@ -7,15 +7,17 @@ from src.items.item_loader import ItemLoader
 from src.characters.types.npcs.load_npc import NPCLoader
 from src.characters.types.player.player import Player
 from src.triggers.base import Trigger
+from src.triggers.trigger_loaders import TriggerLoader
 from src.characters.types.npcs.npc import NPC
+from src.characters.base import Character
 from src.endpoints.gpt import StandardGPT
 from src.game.prompts import PLAYER_NARRATION_SYSTEM_MESSAGE
 from src.voices.voice import Voice
+from src.narrator.narrator import Narrator
 
 from typing import List, Dict
 
 from enum import Enum
-from dataclasses import dataclass
 
 class GameMode(Enum):
 
@@ -33,25 +35,41 @@ class Turn(Enum):
     NEW_MAP = "new_map"
     QUIT = "quit"
 
-@dataclass
-class Narration:
+class NarrationType(Enum):
+
+    stage = "stage"
+    dialogue = "dialogue"
+
+
+
+    
+    
+class GameEnvironmentTurn:
 
     def __init__(
             self,
-            text: str|None,
-            audio_path: str|None,
-            image_path: str|None,
+            game: "Game",
     ):
-        self.text = text
-        self.audio_path = audio_path
-        self.image_path = image_path
+        self.game = game
 
-    def to_dict(self):
-        return {
-            "text": self.text,
-            "audio_path": self.audio_path,
-            "image_path": self.image_path,
-        }
+    def fetch_triggers_environment(self):
+        quest_log = self.game.player.quest_log
+        armed_triggers = self.game.environment.fetch_active_triggers(
+            quest_log = quest_log
+        )
+        return armed_triggers
+    
+    def game_environment_turn(
+            self,
+    ):
+        # fetch triggers
+        prepared_triggers = self.fetch_triggers_environment()
+        # reconcile prepared triggers
+        self.game._reconcile_triggers(prepared_triggers) 
+        # increment turns in location
+        self.game.add_turn()
+        self.next_turn = Turn.PLAYER.value
+
 
 class Game:
 
@@ -68,11 +86,15 @@ class Game:
             model: StandardGPT = StandardGPT,
             model_name: str = "gpt-3.5-turbo",
             narrator: Voice = Voice,
+            environment_turn: GameEnvironmentTurn = GameEnvironmentTurn,
+            trigger_loader: TriggerLoader = TriggerLoader,
+            narrator_collector: Narrator = Narrator,
     ):  
         # loaders
         self.environment_loader: EnvironmentLoader = environment_loader
         self.item_loader: ItemLoader = item_loader
         self.npc_loader: NPCLoader = npc_loader
+        self.trigger_loader: TriggerLoader = trigger_loader
         # in game data
         self.data_paths: GameDataPaths = data_paths
         self.player: Player = player
@@ -83,24 +105,43 @@ class Game:
         self.narrator: Voice = narrator(
             voice="echo",
         )
-        self.narration_queue: Dict[int, Narration] = {}
+        self.narrator_collector: Narrator = narrator_collector
+        self.environment_turn: GameEnvironmentTurn = environment_turn(self)
         self.next_turn: str = Turn.GAME.value
+        self.action_queue: List[Trigger] = []
+
+    def add_character_actions_to_queue(
+            self,
+            character: Character
+    ):
+        self.action_queue += character.get_action_queue()
 
     def save_game(self):
+        """
+        Triggers the save game process (only during exploration mode)
+        """
         # TODO: Implement save game
         pass
 
-    def fetch_triggers_environment(self):
-        quest_log = self.player.quest_log
-        armed_triggers = self.environment.fetch_active_triggers(
-            quest_log = quest_log
-        )
-        return armed_triggers
+    def add_turn(
+            self,
+    ):
+        """
+        Increment the turn tickers for environment and any conditions on characters.
+        """
+        # TODO: Character tickers
+        self.environment.add_turn()
     
     def add_to_characters(
             self,
             characters: List[str],
     ):
+        """
+        Loads NPC characters into game focus.
+
+        Args:
+        characters (List[str]): List of character names to load into game focus.
+        """
         for character in characters:
             loaded_character = self.npc_loader.load_character(character)
             self.characters.append(loaded_character)
@@ -109,10 +150,66 @@ class Game:
             self,
             characters: List[str]|str,
     ):
+        """
+        Removes NPC characters from game focus.
+
+        Args:
+        characters (List[str]|str): List of character names to remove from game focus.
+        """
         if isinstance(characters, str):
             characters = [characters]
         for character in characters:
             self.characters = [c for c in self.characters if c.name != character]
+
+    def _ai_generate_narration(
+            self,
+            text: str,
+    ):
+        """
+        Rewrite narration text using AI.
+        """
+        system_message = PLAYER_NARRATION_SYSTEM_MESSAGE
+        response = self.model.generate(prompt=text, system_message=system_message)
+        return response
+    
+    def _add_to_npc_narrator_single(
+            self,
+            text: str,
+            text_tag: str,
+            ai_generate: bool,
+    ):
+        """
+        Adds text to NPC stage/dialogue queue (input is used for character reactions)
+        """
+        # TODO: Consider the character perception of the event via system prompt injection
+        if ai_generate and text_tag == NarrationType.stage.value:
+            response = self._ai_generate_narration(text)
+        else:
+            response = text
+        text = f"<{text_tag}>{response}</{text_tag}>"
+        for character in self.characters:
+            character.add_short_term_memory(text)
+
+    def _add_to_npc_narrator_multiple(
+            self,
+            text: Dict[str, str],
+            text_tag: str,
+            characters: List[NPC],
+            ai_generate: bool,
+    ):
+        """
+        Adds text to NPC stage/dialogue queue (input is used for character reactions)
+        Used for multiple characters, each with their own perception of the event.
+        """
+        # TODO: Consider the character perception of the event via system prompt injection
+        for character, text in characters.items():
+            character = [character for character in self.characters if character.name == character][0]
+            if ai_generate and text_tag == NarrationType.stage.value:
+                response = self._ai_generate_narration(text)
+            else:
+                response = text
+            text = f"<{text_tag}>{response}</{text_tag}>"
+            character.add_short_term_memory(text)
 
     def add_to_npc_narrator(
             self,
@@ -121,33 +218,10 @@ class Game:
             characters: List[str],
             ai_generate: bool = False,
     ):
-        # TODO: Tidy this up!
         if isinstance(text, str):
-            if ai_generate:
-                if text_tag == "stage":
-                    system_message = PLAYER_NARRATION_SYSTEM_MESSAGE
-                    response = self.model.generate(prompt=text, system_message=system_message)
-                else:
-                    response = text
-            else:
-                response = text
-            text = f"<{text_tag}>{response}</{text_tag}>"
-            for character in self.characters:
-                character.add_to_narration_queue(text)
-
+            self._add_to_npc_narrator_single(text, text_tag, characters, ai_generate)
         else:
-            for character, text in characters.items():
-                character = [character for character in self.characters if character.name == character][0]
-                if ai_generate:
-                    if text_tag == "stage":
-                        system_message = PLAYER_NARRATION_SYSTEM_MESSAGE
-                        response = self.model.generate(prompt=text, system_message=system_message)
-                    else:
-                        response = text
-                else:
-                    response = text
-                response = f"<{text_tag}>{response}</{text_tag}>"
-                character.add_to_narration_queue(response)
+            self._add_to_npc_narrator_multiple(text, text_tag, characters, ai_generate)
 
     def switch_game_mode(
             self,
@@ -155,24 +229,58 @@ class Game:
     ):
         self.game_mode = GameMode(mode).value
     
-    def add_to_narrator(
+    def add_to_player_narrator(
             self,
             text: str,
+            text_tag: str = NarrationType.stage.value,
+            voice: Voice = None,
             ai_generate: bool = False,
     ):  
         if ai_generate:
-            text = self.model.generate(prompt=text, system_message=PLAYER_NARRATION_SYSTEM_MESSAGE)
-        audio_path = self.narrator.generate(text)
-        self.narration_queue[len(self.narration_queue)] = Narration(
-            text = text,
-            audio_path = audio_path,
-            # image_path = image_path
+            text = self.model.generate(
+                prompt=text, 
+                system_message=PLAYER_NARRATION_SYSTEM_MESSAGE
+            )
+
+        voice = voice if voice else self.narrator
+        audio_path = voice.generate(text)
+
+        text = f"<{text_tag}>{text}</{text_tag}>"
+
+        self.narrator_collector.add_narration(
+            text=text, 
+            audio_path=audio_path,
+            # image_path=image_path,
         )
+        self.player.add_short_term_memory(text)
+
+    def add_character_dialogue_to_narrator(
+            self,
+            text: str,
+            character: Character,
+    ):
+        audio_path = character.voice.generate(text)
+        self.narrator_collector.add_narration(
+            text=text, 
+            audio_path=audio_path,
+            # image_path=image_path,
+        )
+
+    def get_in_focus_character(
+            self,
+            name: str,
+    ):
+        for character in self.characters:
+            if character.name == name:
+                return character
+        return None
     
     def activate_trigger(
             self, 
-            trigger:Trigger
+            trigger:Trigger|str,
     ):
+        if isinstance(trigger, str):
+            trigger = self.trigger_loader.get_trigger(trigger)
         out = trigger.activate(self)
         return out
         
@@ -193,27 +301,16 @@ class Game:
                 new_triggers.extend(trigger_response.triggers)
             self._reconcile_triggers(new_triggers)
 
-    def game_environment_turn(
-            self,
-    ):
-        self.next_turn = Turn.PLAYER.value
-        # fetch triggers
-        prepared_triggers = self.fetch_triggers_environment()
-        # reconcile prepared triggers
-        self._reconcile_triggers(prepared_triggers) 
-        # increment turns in location
-        self.environment.add_turn()
-
     
-    def character_reaction_turn(
+    def NPC_reaction_turn(
             self,
     ):
         if len(self.characters)==1:
-            self.characters[0].character_reaction(
-                event = "insert dialogue/narrative here", # TODO: Implement dialogue system
+            character: NPC = self.characters[0]
+            character.character_reaction(
+                event = character.get_short_term_memory(),
                 name = self.player.name, # TODO: Check character knows player name
                 mode = self.game_mode, # TODO: Ensure all are using same mode Enum
-                chat_history=self.player.chat_history, # TODO: Fix this
             )
         else:
             raise NotImplementedError("Character reaction for multiple not implemented yet.")
@@ -221,26 +318,33 @@ class Game:
     def game_turn(
             self,
     ):
-        if self.game_mode == GameMode.EXPLORE.value:
-            self.game_environment_turn()
-        elif self.game_mode == GameMode.DIALOGUE.value or self.game_mode == GameMode.COMBAT.value:
-            self.character_reaction_turn()
-        else:
+        if self.game_mode == GameMode.EXPLORE.value and self.next_turn == Turn.GAME.value:
+            self.environment_turn.game_environment_turn()
+        
+        if (self.game_mode in [GameMode.DIALOGUE.value, GameMode.COMBAT.value]
+            and self.next_turn == Turn.GAME.value):
+            self.NPC_reaction_turn()
+
+        if self.game_mode not in GameMode.__members__.values():
             raise ValueError(f"Game mode {self.game_mode} not recognized")
         
     def load_new_map(
             self,
     ):
         raise NotImplementedError("NEW_MAP mode not implemented")
+    
+    def activate_player_actions(
+            self,
+    ):
+        self.add_character_actions_to_queue(self.player)
+        self._reconcile_triggers(self.action_queue)
         
     def start_turn(
             self,
     ):
         if self.next_turn == Turn.PLAYER.value:
-            # TODO: Implement player turn separately as it requires an input from FE
-            return # self.activate_player_actions() these are stored 
+            self.activate_player_actions()
         elif self.next_turn == Turn.GAME.value:
-            # This will trigger naturally after player turn if game turn is set as so
             self.game_turn()
         elif self.next_turn == Turn.SAVE.value:
             self.save_game()
@@ -252,14 +356,10 @@ class Game:
         else:
             raise ValueError(f"Turn {self.next_turn} not recognized")
         
-        payload = self.narration_queue
-        self.narration_queue = {}
-        # this will be sent to the FE to play the audio and display the text/images
-        return {k:n.to_dict() for k, n in payload.items()} 
+        return self.narrator_collector.get_narration_queue()
         
         
-
         
-
-
+        
+        
 

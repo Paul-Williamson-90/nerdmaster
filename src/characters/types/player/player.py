@@ -8,7 +8,10 @@ from src.characters.memory.base import Memory
 from src.characters.avatars.base import Avatar
 from src.triggers.base import Trigger
 from src.quests.base import QuestLog
+from src.agents.agent import NerdMasterAgent as Agent
 from src.voices.voice import Voice
+from src.characters.types.player.player_actions import PlayerReActionMap
+
 
 from typing import List, Dict
 import numpy as np
@@ -33,6 +36,8 @@ class Player(Character):
             voice: Voice = Voice,
             triggers: List[Trigger] = [],
             quest_log: QuestLog = QuestLog([], [], []),
+            agent: Agent = Agent,
+            reactions: PlayerReActionMap = PlayerReActionMap,
     )->None:
         super().__init__(
             name=name,
@@ -48,44 +53,9 @@ class Player(Character):
             with_player=with_player,
             voice=voice,
             triggers=triggers,
+            agent=agent,
+            reactions=reactions,
         )
         self.current_location = current_location
         self.quest_log = quest_log
     
-    def get_agent_tools(self):
-        tools = {
-            self.name: {
-            # Item Management via click, with narratives sent to AI for generation / logging
-            "add_item_to_backpack": self.add_item_to_backpack, # needs to be wrapped in another method game end
-            "remove_item_from_backpack": self.remove_item_from_backpack, # needs to be wrapped in another method game end
-            "equip_item": self.equip_item, # needs to be wrapped in another method game end
-            "unequip_item": self.unequip_item, # needs to be wrapped in another method game end
-            "modify_gold": self.modify_gold, # needs to be wrapped in another method game end
-            "use_item": self.use_item, # needs to be wrapped in another method game end
-
-            # Faction changes via methods that wrap these
-            "add_to_factions": self.add_to_factions,
-            "remove_from_factions": self.remove_from_factions,
-
-            # Useful for diaglogues (tell the character about yourself in full)
-            "get_background_full": self.get_background_full,
-            "get_backstory": self.get_backstory,
-            "get_visual_description": self.get_visual_description,
-            "get_name": self.get_name,
-
-            # Maybe experiment with re-writing character dialogues against the background
-            "get_personality": self.get_personality,
-
-            # Useful for alignment checks
-            "get_factions": self.get_factions,
-            "check_faction": self.check_faction,
-
-            # Memory management
-            "add_short_term_memory": self.add_short_term_memory,
-            "store_short_term_memory": self.store_short_term_memory,
-            "search_memory": self.search_memory,
-
-            # Needed for game end
-            "get_avatar": self.get_avatar,
-        }}
-        return tools

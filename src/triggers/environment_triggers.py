@@ -1,7 +1,7 @@
 from src.triggers.base import Trigger, TriggerResponse
 from src.quests.base import QuestLog
 from src.environments.base import Environment
-from src.game.game import Game
+from src.game.game import Game, NarrationType
 from abc import ABC, abstractmethod
 
 from typing import List, Dict, Any
@@ -382,7 +382,7 @@ class TriggerEventAnyCharacter(EnvironmentTrigger):
     ):
         game.add_to_narrator(
             text=self.narrative_prompt_player, 
-            text_tag="stage", # TODO: Replace with Enum
+            text_tag=NarrationType.stage.value,
             ai_generate=True
         )
         game.add_to_characters(
@@ -390,7 +390,7 @@ class TriggerEventAnyCharacter(EnvironmentTrigger):
         )
         game.add_to_npc_narrator(
             text=self.narrative_prompt_npc, 
-            text_tag="stage", # TODO: Replace with Enum
+            text_tag=NarrationType.stage.value,
             characters=self.attributes["characters"],
             ai_generate=True
         )
@@ -461,7 +461,7 @@ class TriggerEventAllCharacter(EnvironmentTrigger):
     ):
         game.add_to_narrator(
             text=self.narrative_prompt_player, 
-            text_tag="stage", # TODO: Replace with Enum
+            text_tag=NarrationType.stage.value, 
             ai_generate=True
         )
         game.add_to_characters(
@@ -469,7 +469,7 @@ class TriggerEventAllCharacter(EnvironmentTrigger):
         )
         game.add_to_npc_narrator(
             text=self.narrative_prompt_npc, 
-            text_tag="stage", # TODO: Replace with Enum
+            text_tag=NarrationType.stage.value,
             characters=self.attributes["characters"],
             ai_generate=True
         )

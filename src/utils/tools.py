@@ -29,7 +29,7 @@ def create_tool(callable:Callable):
     )
     return tool
 
-def create_npc_action_tool(callable:Callable, name: str):
+def create_action_tool(callable:Callable, name: str):
     method = callable
     args = {k:v for k,v in method.__annotations__.items() if k != "self" and k != "return"}
     doc = method.__doc__

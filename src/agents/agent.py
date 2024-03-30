@@ -46,6 +46,12 @@ class NerdMasterAgent(ABC):
             model=self.model
         )
     
+    def update_tools(
+            self, 
+            tools: dict
+    ):
+        self.tools = tools
+    
     def _prepare_tools(
             self, 
             tools:List[StructuredTool] = []

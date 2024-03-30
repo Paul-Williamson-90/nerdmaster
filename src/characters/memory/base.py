@@ -67,6 +67,11 @@ class Memory:
     )->str:
         self.add_to_long_term("\n".join(self.short_term))
         self.short_term = []
+
+    def get_short_term_memory(
+            self,
+    ):
+        return "\n\n".join(self.short_term)
     
     def search_short_term(
             self,

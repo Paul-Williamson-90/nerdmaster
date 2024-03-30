@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import List, Dict
 import numpy as np
 
@@ -10,8 +10,11 @@ from src.characters.background import Background
 from src.characters.prompts import VISUAL_DESCRIPTION
 from src.characters.memory.base import Memory
 from src.characters.avatars.base import Avatar
+from src.agents.npc_agent import NPCAgent
+from src.agents.player_agent import PlayerAgent
 from src.triggers.base import Trigger
 from src.voices.voice import Voice
+from src.characters.actions.base import ReActionMap
 
 class Character(ABC):
 
@@ -29,22 +32,45 @@ class Character(ABC):
             equipped_items: Equipped|Dict[str, str] = DEFAULT_SLOT_ITEMS, 
             with_player: bool = False,
             voice: Voice = Voice,
+            agent: NPCAgent|PlayerAgent = NPCAgent,
             triggers: List[Trigger] = [],
+            reactions: ReActionMap = ReActionMap,
     )->None:
         self.name = name
         self.voice: Voice = voice
         self.visual_description = visual_description
-        self.backpack = self._handle_backpack(backpack)
-        self.equipped_items = self._handle_equipped_items(equipped_items)
+        self.backpack: Backpack = self._handle_backpack(backpack)
+        self.equipped_items: Equipped = self._handle_equipped_items(equipped_items)
         self.gold = gold
-        self.health = self._handle_health(health)
-        self.background = self._handle_background(background)
-        self.memory = self._handle_memory(memory)
-        self.avatar = self._handle_avatar(avatar)
+        self.health: Health = self._handle_health(health)
+        self.background: Background = self._handle_background(background)
+        self.memory: Memory = self._handle_memory(memory)
+        self.avatar: Avatar = self._handle_avatar(avatar)
         self.with_player = with_player
-        self.skills = self._handle_skills(skills)
+        self.skills: SkillTree = self._handle_skills(skills)
         self.triggers = triggers
+        self.agent: NPCAgent|PlayerAgent = agent()
+        self.reactions: ReActionMap = reactions(self)
+        self.action_queue: List[Trigger] = []
 
+    def get_short_term_memory(
+            self,
+    ):
+        return self.memory.get_short_term_memory()
+
+    def add_to_action_queue(
+            self,
+            trigger: Trigger,
+    ):
+        self.action_queue.append(trigger)
+
+    def get_action_queue(
+            self,
+    )->List[Trigger]:
+        action_queue = self.action_queue
+        self.action_queue = []
+        return action_queue
+        
     def _handle_avatar(
             self,
             avatar: Avatar|np.ndarray|None,
@@ -332,6 +358,4 @@ class Character(ABC):
         """
         return self.backpack.use_item_by_unique_id(unique_id, character_name)
 
-    @abstractmethod
-    def get_agent_tools(self):
-        ...
+   

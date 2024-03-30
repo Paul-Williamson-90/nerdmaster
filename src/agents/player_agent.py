@@ -1,5 +1,4 @@
 from src.agents.agent import NerdMasterAgent
-from src.characters.background import Background
 
 import os 
 from dotenv import load_dotenv
@@ -8,9 +7,8 @@ from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain import hub
 
 from src.agents.prompts import (
-    CUSTOM_SYSTEM_MESSAGE,
     DEFAULT_EVENT_OUTCOME_FORMAT,
-    NPC_SYSTEM_PROMPT
+    PLAYER_SYSTEM_PROMPT
 )
 
 from typing import List
@@ -18,11 +16,11 @@ from typing import List
 load_dotenv()
 
 
-class NPCAgent(NerdMasterAgent):
+class PlayerAgent(NerdMasterAgent):
 
     def __init__(
             self,
-            system_message: str = CUSTOM_SYSTEM_MESSAGE,
+            system_message: str = "",
             prompt_id: str = "hwchase17/openai-tools-agent",
             openai_api_key: str = os.getenv("OPENAI_API_KEY"),
             verbose: bool = True,
@@ -33,37 +31,27 @@ class NPCAgent(NerdMasterAgent):
 
     def _prepare_system(
             self, 
-            background: Background, 
             name: str
     )->str:
-        personality = background.get_personality()
-        backstory = background.get_backstory()
-        beliefs = background.get_views_beliefs()
-        return NPC_SYSTEM_PROMPT.format(
-            personality=personality,
-            backstory=backstory,
-            beliefs=beliefs,
-            system=self.system_message,
+        return PLAYER_SYSTEM_PROMPT.format(
             name=name,
         )
 
     def _prepare_prompt(
             self, 
-            background: Background, 
             name: str
     )->str:
         prompt = hub.pull(self.prompt_id)
-        prompt.messages[0].prompt.template = self._prepare_system(background, name)
-        prompt[2].prompt.template = "**Events**:\n{input}"
+        prompt.messages[0].prompt.template = self._prepare_system(name)
+        prompt[2].prompt.template = "**Player Input Request:**\n{input}"
         return prompt
 
     def _setup_agent(
             self, 
-            background: Background, 
             name: str
     ):
         tools = self._prepare_tools()
-        prompt = self._prepare_prompt(background, name)
+        prompt = self._prepare_prompt(name)
         agent = create_openai_tools_agent(
             self.llm, 
             tools, 
@@ -78,13 +66,13 @@ class NPCAgent(NerdMasterAgent):
     def invoke(
             self, 
             user_input: str,
-            background: Background, 
             name: str,
     ):
-        self._setup_agent(background, name)
+        self._setup_agent(name)
         response = self.agent.invoke(
             {
                 "input": user_input,
+                "chat_history": self._get_history(),
             }
         )
         return response["output"]
@@ -92,10 +80,9 @@ class NPCAgent(NerdMasterAgent):
     def get_reaction(
             self,
             event: str,
-            background: Background,
             name: str,
     )->str:
-        response = self.invoke(event, background, name)
+        response = self.invoke(event, name)
         return response
 
     

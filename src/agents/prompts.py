@@ -49,3 +49,8 @@ Events notation should be read as follows:
 - <character_name>"Dialogue is wrapped in dialogue tags"</character_name>
     - For example: <{name}>"Would be dialogue from your character."</{name}>
 """
+
+PLAYER_SYSTEM_PROMPT = """You are an AI assistant for a player in a text-based adventure game, their character is called {name}.
+
+**Instructions:**
+Using the player's input below, select from the available tools to action the player's request."""
