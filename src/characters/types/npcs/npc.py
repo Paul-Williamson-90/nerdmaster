@@ -53,7 +53,6 @@ class NPC(Character):
             agent=agent,
             reactions=reactions,
         )
-        self.action_tool_outputs:List[str]=[]
     
     def character_reaction(
             self,

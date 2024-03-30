@@ -110,4 +110,5 @@ class GameLoader:
             environment_loader=self.environment_loader,
             item_loader=self.item_loader,
             npc_loader=self.npc_loader,
+            trigger_loader=self.trigger_loader,
         )

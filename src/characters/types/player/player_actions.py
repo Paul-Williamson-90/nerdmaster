@@ -44,10 +44,8 @@ class PlayerReActionMap(ReActionMap):
             self,
             event: str,
             mode: str,
-            additional_tools: dict = {},
     ):
         tools = self._get_tools(mode)
-        tools.update(additional_tools)
         self.character.agent.update_tools(tools)
         final_output = self.character.agent.get_reaction(event, self.character.name)
         return final_output

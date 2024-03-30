@@ -4,9 +4,11 @@ from src.utils.tools import create_action_tool
 
 from typing import Dict
 
+from abc import ABC, abstractmethod
 
 
-class ReActionMap:
+
+class ReActionMap(ABC):
 
     def __init__(
             self,
@@ -23,3 +25,11 @@ class ReActionMap:
         for k,tool in self.action_map[mode].items():
             tools[k] = create_action_tool(tool, k)
         return tools 
+    
+    @abstractmethod
+    def get_reaction(
+            self,
+            event: str,
+            mode: str,
+    ):
+        ...

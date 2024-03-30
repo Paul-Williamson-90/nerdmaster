@@ -11,11 +11,10 @@ class NPCAction(Trigger):
 
     def __init__(
             self,
-            trigger_id: str,
             character: Character,
             attributes: Dict[str, str] = {}
     ):
-        super().__init__(trigger_id=trigger_id)
+        super().__init__(trigger_id=self.__class__.__name__)
         self.character: Character = character
         self.attributes: Dict[str, str] = attributes
 

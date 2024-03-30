@@ -102,9 +102,7 @@ class Game:
         self.game_mode: str = GameMode.EXPLORE.value
         self.characters: List[NPC] = []
         self.model: StandardGPT = model(model=model_name)
-        self.narrator: Voice = narrator(
-            voice="echo",
-        )
+        self.narrator: Voice = narrator(voice="echo")
         self.narrator_collector: Narrator = narrator_collector
         self.environment_turn: GameEnvironmentTurn = environment_turn(self)
         self.next_turn: str = Turn.GAME.value
@@ -120,8 +118,10 @@ class Game:
         """
         Triggers the save game process (only during exploration mode)
         """
-        # TODO: Implement save game
-        pass
+        self.narrator_collector.add_narration(
+            text="Game saved.",
+        )
+        # TODO: Save game state
 
     def add_turn(
             self,
@@ -202,7 +202,7 @@ class Game:
         Used for multiple characters, each with their own perception of the event.
         """
         # TODO: Consider the character perception of the event via system prompt injection
-        for character, text in characters.items():
+        for character, text in text.items():
             character = [character for character in self.characters if character.name == character][0]
             if ai_generate and text_tag == NarrationType.stage.value:
                 response = self._ai_generate_narration(text)
@@ -339,7 +339,7 @@ class Game:
         self.add_character_actions_to_queue(self.player)
         self._reconcile_triggers(self.action_queue)
         
-    def start_turn(
+    def turn_order(
             self,
     ):
         if self.next_turn == Turn.PLAYER.value:
@@ -356,7 +356,22 @@ class Game:
         else:
             raise ValueError(f"Turn {self.next_turn} not recognized")
         
+    def get_player_reaction(
+            self,
+            event: str
+    ):
+        return self.player.reactions.get_reaction(event, self.game_mode)
+        
+    def player_turn(
+            self,
+            player_input: str,
+    ):
+        _ = self.get_player_reaction(player_input)
+        self.turn_order()
         return self.narrator_collector.get_narration_queue()
+        
+        
+    
         
         
         

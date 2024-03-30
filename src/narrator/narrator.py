@@ -1,4 +1,4 @@
-
+from typing import List
 
 
 class Narration:
@@ -26,7 +26,7 @@ class Narrator:
     def __init__(
             self
     ):
-        self.narration_queue = []
+        self.narration_queue: List[Narration] = []
 
     def add_narration(
             self,
@@ -44,4 +44,9 @@ class Narrator:
     def get_narration_queue(self):
         narration_queue = self.narration_queue
         self.narration_queue = []
-        return narration_queue
+        return [x.to_dict() for x in narration_queue]
+    
+    def get_one_narration(self):
+        if self.narration_queue:
+            return self.narration_queue.pop(0)
+        return None
