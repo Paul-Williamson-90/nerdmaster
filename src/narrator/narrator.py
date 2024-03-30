@@ -41,12 +41,16 @@ class Narrator:
         )
         self.narration_queue.append(narration)
 
-    def get_narration_queue(self):
+    def get_narration_queue(
+            self
+    ):
         narration_queue = self.narration_queue
         self.narration_queue = []
         return [x.to_dict() for x in narration_queue]
     
-    def get_one_narration(self):
+    def get_one_narration(
+            self
+    ):
         if self.narration_queue:
             return self.narration_queue.pop(0)
         return None

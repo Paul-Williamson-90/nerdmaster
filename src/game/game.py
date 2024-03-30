@@ -44,7 +44,6 @@ class GameEnvironmentTurn:
         self.game._reconcile_triggers(prepared_triggers) 
         # increment turns in location
         self.game.add_turn()
-        self.next_turn = Turn.PLAYER.value
 
 
 class Game:
@@ -79,7 +78,7 @@ class Game:
         self.characters: List[NPC] = []
         self.model: StandardGPT = model(model=model_name)
         self.narrator: Voice = narrator(voice="echo")
-        self.narrator_collector: Narrator = narrator_collector
+        self.narrator_collector: Narrator = narrator_collector()
         self.environment_turn: GameEnvironmentTurn = environment_turn(self)
         self.next_turn: str = Turn.GAME.value
         self.action_queue: List[Trigger] = []
@@ -145,7 +144,7 @@ class Game:
         Rewrite narration text using AI.
         """
         system_message = PLAYER_NARRATION_SYSTEM_MESSAGE
-        response = self.model.generate(prompt=text, system_message=system_message)
+        response = self.model.generate(prompt=text, system_prompt=system_message)
         return response
     
     def _add_to_npc_narrator_single(
@@ -170,7 +169,6 @@ class Game:
             self,
             text: Dict[str, str],
             text_tag: str,
-            characters: List[NPC],
             ai_generate: bool,
     ):
         """
@@ -195,9 +193,9 @@ class Game:
             ai_generate: bool = False,
     ):
         if isinstance(text, str):
-            self._add_to_npc_narrator_single(text, text_tag, characters, ai_generate)
+            self._add_to_npc_narrator_single(text, text_tag, ai_generate)
         else:
-            self._add_to_npc_narrator_multiple(text, text_tag, characters, ai_generate)
+            self._add_to_npc_narrator_multiple(text, text_tag, ai_generate)
 
     def switch_game_mode(
             self,
@@ -215,7 +213,7 @@ class Game:
         if ai_generate:
             text = self.model.generate(
                 prompt=text, 
-                system_message=PLAYER_NARRATION_SYSTEM_MESSAGE
+                system_prompt=PLAYER_NARRATION_SYSTEM_MESSAGE
             )
 
         voice = voice if voice else self.narrator
@@ -235,6 +233,13 @@ class Game:
             text: str,
             character: Character,
     ):
+        if text[0] != "\"":
+            text = "\""+text
+        if text[-1] != "\"":
+            text = text+"\""
+
+        text = f"<{character.name}>{text}</{character.name}>"
+        
         audio_path = character.voice.generate(text)
         self.narrator_collector.add_narration(
             text=text, 
@@ -253,30 +258,64 @@ class Game:
     
     def activate_trigger(
             self, 
-            trigger:Trigger|str,
+            trigger:Trigger,
     ):
-        if isinstance(trigger, str):
-            trigger = self.trigger_loader.get_trigger(trigger)
         out = trigger.activate(self)
         return out
+    
+    def _prepare_triggers(
+            self,
+            triggers: List[Trigger],
+    ):
+        # Fetching
+        if triggers:
+            triggers = [self.trigger_loader.get_trigger(x) if isinstance(x, str) 
+                            else x for x in triggers]
+            # Preparing
+            prepared_triggers = []
+            for trigger in triggers:
+                if trigger.trigger_type == "environment":
+                    trigger.prepare(
+                        environment=self.environment,
+                        quest_log=self.player.quest_log
+                    )
+                    prepared_triggers.append(trigger)
+                elif trigger.trigger_type == "character":
+                    trigger.prepare()
+                    prepared_triggers.append(trigger)
+            return prepared_triggers
+        return []
         
     def _reconcile_triggers(
             self,
             triggers: List[Trigger],
     ):
+        print("Triggers:", triggers)
         if len(triggers) == 0:
             return 
         elif len(triggers) == 1:
+            print(triggers[0].trigger_id)
             trigger_response = self.activate_trigger(triggers[0])
             triggers = trigger_response.triggers
+            triggers = self._prepare_triggers(triggers)
             self._reconcile_triggers(triggers)
         else:
             new_triggers = []
             for trigger in triggers:
+                print(trigger.trigger_id)
                 trigger_response = self.activate_trigger(trigger)
-                new_triggers.extend(trigger_response.triggers)
+                trig_adds = trigger_response.triggers
+                trig_adds = self._prepare_triggers(trig_adds)
+                new_triggers.extend(trig_adds)
             self._reconcile_triggers(new_triggers)
 
+    def reconcile_all_characters(
+            self,
+    ):
+        for character in self.characters:
+            self.add_character_actions_to_queue(character)
+        self.add_character_actions_to_queue(self.player)
+        self._reconcile_triggers(self.action_queue)
     
     def NPC_reaction_turn(
             self,
@@ -284,12 +323,12 @@ class Game:
         if len(self.characters)==1:
             character: NPC = self.characters[0]
             character.character_reaction(
-                event = character.get_short_term_memory(),
-                name = self.player.name, # TODO: Check character knows player name
-                mode = self.game_mode, # TODO: Ensure all are using same mode Enum
+                mode = self.game_mode, 
             )
         else:
             raise NotImplementedError("Character reaction for multiple not implemented yet.")
+
+        self.reconcile_all_characters()
 
     def game_turn(
             self,
@@ -301,7 +340,7 @@ class Game:
             and self.next_turn == Turn.GAME.value):
             self.NPC_reaction_turn()
 
-        if self.game_mode not in GameMode.__members__.values():
+        if self.game_mode not in [GameMode.EXPLORE.value, GameMode.DIALOGUE.value, GameMode.COMBAT.value]:
             raise ValueError(f"Game mode {self.game_mode} not recognized")
         
     def load_new_map(
@@ -320,7 +359,7 @@ class Game:
     ):
         if self.next_turn == Turn.PLAYER.value:
             self.activate_player_actions()
-        elif self.next_turn == Turn.GAME.value:
+        if self.next_turn == Turn.GAME.value:
             self.game_turn()
         elif self.next_turn == Turn.SAVE.value:
             self.save_game()
@@ -331,6 +370,7 @@ class Game:
             return
         else:
             raise ValueError(f"Turn {self.next_turn} not recognized")
+        self.next_turn = Turn.PLAYER.value
         
     def get_player_reaction(
             self,
@@ -345,6 +385,18 @@ class Game:
         _ = self.get_player_reaction(player_input)
         self.turn_order()
         return self.narrator_collector.get_narration_queue()
+    
+    def play(
+            self,
+            player_input: str|None = None,
+    ):
+        if self.next_turn == Turn.PLAYER.value:
+            if player_input is None:
+                raise ValueError("Player input required for player turn")
+            return self.player_turn(player_input)
+        else:
+            self.turn_order()
+            return self.narrator_collector.get_narration_queue()
         
         
     

@@ -10,6 +10,8 @@ from src.triggers.trigger_loaders import TriggerLoader
 from src.characters.types.npcs.npc import NPC
 from src.voices.voice import Voice
 
+from copy import deepcopy
+
 import json
 from pathlib import Path
 
@@ -29,7 +31,7 @@ class NPCLoader:
     )->NPC:
         return self._create_character(character_name)
 
-    def _load_data(self, data_path:Path=Path(NPC_DATA_PATH)):
+    def _load_data(self, data_path:Path):
         with open(data_path, "r") as file:
             data = json.load(file)
         return data
@@ -38,8 +40,13 @@ class NPCLoader:
             self, 
             character_name
     ):
-        character_data = self.data[character_name]
-        character_data["background"] = Background(**character_data["background"])
+        character_data = deepcopy(self.data[character_name])
+        character_data["background"] = Background(
+            backstory = character_data["background"]["backstory"],
+            personality = character_data["background"]["personality"],
+            views_beliefs=character_data["background"]["views_beliefs"],
+            factions=character_data["background"]["factions"],
+        )
         character_data["memory"] = Memory(background=character_data["background"],
                                         **character_data["memory"])
         character_data["avatar"] = Avatar(visual_description=character_data["visual_description"],

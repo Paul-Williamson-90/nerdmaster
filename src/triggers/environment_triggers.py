@@ -4,12 +4,12 @@ from src.environments.base import Environment
 from src.game.terms import NarrationType
 from abc import ABC, abstractmethod
 
-from typing import List, Dict, Any
+from typing import List, Dict
 import numpy as np
 
 class EnvironmentTrigger(Trigger, ABC):
 
-    attributes: Dict[str, Any] = {}
+    trigger_type = "environment"
 
     def __init__(
             self,
@@ -24,6 +24,7 @@ class EnvironmentTrigger(Trigger, ABC):
             req_trigger_ids: List[str] = [], # Triggers that need to have been active for trigger
             exl_trigger_ids: List[str] = [], # Triggers that can't have been active for trigger
             req_characters: List[str] = [], # Characters that need to be present in the location
+            attributes: Dict[str, str] = {},
     ):
         super().__init__(trigger_id)
         self.narrative_prompt = narrative_prompt
@@ -36,7 +37,7 @@ class EnvironmentTrigger(Trigger, ABC):
         self.ids_to_trigger = ids_to_trigger
         self.req_characters = req_characters
         self.random_chance = random_chance
-        self.attributes: Dict[str, str] = {}
+        self.attributes: Dict[str, str] = attributes
     
     def prepare(
             self,
@@ -94,7 +95,7 @@ class EnvironmentTrigger(Trigger, ABC):
             return environment.turns_in_location > n_turns
         elif sign == "<":
             return environment.turns_in_location < n_turns
-        elif sign == "=":
+        elif sign == "==":
             return environment.turns_in_location == n_turns
         elif sign == ">=":
             return environment.turns_in_location >= n_turns
@@ -112,7 +113,7 @@ class EnvironmentTrigger(Trigger, ABC):
         """
         Validate all required quests are completed
         """
-        return not all([quest_id in completed_quest_ids for quest_id in self.req_quest_completed_ids])
+        return all([quest_id in completed_quest_ids for quest_id in self.req_quest_completed_ids])
     
     def val_req_active_quests(
             self,
@@ -130,7 +131,7 @@ class EnvironmentTrigger(Trigger, ABC):
         """
         Validate certain quests are not active
         """
-        return any([quest_id in active_quest_ids for quest_id in self.exl_quest_active_ids])
+        return not any([quest_id in active_quest_ids for quest_id in self.exl_quest_active_ids])
     
     def val_triggers_not_prev_active(
             self,
@@ -139,7 +140,7 @@ class EnvironmentTrigger(Trigger, ABC):
         """
         Validate certain triggers are not active
         """
-        return any([trigger_id in completed_trigger_ids for trigger_id in self.exl_trigger_ids])
+        return not any([trigger_id in completed_trigger_ids for trigger_id in self.exl_trigger_ids])
     
     def val_random_chance_trigger(
             self,
@@ -158,13 +159,17 @@ class EnvironmentTrigger(Trigger, ABC):
         """
         Validate the quest log requirements for the trigger
         """
-        if self.val_req_active_quests(active_quest_ids):
+        if not self.val_req_active_quests(active_quest_ids):
+            # print(f"Failed req active quests: {self.req_active_quest_ids}")
             return False
-        if self.val_req_quests_completed(completed_quest_ids):
+        if not self.val_req_quests_completed(completed_quest_ids):
+            # print(f"Failed req completed quests: {self.req_quest_completed_ids}")
             return False
-        if self.val_quests_not_active(active_quest_ids):
+        if not self.val_quests_not_active(active_quest_ids):
+            # print(f"Failed exl active quests: {self.exl_quest_active_ids}")
             return False
-        if self.val_triggers_not_prev_active(completed_trigger_ids):
+        if not self.val_triggers_not_prev_active(completed_trigger_ids):
+            # print(f"Failed exl active triggers: {self.exl_trigger_ids}")
             return False
         return True
     
@@ -175,7 +180,8 @@ class EnvironmentTrigger(Trigger, ABC):
         """
         Validate if the characters are present in the location
         """
-        characters = [character.name for character in environment.character_locations]
+        characters = [character.name  for character_locations in environment.character_locations 
+                      for character in character_locations.characters]
         return any([character in characters for character in self.req_characters])
     
     def val_all_req_characters_present(
@@ -185,7 +191,8 @@ class EnvironmentTrigger(Trigger, ABC):
         """
         Validate if all characters are present in the location
         """
-        characters = [character.name for character in environment.character_locations]
+        characters = [character for character_locations in environment.character_locations 
+                      for character in character_locations.characters]
         return all([character in characters for character in self.req_characters])
     
     def get_characters_present_names(
@@ -195,8 +202,9 @@ class EnvironmentTrigger(Trigger, ABC):
         """
         Get the names of the characters present in the location that are connected to the trigger
         """
-        return [character.name for character in environment.character_locations
-                if character.name in self.req_characters]
+        characters = [character for character_locations in environment.character_locations 
+                      for character in character_locations.characters]
+        return [name for name in characters if name in self.req_characters]
     
 class DescribeLocationTrigger(EnvironmentTrigger):
     """
@@ -220,6 +228,7 @@ class DescribeLocationTrigger(EnvironmentTrigger):
             self,
             game
     ):
+        print(self.attributes)
         game.add_to_player_narrator(
             text=self.attributes["location_description"],
             text_tag=NarrationType.stage.value,
@@ -298,8 +307,8 @@ class OnExitTrigger(EnvironmentTrigger):
     ):
         if not self.val_quest_log_requirements(active_quest_ids, completed_quest_ids, completed_trigger_ids):
             return
-        if not self.val_turns_in_location(environment, 0, "=="):
-            return
+        # TODO: Implement exit checker
+
         if not self.val_random_chance_trigger():
             return 
         environment.arm_trigger(self)
@@ -363,17 +372,17 @@ class TriggerEventAnyCharacter(EnvironmentTrigger):
         self.narrative_prompt_npc = narrative_prompt_npc
         self.event_type = event_type
         
-
+    
     def validate(
             self,
             environment: Environment,
-            req_quest_ids: List[str]=[], # Quests that need to be completed before this dialogue can be triggered
-            exl_quest_ids: List[str]=[], # Quests that can't be active/already triggered for this dialogue to trigger
+            active_quest_ids: List[str]=[], # Quests that need to be completed before this dialogue can be triggered
+            completed_quest_ids: List[str]=[], # Quests that can't be active/already triggered for this dialogue to trigger
             completed_trigger_ids: List[str]=[], # Triggers that can't be active/already triggered for this to trigger
     ):
         if not self.val_any_req_characters_present(environment):
             return
-        if not self.val_quest_log_requirements(req_quest_ids, exl_quest_ids, completed_trigger_ids):
+        if not self.val_quest_log_requirements(active_quest_ids, completed_quest_ids, completed_trigger_ids):
             return
         if not self.val_random_chance_trigger():
             return 
@@ -448,13 +457,13 @@ class TriggerEventAllCharacter(EnvironmentTrigger):
     def validate(
             self,
             environment: Environment,
-            req_quest_ids: List[str]=[], # Quests that need to be completed before this dialogue can be triggered
-            exl_quest_ids: List[str]=[], # Quests that can't be active/already triggered for this dialogue to trigger
+            active_quest_ids: List[str]=[], # Quests that need to be completed before this dialogue can be triggered
+            completed_quest_ids: List[str]=[], # Quests that can't be active/already triggered for this dialogue to trigger
             completed_trigger_ids: List[str]=[], # Triggers that can't be active/already triggered for this to trigger
     ):
         if not self.val_all_req_characters_present(environment):
             return
-        if not self.val_quest_log_requirements(req_quest_ids, exl_quest_ids, completed_trigger_ids):
+        if not self.val_quest_log_requirements(active_quest_ids, completed_quest_ids, completed_trigger_ids):
             return
         if not self.val_random_chance_trigger():
             return 

@@ -3,8 +3,8 @@ from pathlib import Path
 
 # TODO: Put these into an Enum
 ITEM_DATA_PATH = "./data/items/items.json"
-TEMP_IMAGE_DATA_PATH = "./data/images/temp.png"
-TEMP_AUDIO_DATA_PATH = "./data/audio/temp.mp3"
+TEMP_IMAGE_DATA_PATH = "./data/images/"
+TEMP_AUDIO_DATA_PATH = "./data/audio/"
 MAP_DATA_PATH = "./data/environments/map.json"
 QUEST_DATA_PATH = "./data/quests/quests.json"
 NPC_DATA_PATH = "./data/characters/characters.json"
@@ -19,8 +19,8 @@ class GameDataPaths:
     def __init__(
             self,
             item_data_path : Path = Path("./data/items/items.json"),
-            temp_image_data_path : Path = Path("./data/images/temp.png"),
-            temp_audio_data_path : Path = Path("./data/audio/temp.mp3"),
+            temp_image_data_path : Path = Path("./data/images/"),
+            temp_audio_data_path : Path = Path("./data/audio/"),
             map_data_path : Path = Path("./data/environments/map.json"),
             quest_data_path : Path = Path("./data/quests/quests.json"),
             npc_data_path : Path = Path("./data/characters/characters.json"),

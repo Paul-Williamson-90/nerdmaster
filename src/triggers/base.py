@@ -14,6 +14,8 @@ class TriggerResponse:
         self.narrative_message = narrative_message
         self.attributes = attributes
         self.log_message = log_message
+        # print(f"TriggerResponse: {self.__dict__}")
+        
 
 class Trigger(ABC):
     
