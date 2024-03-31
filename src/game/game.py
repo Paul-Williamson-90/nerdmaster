@@ -17,7 +17,7 @@ from src.narrator.narrator import Narrator
 from src.game.terms import GameMode, Turn, NarrationType
 
 from typing import List, Dict
-from src.utils.tools import print_func_name
+# from src.utils.tools import print_func_name
     
     
 class GameEnvironmentTurn:
@@ -66,6 +66,7 @@ class Game:
             environment_turn: GameEnvironmentTurn = GameEnvironmentTurn,
             trigger_loader: TriggerLoader = TriggerLoader,
             narrator_collector: Narrator = Narrator,
+            game_mode: GameMode = GameMode.EXPLORE,
     ):  
         # loaders
         self.environment_loader: EnvironmentLoader = environment_loader
@@ -76,13 +77,13 @@ class Game:
         self.data_paths: GameDataPaths = data_paths
         self.player: Player = player
         self.environment: Environment = environment
-        self.game_mode: str = GameMode.EXPLORE.value
+        self.game_mode: GameMode = game_mode
         self.characters: List[NPC] = []
         self.model: StandardGPT = model(model=model_name)
         self.narrator: Voice = narrator(voice="echo")
         self.narrator_collector: Narrator = narrator_collector()
         self.environment_turn: GameEnvironmentTurn = environment_turn(self)
-        self.next_turn: str = Turn.GAME.value
+        self.next_turn: Turn = Turn.GAME.value
         self.action_queue: List[Trigger] = []
 
     # @print_func_name

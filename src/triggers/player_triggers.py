@@ -46,7 +46,7 @@ class StageDirection(PlayerAction):
         Args
         str - <stage_direction>: The stage direction for the player's character.
         """
-        print(self.__class__.__name__, "prepare")
+        # print(self.__class__.__name__, "prepare")
         self.attributes["stage_direction"] = stage_direction
         self.character.add_to_action_queue(self)
         return "**Tool Action Accepted**"
@@ -56,7 +56,7 @@ class StageDirection(PlayerAction):
             self,
             game
     ):
-        print(self.__class__.__name__, "activate")
+        # print(self.__class__.__name__, "activate")
         game.add_to_player_narrator(
             text=self.attributes["stage_direction"],
             text_tag=NarrationType.stage.value,
@@ -72,7 +72,52 @@ class StageDirection(PlayerAction):
 
         game.next_turn = Turn.GAME.value
 
-        return TriggerResponse(log_message=f"Trigger {self.trigger_id} activated.")
+        return TriggerResponse(
+            log_path=game.data_paths.logs_path,
+            log_message=f"Trigger {self.trigger_id} activated."
+        )
+    
+class LeaveConversation(PlayerAction):
+
+    # @print_func_name
+    def prepare(
+            self,
+    ):
+        """
+        <desc>Make the player's character leave the conversation</desc>
+        """
+        # print(self.__class__.__name__, "prepare")
+        self.character.add_to_action_queue(self)
+        return "**Tool Action Accepted**"
+    
+    # @print_func_name
+    def activate(
+            self,
+            game
+    ):
+        # print(self.__class__.__name__, "activate")
+        # TODO: Check characters for any no-leave triggers/flags
+
+        game.add_to_player_narrator(
+            text=f"{self.character.name} leaves the conversation.",
+            text_tag=NarrationType.stage.value,
+            ai_generate=True,
+        )
+
+        game.add_to_npc_narrator(
+            text=f"{self.character.name} leaves the conversation.",
+            text_tag=NarrationType.stage.value,
+            characters=[char.name for char in game.characters],
+            ai_generate=True,
+        )
+
+        game.game_mode = GameMode.EXPLORE.value
+        game.next_turn = Turn.PLAYER.value
+
+        return TriggerResponse(
+            log_path=game.data_paths.logs_path,
+            log_message=f"Trigger {self.trigger_id} activated."
+        )
 
 class Speak(PlayerAction):
 
@@ -87,7 +132,7 @@ class Speak(PlayerAction):
         Args
         str - <dialogue>: The dialogue the player's character will say.
         """
-        print(self.__class__.__name__, "prepare")
+        # print(self.__class__.__name__, "prepare")
         self.attributes["dialogue"] = dialogue
         self.character.add_to_action_queue(self)
         return "**Tool Action Accepted**"
@@ -97,7 +142,7 @@ class Speak(PlayerAction):
             self,
             game
     ):
-        print(self.__class__.__name__, "activate")
+        # print(self.__class__.__name__, "activate")
         player_name = game.player.name
         dialogue = self.attributes["dialogue"]
         characters = [char.name for char in game.characters]
@@ -127,7 +172,10 @@ class Speak(PlayerAction):
         game.next_turn = Turn.GAME.value
         game.switch_game_mode(GameMode.DIALOGUE.value)
 
-        return TriggerResponse(log_message=f"Trigger {self.trigger_id} activated.")
+        return TriggerResponse(
+            log_path=game.data_paths.logs_path,
+            log_message=f"Trigger {self.trigger_id} activated."
+        )
         
 
 class SearchMemory(PlayerAction):
@@ -163,7 +211,10 @@ class SearchMemory(PlayerAction):
             voice=self.character.voice,
         )
 
-        return TriggerResponse(log_message=f"Trigger {self.trigger_id} activated.")
+        return TriggerResponse(
+            log_path=self.character.game.data_paths.logs_path,
+            log_message=f"Activated {self.trigger_id}: {self.character.name} searches memory for {self.attributes['query']}",
+        )
 
 class Attack(PlayerAction):
     """

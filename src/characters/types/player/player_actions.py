@@ -7,12 +7,11 @@ from src.triggers.player_triggers import (
     SearchMemory, 
     StageDirection, 
     Attack,
-    PrepareAttack
+    PrepareAttack,
+    LeaveConversation
 )
 
 from typing import Dict
-
-
 
 class PlayerReActionMap(ReActionMap):
 
@@ -27,6 +26,7 @@ class PlayerReActionMap(ReActionMap):
                 "search_memory": SearchMemory(character=character).prepare,
                 "stage_direction": StageDirection(character=character).prepare,
                 "prepare_attack": PrepareAttack(character=character).prepare,
+                "leave_conversation": LeaveConversation(character=character).prepare,
                 # "look_at_character": None, # TODO: Implement this
                 # "look_around": None, # TODO: Implement this
             },
@@ -37,6 +37,12 @@ class PlayerReActionMap(ReActionMap):
                 # "surrender": None, # TODO: Implement this
                 # "run_away": None, # TODO: Implement this
                 # "scream_for_help": None, # TODO: Implement this
+            },
+            GameMode.EXPLORE.value: {
+                "search_memory": SearchMemory(character=character).prepare,
+                "stage_direction": StageDirection(character=character).prepare,
+                # "look_at_character": None, # TODO: Implement this
+                # "look_around": None, # TODO: Implement this
             }
         }
 

@@ -1,5 +1,6 @@
 from enum import Enum
 from pathlib import Path
+from datetime import datetime
 
 # TODO: Put these into an Enum
 ITEM_DATA_PATH = "./data/items/items.json"
@@ -21,25 +22,34 @@ class GameDataPaths:
 
     def __init__(
             self,
-            item_data_path : Path = Path("./data/items/items.json"),
-            temp_image_data_path : Path = Path("./data/images/"),
-            temp_audio_data_path : Path = Path("./data/audio/"),
-            map_data_path : Path = Path("./data/environments/map.json"),
-            quest_data_path : Path = Path("./data/quests/quests.json"),
-            npc_data_path : Path = Path("./data/characters/characters.json"),
-            local_locations_data_path : Path = Path("./data/environments/local_locations.json"),
-            triggers_data_path : Path = Path("./data/triggers/triggers.json"),
-            environments_data_path : Path = Path("./data/environments/environments.json"),
+            item_data_path: Path = Path("./data/items/items.json"),
+            temp_image_data_path: Path = Path("./data/images/"),
+            temp_audio_data_path: Path = Path("./data/audio/"),
+            map_data_path: Path = Path("./data/environments/map.json"),
+            quest_data_path: Path = Path("./data/quests/quests.json"),
+            npc_data_path: Path = Path("./data/characters/characters.json"),
+            local_locations_data_path: Path = Path("./data/environments/local_locations.json"),
+            triggers_data_path: Path = Path("./data/triggers/triggers.json"),
+            environments_data_path: Path = Path("./data/environments/environments.json"),
     ):
-        self.item_data_path = item_data_path
-        self.temp_image_data_path = temp_image_data_path
-        self.temp_audio_data_path = temp_audio_data_path
-        self.map_data_path = map_data_path
-        self.quest_data_path = quest_data_path
-        self.npc_data_path = npc_data_path
-        self.local_locations_data_path = local_locations_data_path
-        self.triggers_data_path = triggers_data_path
-        self.environments_data_path = environments_data_path
+        self.item_data_path: Path = item_data_path
+        self.temp_image_data_path: Path = temp_image_data_path
+        self.temp_audio_data_path: Path = temp_audio_data_path
+        self.map_data_path: Path = map_data_path
+        self.quest_data_path: Path = quest_data_path
+        self.npc_data_path: Path = npc_data_path
+        self.local_locations_data_path: Path = local_locations_data_path
+        self.triggers_data_path: Path = triggers_data_path
+        self.environments_data_path: Path = environments_data_path
+        self.logs_path: Path = self._new_logs_path()
+    
+    def _new_logs_path(
+            self,
+    )->Path:
+        now = datetime.now()
+        with open(".data/logs/.log", "w") as file:
+            file.write(f"- {now.strftime('%Y%m%d%H%M%S')} - New game created.\n")
+        return Path(f".data/logs/{now.strftime('%Y%m%d%H%M%S')}.txt")
 
 GAME_DATA_PATH = "./data/game/game.json"
 

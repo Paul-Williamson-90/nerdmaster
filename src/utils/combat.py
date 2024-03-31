@@ -39,6 +39,7 @@ def combat_resolutions(
         )
 
         return TriggerResponse(
+            log_path=game.data_paths.logs_path,
             log_message=f"Activated {trigger_id}: {narrative_message}",
         )
     else:
@@ -58,6 +59,7 @@ def combat_resolutions(
         )
         
         return TriggerResponse(
+            log_path=game.data_paths.logs_path,
             log_message=f"Activated {trigger_id}: {narrative_message}",
         )
 

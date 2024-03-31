@@ -41,6 +41,10 @@ class SearchMemory(NPCAction):
     def activate(
             self,
     ):
+        TriggerResponse(
+            log_path=self.character.game.data_paths.logs_path,
+            log_message=f"Activated {self.trigger_id}: {self.character.name} searches memory for {self.attributes['query']}",
+        )
         response = self.character.memory.search_memory(self.attributes["query"], self.character.name)
         return response
 
@@ -81,6 +85,7 @@ class Speak(NPCAction):
         )
 
         return TriggerResponse(
+            log_path=game.data_paths.logs_path,
             log_message=f"Activated {self.trigger_id}: {self.character.name} says: {dialogue}",
         )
     

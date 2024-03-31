@@ -45,6 +45,7 @@ def prepare_attack_action(
         trigger.prepare(character_to_attack=defending.name)
 
         return TriggerResponse(
+            log_path=game.data_paths.logs_path,
             log_message=f"Trigger {trigger_id}: {attacking.name} attacks {defending.name}, {defending.name} is caught off guard!",
         )
 
@@ -70,5 +71,6 @@ def prepare_attack_action(
             game.next_turn = Turn.GAME.value
 
         return TriggerResponse(
+            log_path=game.data_paths.logs_path,
             log_message=f"Trigger {trigger_id}: {defending.name} notices {attacking.name} is about to attack!",
         )
