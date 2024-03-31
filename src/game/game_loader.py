@@ -16,6 +16,9 @@ from pathlib import Path
 import os
 import json
 
+class GameLoaderException(Exception):
+    pass
+
 class GameLoader:
 
     def __init__(
@@ -151,31 +154,40 @@ class GameLoader:
             player_id: str,
     
     ):
-        with open(f".data/game/game_data.json", 'r') as f:
+        if not os.path.exists("./saves"):
+            os.mkdir("./saves")
+
+        with open(f"./data/game/game.json", 'r') as f:
             data = json.load(f)
 
         if player_id in data.keys():
-            raise ValueError(f"Player with id {player_id} already exists.")
-
-        dirs_to_copy = [
-        "./data/audio",
-        "./data/characters",
-        "./data/images",
-        "./data/quests",
-        ]
+            raise GameLoaderException(f"Player with id {player_id} already exists.")
 
         os.mkdir("./saves/" + player_id.replace(" ", "_"))
+
+        dirs_to_copy = [
+        "characters",
+        "images",
+        ]
+
         for dir in dirs_to_copy:
-            os.system(f"cp {dir} ./saves/{player_id.replace(' ', '_')}")
+            os.mkdir("./saves/" + player_id.replace(" ", "_") + "/" + dir)
+            files = os.listdir(f"./data/{dir}")
+            for file in files:
+                with open(f"./data/{dir}/{file}", 'r') as f:
+                    file_data = json.load(f)
+                with open(f"./saves/{player_id.replace(' ', '_')}/{dir}/{file}", 'w') as f:
+                    json.dump(file_data, f, indent=4)
         
         os.mkdir("./saves/" + player_id.replace(" ", "_") + "/memories")
+        os.mkdir("./saves/" + player_id.replace(" ", "_") + "/audio")
         
         data_paths = {
             "item_data_path" : "./data/items/items.json",
             "temp_image_data_path" : "./saves/" + player_id.replace(" ", "_")+"/images/",
             "temp_audio_data_path" : "./saves/" + player_id.replace(" ", "_")+"/audio/",
             "map_data_path" : "./data/environments/map.json",
-            "quest_data_path" : "./saves/" + player_id.replace(" ", "_")+"/quests/quests.json",
+            "quest_data_path" : "./data/quests/quests.json",
             "npc_data_path" : "./saves/" + player_id.replace(" ", "_")+"/characters/characters.json",
             "local_locations_data_path" : "./data/environments/local_locations.json",
             "triggers_data_path" : "./data/triggers/triggers.json",
@@ -183,15 +195,97 @@ class GameLoader:
             "memories_root_dir": "./saves/" + player_id.replace(" ", "_") + "/memories/",
         }
 
-        data[player_id] = data_paths["data_paths"]
+        data[player_id] = data_paths
 
-        with open(f".data/game/game_data.json", 'w') as f:
-            json.dump(data, f)
+        with open(f"./data/game/game.json", 'w') as f:
+            json.dump(data, f, indent=4)
 
     def new_game(
             self,
-            player_id: str,
+            name: str,
+            visual_description: str,
+            avatar_image_path: Path = None,
+            voice: str = "alloy",
     ):
-        self._setup_data_paths(player_id)
-        return self.load_game(player_id)
+        self._create_player(name, visual_description, avatar_image_path, voice)
+        self._setup_data_paths(name)
+        return self.load_game(name)
+    
+    def _create_player(
+            self,
+            player_id: str,
+            visual_description: str,
+            avatar_image_path: Path,
+            voice: str,
+    ):
+        with open(f"./data/player/player.json", 'r') as f:
+            data = json.load(f)
+
+        if player_id in data.keys():
+            raise GameLoaderException(f"Player with id {player_id} already exists.")
+        
+        data[player_id] = {
+            "name": player_id,
+            "current_location": "The Room",
+            "gold": 100,
+            "background": {
+                "backstory": "Wyatt Thompson was born in the small town of Dusty Creek, Texas, in 1850. He grew up on a ranch, learning the ways of the land from his father, who was a respected cattle rancher. From a young age, Wyatt showed an aptitude for handling horses and firearms, quickly earning him the nickname \"Ace.\"\n\nAt the age of 17, tragedy struck when Wyatt's family ranch was attacked by a gang of outlaws looking to seize their land. Wyatt's parents were killed in the attack, and he was left to fend for himself. Fuelled by vengeance, Wyatt embarked on a quest to track down the outlaws responsible for his family's demise.",
+                "personality": "Wyatt is a stoic and determined individual, with a steely resolve forged by years of hardship and loss. He is fiercely independent and values his freedom above all else. Despite his tough exterior, Wyatt has a compassionate side, especially towards those who have suffered injustice. He is a man of few words, preferring to let his actions speak for him.",
+                "views_beliefs": "Wyatt believes in justice, albeit of the frontier variety. He has little faith in the law to protect the innocent, preferring to take matters into his own hands when necessary. He is a firm believer in the code of the West, which values honor, loyalty, and courage above all else. However, Wyatt also understands that sometimes survival means bending the rules, and he's not afraid to get his hands dirty to achieve his goals.\n\nDespite his rough exterior, Wyatt has a strong moral compass and strives to do what he believes is right, even if it means making difficult choices along the way. He harbors a deep distrust of authority figures, particularly those in positions of power who abuse their influence for personal gain.\n\nWyatt's quest for vengeance has consumed much of his life, but deep down, he yearns for a sense of belonging and purpose beyond his vendetta. He longs for a world where justice isn't just a fleeting ideal but a tangible reality for all who seek it.",
+                "factions": [
+                    "Outlaws",
+                    "Lawmen",
+                    "Frontiersmen"
+                ]
+            },
+            "visual_description": visual_description,
+            "memory": {
+                    "long_term": None,
+                    "short_term": [],
+                    "names": {}
+                },
+            "avatar": {
+                    "image": avatar_image_path
+                },
+            "health": {
+                    "status": "HEALTHY",
+                    "status_turn_count": 0,
+                    "description": "",
+                    "scars": []
+                },
+            "skills": {
+                "DEXTERITY": "UNTRAINED",
+                "AIM": "UNTRAINED",
+                "ATHLETICS": "UNTRAINED",
+                "BRAWL": "UNTRAINED",
+                "LOCKPICK": "UNTRAINED",
+                "MEDICINE": "UNTRAINED",
+                "MECHANICS": "UNTRAINED",
+                "COMPUTERS": "UNTRAINED",
+                "DRIVING": "UNTRAINED",
+                "STEALTH": "UNTRAINED",
+                "PERCEPTION": "UNTRAINED"
+            },
+            "backpack": [],
+            "equipped_items": {
+                "HEAD": None,
+                "CHEST": None,
+                "LEGS": None,
+                "FEET": None,
+                "MAIN_HAND": None,
+                "OFF_HAND": None
+            },
+            "with_player": False,
+            "voice": voice,
+            "quest_log": {
+                "active_quest_ids": [],
+                "completed_quest_ids": [],
+                "completed_trigger_ids": []
+            },
+            "triggers": []
+        }
+
+        with open(f"./data/player/player.json", 'w') as f:
+            json.dump(data, f, indent=4)
+        
         
