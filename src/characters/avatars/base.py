@@ -9,22 +9,20 @@ class Avatar:
     def __init__(
             self,
             visual_description: str,
-            avatar: np.ndarray|Path|None,
+            avatar: Path|None,
             image_model: Dalle = Dalle,
     )->None:
         self.image_model = image_model()
         self.visual_description = visual_description
+        self.avatar_path = avatar
         self.avatar = self._load_avatar(avatar)
 
     def _load_avatar(
             self,
-            avatar: np.ndarray|None,
+            avatar: Path|None,
     )->np.ndarray:
         if avatar:
-            if isinstance(avatar, np.ndarray):
-                return avatar
-            elif isinstance(avatar, Path):
-                return np.load(avatar)
+            return np.load(avatar)
         else:
             pass #self.create_avatar()
 

@@ -14,6 +14,8 @@ TRIGGERS_DATA_PATH = "./data/triggers/triggers.json"
 ENVIRONMENT_DATA_PATH = "./data/environments/environments.json"
 PLAYER_DATA_PATH = "./data/player/player.json"
 
+GAME_DATA_PATH = "./data/game/game.json"
+
 class AgentConfigs(Enum):
 
     VERBOSE = False
@@ -50,8 +52,6 @@ class GameDataPaths:
         with open(".data/logs/.log", "w") as file:
             file.write(f"- {now.strftime('%Y%m%d%H%M%S')} - New game created.\n")
         return Path(f".data/logs/{now.strftime('%Y%m%d%H%M%S')}.txt")
-
-GAME_DATA_PATH = "./data/game/game.json"
 
 
 class DifficultyConfigs(Enum):

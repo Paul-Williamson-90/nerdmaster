@@ -22,6 +22,7 @@ class NPCLoader:
             data_path: Path = Path(NPC_DATA_PATH),
             trigger_loader: TriggerLoader = TriggerLoader,
     ):
+        self.data_path = data_path
         self.data = self._load_data(data_path)
         self.trigger_loader = trigger_loader()
 
@@ -62,3 +63,14 @@ class NPCLoader:
         npc = NPC(**character_data)
         return npc
 
+    def character_save(
+            self,
+            name: str,
+            data: dict,
+    ):
+        self.data[name] = data
+        self._save_data()
+
+    def _save_data(self):
+        with open(self.data_path, "w") as file:
+            json.dump(self.data, file, indent=4)

@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import List, Dict
 import numpy as np
 
@@ -357,5 +357,9 @@ class Character(ABC):
         str - <character_name>: The name of the character to use the item on.
         """
         return self.backpack.use_item_by_unique_id(unique_id, character_name)
+    
+    @abstractmethod
+    def save(self):
+        ...
 
    

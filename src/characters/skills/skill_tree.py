@@ -105,3 +105,15 @@ class SkillTree:
         """
         message = self.skills[skill].increase_proficiency(name)
         return message
+    
+    def serialize(
+            self,
+    )->Dict[str, str]:
+        """
+        Serialize the skills.
+
+        Returns:
+        Dict[str, str]: The serialized skills.
+        """
+        serialized_skills = {skill: skill.get_proficiency() for skill in self.skills.values()}
+        return serialized_skills

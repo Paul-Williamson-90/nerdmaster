@@ -66,7 +66,6 @@ class StageDirection(PlayerAction):
         game.add_to_npc_narrator(
             text=self.attributes["stage_direction"],
             text_tag=NarrationType.stage.value,
-            characters=[char.name for char in game.characters],
             ai_generate=False,
         )
 
@@ -107,9 +106,10 @@ class LeaveConversation(PlayerAction):
         game.add_to_npc_narrator(
             text=f"{self.character.name} leaves the conversation.",
             text_tag=NarrationType.stage.value,
-            characters=[char.name for char in game.characters],
             ai_generate=True,
         )
+
+        game.remove_from_characters()
 
         game.game_mode = GameMode.EXPLORE.value
         game.next_turn = Turn.PLAYER.value
@@ -165,7 +165,6 @@ class Speak(PlayerAction):
         game.add_to_npc_narrator(
             text=dialogue,
             text_tag=player_name,
-            characters=characters,
             ai_generate=False,
         )
 

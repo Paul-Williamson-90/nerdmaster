@@ -137,3 +137,8 @@ class Equipped:
             weapon_modifier += (off_hand.get_modifier()//2)
         
         return skill_type, weapon_name, weapon_modifier
+    
+    def serialize(
+            self,
+    )->Dict[str, str]:
+        return {k: v.item_id if v else None for k, v in self.equipped.items()}

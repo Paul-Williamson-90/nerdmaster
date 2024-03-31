@@ -15,7 +15,8 @@
         "visual_description": "The man cuts a formidable figure, standing tall and lean with a weather-beaten face etched with lines of hardship and determination. His piercing blue eyes, framed by a shadow of stubble, carry a weight of experience beyond his years. Clad in worn leather boots, faded denim jeans, and a dusty duster coat, he exudes the rugged resilience of a man who's weathered the harsh trials of the frontier. A Colt revolver rests snugly in a well-worn holster at his hip, a silent testament to his readiness for whatever challenges may come his way.",
         "memory": {
             "long_term": null,
-            "short_term": []
+            "short_term": [],
+            "names": {}
         },
         "avatar": {
             "image": null

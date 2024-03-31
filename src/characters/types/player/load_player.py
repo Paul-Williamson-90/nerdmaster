@@ -164,3 +164,16 @@ class PlayerLoader:
             voice=voice
         )
         return player
+    
+    def save_player(
+            self,
+            player_data: dict
+    ):
+        # open the file to get all data
+        with open(PLAYER_DATA_PATH, 'r') as file:
+            data = json.load(file)
+        # update the data
+        data[player_data["name"]] = player_data
+        # save the data
+        with open(PLAYER_DATA_PATH, 'w') as file:
+            json.dump(data, file, indent=4)

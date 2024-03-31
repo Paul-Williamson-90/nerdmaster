@@ -16,7 +16,8 @@
         "visual_description": "Wyatt",
         "memory": {
                 "long_term": null,
-                "short_term": []
+                "short_term": [],
+                "names": {}
             },
         "avatar": {
                 "image": null

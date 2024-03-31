@@ -18,6 +18,30 @@ class NPCAction(Trigger):
         self.character: Character = character
         self.attributes: Dict[str, str] = attributes
 
+class MemorisePlayerName(NPCAction):
+
+    def prepare(
+            self,
+            name: str,
+    ):
+        """
+        <desc>When a character called "Stranger" tells you their name, commit the name into your character's memory.</desc>
+
+        Args
+        str - <name>: The name of the character to memorise.
+        """
+        self.attributes["character_name"] = name
+        return self.activate()
+
+    def activate(
+            self,
+    ):
+        self.character.memory.memorise_name(self.attributes["character_name"])
+        return TriggerResponse(
+            log_path=self.character.game.data_paths.logs_path,
+            log_message=f"{self.character.name} memorises character name {self.attributes['character_name']}",
+        )
+
 
 class SearchMemory(NPCAction):
 
@@ -75,7 +99,6 @@ class Speak(NPCAction):
         game.add_to_npc_narrator(
             text=dialogue,
             characters=[char.name for char in game.characters],
-            text_tag=self.character.name,
             ai_generate=True,
         )
         

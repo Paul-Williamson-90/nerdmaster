@@ -15,6 +15,7 @@ from src.game.prompts import PLAYER_NARRATION_SYSTEM_MESSAGE
 from src.voices.voice import Voice
 from src.narrator.narrator import Narrator
 from src.game.terms import GameMode, Turn, NarrationType
+from src.characters.types.player.load_player import PlayerLoader
 
 from typing import List, Dict
 # from src.utils.tools import print_func_name
@@ -98,6 +99,10 @@ class Game:
         """
         Triggers the save game process (only during exploration mode)
         """
+        data = self.player.save()
+        loader = PlayerLoader()
+        loader.save_player(data)
+
         self.narrator_collector.add_narration(
             text="Game saved.",
         )
@@ -131,7 +136,6 @@ class Game:
     # @print_func_name
     def remove_from_characters(
             self,
-            characters: List[str]|str,
     ):
         """
         Removes NPC characters from game focus.
@@ -139,10 +143,11 @@ class Game:
         Args:
         characters (List[str]|str): List of character names to remove from game focus.
         """
-        if isinstance(characters, str):
-            characters = [characters]
+        characters = self.characters
         for character in characters:
-            self.characters = [c for c in self.characters if c.name != character]
+            save_json = character.save() # TODO: Consider keeping short-term and removing it if leave environment
+            self.npc_loader.character_save(character.name, save_json)
+        self.characters = []
 
     # @print_func_name
     def _ai_generate_narration(
@@ -201,7 +206,6 @@ class Game:
             self,
             text: str|Dict[str, str],
             text_tag: str, # stage or character name
-            characters: List[str], # TODO: Need to remove this arg and from all calling it
             ai_generate: bool = False,
     ):
         if isinstance(text, str):

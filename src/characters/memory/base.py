@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 
 from src.characters.background import Background
 from src.characters.memory.prompts import (
@@ -11,7 +11,11 @@ from src.endpoints.gpt import StandardGPT
 from src.characters.memory.memory_agent import MemoryAgent
 
 from pathlib import Path
-import tempfile
+from uuid import uuid4
+
+from src.game.terms import NarrationType
+
+import re
 
 
 class Memory:
@@ -22,12 +26,72 @@ class Memory:
             long_term: MemoryAgent|Path|None = None,
             short_term: List[str] = [],
             model: StandardGPT = StandardGPT,
-            model_name: str = "gpt-3.5-turbo"
+            model_name: str = "gpt-3.5-turbo",
+            names: Dict[str, str] = {},
     )->None:
+        self.long_term_file_path = long_term if isinstance(long_term, Path) else None
         self.background = background
+        self.names: Dict[str, str] = names
         self.short_term = short_term
         self.model = model(model=model_name)
         self.long_term = self._load_long_term(long_term)
+
+    def memorise_name(
+            self,
+            name: str,
+    )->None:
+        self.names[name] = name
+
+    def add_stranger(
+            self,
+            name: str,
+    )->None:
+        self.names[name] = "Stranger"
+
+    def _name_replacement(
+            self,
+            text: str,
+    ):
+        for name in self.names.keys():
+            text = text.replace(
+                f"<{name}>", f"<{self.names[name]}>"
+            ).replace(
+                f"</{name}>", f"</{self.names[name]}>"
+            )
+        return text
+    
+    def _check_new_names(
+            self,
+            text: str,
+    ):
+        new_names = re.findall(r"<(.*?)>", text)
+        for name in new_names:
+            if name not in self.names.keys():
+                if name not in [x.value for x in list(NarrationType.__members__.values())]:
+                    self.add_stranger(name)
+
+    def parse_names(
+            self,
+            text: str,
+    ):
+        self._check_new_names(text)
+        text = self._name_replacement(text)  
+        return text
+    
+    def _process_long_term(
+            self,
+            long_term: Path,
+    ):
+        with open(long_term, 'r') as file:
+            data = file.read()
+        for name in self.names.keys():
+            data = data.replace(
+                f"{name}", f"{self.names[name]}"
+            )
+        new_file_path = long_term.parent / f"{long_term.stem}_temp{long_term.suffix}"
+        with open(new_file_path, 'w') as file:
+            file.write(data)
+        return new_file_path
 
     def _load_long_term(
             self,
@@ -37,12 +101,14 @@ class Memory:
             if isinstance(long_term, MemoryAgent):
                 return long_term
             elif isinstance(long_term, Path):
-                return MemoryAgent(long_term)
+                new_file_path = self._process_long_term(long_term)
+                return MemoryAgent(new_file_path)
         else:
-            with tempfile.NamedTemporaryFile(delete=False) as temp:
-                temp.write(self.background.__str__().encode())
-                temp_path = temp.name
-            return MemoryAgent(temp_path)
+            new_file_path = Path(f"./data/memories/{uuid4()}.txt")
+            with open(new_file_path, "w") as f:
+                f.write(self.background.__str__())
+            self.long_term_file_path = new_file_path
+            return MemoryAgent(self.long_term_file_path)
 
     def add_to_short_term(
             self,
@@ -78,7 +144,7 @@ class Memory:
             query: str,
     )->str:
         system_message = SEARCH_SHORT_TERM.format(
-            short_term='\n'.join(self.short_term),
+            short_term=self._name_replacement('\n'.join(self.short_term)),
         )
         response = self._call_model(query, system_message)
         return response

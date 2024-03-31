@@ -30,7 +30,7 @@ class Skill:
         self.description = description
         self.proficiency = proficiency
 
-    def get_profieciency(
+    def get_proficiency(
             self,
     )->str:
         """

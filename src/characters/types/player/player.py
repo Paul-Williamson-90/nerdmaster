@@ -58,4 +58,41 @@ class Player(Character):
         )
         self.current_location = current_location
         self.quest_log = quest_log
+
+    def save(self):
+        return {
+            "name": self.name,
+            "current_location": self.current_location,
+            "gold": self.gold,
+            "background": {
+                "backstory": self.background.backstory,
+                "personality": self.background.personality,
+                "views_beliefs": self.background.views_beliefs,
+                "factions": self.background.factions,
+            },
+            "visual_description": self.visual_description,
+            "memory": {
+                "long_term": self.memory.long_term_file_path,
+                "short_term": self.memory.short_term,
+                "names": self.memory.names,
+            },
+            "avatar": self.avatar.avatar_path,
+            "health": {
+                "status": self.health.status,
+                "status_turn_count": self.health.status_turn_count,
+                "description": self.health.description,
+                "scars": self.health.scars,
+            },
+            "skills": self.skills.serialize(),
+            "backpack": self.backpack.items,
+            "equipped_items": self.equipped_items.serialize(),
+            "with_player": self.with_player,
+            "voice": self.voice.voice,
+            "triggers": [x.trigger_id for x in self.triggers],
+            "quest_log": {
+                "active_quest_ids": self.quest_log.active_quest_ids,
+                "completed_quest_ids": self.quest_log.completed_quest_ids,
+                "completed_trigger_ids": self.quest_log.completed_trigger_ids,
+            }
+        }
     
