@@ -33,6 +33,37 @@ class PlayerAction(Trigger, ABC):
         ):
             ...
 
+class LookAround(PlayerAction):
+
+    def prepare(
+            self,
+    ):
+        """
+        <desc>Make the player's character look around the environment</desc>
+        """
+        self.character.add_to_action_queue(self)
+        return "**Tool Action Accepted**"
+    
+    def activate(
+            self,
+            game
+    ):
+        game.add_to_player_narrator(
+            text=f"You look around at the environment around you, looking for things of interest...",
+            text_tag=NarrationType.stage.value,
+            ai_generate=False,
+        )
+
+        # game.environment.fetch_triggers_explore()
+        game.environment.arm_reveal_triggers(game.player.quest_log)
+
+        game.next_turn = Turn.GAME.value
+
+        return TriggerResponse(
+            log_path=game.data_paths.logs_path,
+            log_message=f"Trigger {self.trigger_id} activated."
+        )
+
 class StageDirection(PlayerAction):
 
     # @print_func_name

@@ -27,6 +27,15 @@ class QuestLog:
         self.completed_quest_ids = completed_quest_ids
         self.completed_trigger_ids = completed_trigger_ids
 
+    def add_completed_trigger(self, trigger_id: str):
+        self.completed_trigger_ids.append(trigger_id)
+
+    def add_completed_quest(self, quest_id: str):
+        self.completed_quest_ids.append(quest_id)
+
+    def add_active_quest(self, quest_id: str):
+        self.active_quest_ids.append(quest_id)
+
 class QuestLoader:
 
     def __init__(

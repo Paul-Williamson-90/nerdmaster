@@ -31,11 +31,24 @@ class GameEnvironmentTurn:
 
     # @print_func_name
     def fetch_triggers_environment(self):
+        """
+        These triggers are provided on game environment turn.
+        """
         quest_log = self.game.player.quest_log
         armed_triggers = self.game.environment.fetch_active_triggers(
             quest_log = quest_log
         )
         return armed_triggers
+    
+    def fetch_triggers_explore(self):
+        """
+        These triggers are provided when the player chooses to explore the environment.
+        """
+        quest_log = self.game.player.quest_log
+        prepared_triggers = self.game.environment.fetch_reveal_triggers(
+            quest_log = quest_log
+        )
+        self.game.action_queue += prepared_triggers
     
     # @print_func_name
     def game_environment_turn(
@@ -47,6 +60,8 @@ class GameEnvironmentTurn:
         self.game._reconcile_triggers(prepared_triggers) 
         # increment turns in location
         self.game.add_turn()
+        self.game.action_queue = []
+        self.game.environment.armed_triggers = []
 
 
 class Game:
@@ -67,7 +82,7 @@ class Game:
             environment_turn: GameEnvironmentTurn = GameEnvironmentTurn,
             trigger_loader: TriggerLoader = TriggerLoader,
             narrator_collector: Narrator = Narrator,
-            game_mode: GameMode = GameMode.EXPLORE,
+            game_mode: GameMode = GameMode.EXPLORE.value,
     ):  
         # loaders
         self.environment_loader: EnvironmentLoader = environment_loader
@@ -313,6 +328,8 @@ class Game:
             self,
             triggers: List[Trigger],
     ):
+        if not triggers:
+            return
         if len(triggers) == 0:
             return 
         elif len(triggers) == 1:
@@ -362,10 +379,12 @@ class Game:
         
         if self.game_mode == GameMode.EXPLORE.value and self.next_turn == Turn.GAME.value:
             self.environment_turn.game_environment_turn()
+            print("Post-env",self.action_queue)
         
         if (self.game_mode in [GameMode.DIALOGUE.value, GameMode.COMBAT.value]
             and self.next_turn == Turn.GAME.value):
             self.NPC_reaction_turn()
+            print("Post-npc",self.action_queue)
     
     # @print_func_name
     def load_new_map(
@@ -387,8 +406,11 @@ class Game:
     ):
         if self.next_turn == Turn.PLAYER.value:
             self.activate_player_actions()
+            # self._reconcile_triggers(self.action_queue) 
+            # self.action_queue = []
         if self.next_turn == Turn.GAME.value:
             self.game_turn()
+            print("Post Game",self.action_queue)
         elif self.next_turn == Turn.SAVE.value:
             self.save_game()
         elif self.next_turn == Turn.NEW_MAP.value:

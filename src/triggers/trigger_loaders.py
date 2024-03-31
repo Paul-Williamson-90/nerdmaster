@@ -10,6 +10,8 @@ from src.triggers.environment_triggers import (
     TriggerEventAnyCharacter,
     TriggerEventAllCharacter,
     DescribeLocationTrigger,
+    OnRevealTrigger,
+    RevealTrigger,
 )
 from src.game.configs import TRIGGERS_DATA_PATH
 
@@ -21,6 +23,10 @@ class TriggerTypeMap(Enum):
     TurnsInLocationTrigger = TurnsInLocationTrigger
     OnExitTrigger = OnExitTrigger
     DescribeLocationTrigger = DescribeLocationTrigger
+
+    # Reveals
+    OnRevealTrigger = OnRevealTrigger
+    RevealTrigger = RevealTrigger
 
     # Interaction Triggers
     TriggerEventAnyCharacter = TriggerEventAnyCharacter

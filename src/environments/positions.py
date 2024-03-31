@@ -31,17 +31,17 @@ class CharacterPosition(Position):
             self,
             characters: List[str],
             position_description: str,
-            activity_description: str,
             reveal_description: str|None,
             hidden: bool,
             triggers: List[Trigger|None] = [] # Replace with trigger event
     )->None:
-        super().__init__(position_description, hidden, reveal_description, triggers)
+        super().__init__(
+            position_description=position_description, 
+            hidden=hidden, 
+            reveal_description=reveal_description, 
+            triggers=triggers
+        )
         self.characters = characters
-        self.activity_description = activity_description
-    
-    def get_activity_description(self):
-        return self.activity_description
     
     def get_characters(self):
         return self.characters
@@ -58,7 +58,12 @@ class ObjectPosition(Position):
             hidden: bool,
             triggers: List[Trigger|None] = [] # Replace with trigger event
     )->None:
-        super().__init__(position_description, hidden, reveal_description, triggers)
+        super().__init__(
+            position_description=position_description, 
+            hidden=hidden, 
+            reveal_description=reveal_description, 
+            triggers=triggers
+        )
         self.items = items
         self.object_id = object_id
 

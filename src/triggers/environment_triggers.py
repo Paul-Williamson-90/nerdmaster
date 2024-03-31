@@ -15,6 +15,7 @@ class EnvironmentTrigger(Trigger, ABC):
             self,
             trigger_id: str,
             ids_to_trigger: List[str],
+            ids_to_exclude: List[str] = [],
             narrative_prompt: str|None = None,
             random_chance: float = 1.0,
             req_active_quest_ids: List[str] = [], # Quests that need to be active for trigger
@@ -37,6 +38,7 @@ class EnvironmentTrigger(Trigger, ABC):
         self.ids_to_trigger = ids_to_trigger
         self.req_characters = req_characters
         self.random_chance = random_chance
+        self.ids_to_exclude = ids_to_exclude
         self.attributes: Dict[str, str] = attributes
     
     def prepare(
@@ -55,6 +57,7 @@ class EnvironmentTrigger(Trigger, ABC):
             completed_quest_ids=completed_quest_ids,
             completed_trigger_ids=completed_trigger_ids,
         )
+        
         
     @abstractmethod
     def validate(
@@ -75,7 +78,9 @@ class EnvironmentTrigger(Trigger, ABC):
         Triggers a dialogue from the NPC.
         Triggers are resolved by the Game class, post NPC agent output.
         """
+        game.player.quest_log.add_completed_trigger(self.ids_to_exclude)
         return TriggerResponse(
+            log_path=game.data_paths.logs_path,
             triggers=self.ids_to_trigger,
             narrative_message=self.narrative_prompt,
             attributes = self.attributes,
@@ -211,12 +216,33 @@ class EnvironmentTrigger(Trigger, ABC):
                 if object_id in character_position.characters:
                     for character in character_position.characters:
                         if character == object_id:
-                            if character_position.hidden is True:
+                            if character_position.hidden:
                                 return False
         
         # TODO: Implement other object types
         
         return True
+    
+    def reveal_object(
+            self,
+            object: dict,
+            environment: Environment,
+    ):
+        """
+        Reveal the object in the location
+        """
+        object_type = object["object_type"]
+        object_id = object["object_id"]
+        
+        if object_type == "character":
+            for character_position in environment.character_locations:
+                if object_id in character_position.characters:
+                    character_position.hidden = False
+                    narrative = character_position.get_reveal_description()
+                    self.attributes["reveal_narratives"] += [narrative]
+                    print(f"Revealed: {object_id}, with narrative: {narrative}")
+
+        # TODO: Implement other object types
     
     def get_characters_present_names(
             self,
@@ -246,6 +272,7 @@ class DescribeLocationTrigger(EnvironmentTrigger):
         
         self.attributes["location_description"] = environment.get_visual_description()
         environment.arm_trigger(self)
+        print("Armed: ", self.trigger_id)
 
     def activate(
             self,
@@ -257,8 +284,9 @@ class DescribeLocationTrigger(EnvironmentTrigger):
             text_tag=NarrationType.stage.value,
             ai_generate=False,
         )
-
+        game.player.quest_log.add_completed_trigger(self.ids_to_exclude)
         return TriggerResponse(
+            log_path=game.data_paths.logs_path,
             triggers=self.ids_to_trigger,
             log_message=f"Trigger {self.trigger_id} activated."
         )
@@ -313,6 +341,7 @@ class TurnsInLocationTrigger(EnvironmentTrigger):
         if not self.val_random_chance_trigger():
             return 
         environment.arm_trigger(self)
+        print("Armed: ", self.trigger_id)
         
     
 class OnExitTrigger(EnvironmentTrigger):
@@ -335,6 +364,7 @@ class OnExitTrigger(EnvironmentTrigger):
         if not self.val_random_chance_trigger():
             return 
         environment.arm_trigger(self)
+        print("Armed: ", self.trigger_id)
 
 
 class OnEntryTrigger(EnvironmentTrigger):        
@@ -355,6 +385,48 @@ class OnEntryTrigger(EnvironmentTrigger):
         if not self.val_random_chance_trigger():
             return 
         environment.arm_trigger(self)
+        print("Armed: ", self.trigger_id)
+
+class RevealTrigger(EnvironmentTrigger):
+    """
+    Trigger for revealing an object or location
+    """
+    def validate(
+            self,
+            environment: Environment,
+            active_quest_ids: List[str]=[], # Quests that need to be completed before this can be triggered
+            completed_quest_ids: List[str]=[], # Quests that can't be active/already triggered for this to trigger
+            completed_trigger_ids: List[str]=[], # Triggers that can't be active/already triggered for this to trigger
+    ):
+        if not self.val_quest_log_requirements(active_quest_ids, completed_quest_ids, completed_trigger_ids):
+            return
+        if not self.val_random_chance_trigger():
+            return 
+        reveal_objects = self.attributes["reveal_objects"]
+        self.attributes["reveal_narratives"] = []
+
+        for object in reveal_objects:
+            self.reveal_object(object, environment)
+        environment.arm_trigger(self)
+        print("Armed: ", self.trigger_id)
+
+    def activate(
+            self,
+            game
+    ):
+        for narrative in self.attributes["reveal_narratives"]:
+            game.add_to_player_narrator(
+                text=narrative,
+                text_tag=NarrationType.stage.value,
+                ai_generate=False,
+            )
+        game.player.quest_log.add_completed_trigger(self.ids_to_exclude)
+        return TriggerResponse(
+            log_path=game.data_paths.logs_path,
+            triggers=self.ids_to_trigger,
+            log_message=f"Trigger {self.trigger_id} activated."
+            )
+    
 
 class OnRevealTrigger(EnvironmentTrigger):
     """
@@ -373,12 +445,15 @@ class OnRevealTrigger(EnvironmentTrigger):
             return 
         
         reveal_objects = self.attributes["reveal_objects"]
-
+        print("Validating: ", self.trigger_id)
         for object in reveal_objects:
             if not self.val_reveal_conditions(object, environment):
+                print("Failed reveal conditions")
                 return
+        print("Passed reveal conditions")
 
         environment.arm_trigger(self)
+        print("Armed: ", self.trigger_id)
         
 
 class TriggerEventAnyCharacter(EnvironmentTrigger):
@@ -401,6 +476,7 @@ class TriggerEventAnyCharacter(EnvironmentTrigger):
             req_trigger_ids: List[str] = [], # Triggers that need to have been active for trigger
             exl_trigger_ids: List[str] = [], # Triggers that can't have been active for trigger
             req_characters: List[str] = [], # Characters that need to be present in the location
+            ids_to_exclude: List[str] = [], # Triggers to exclude from the quest log
     ):
         super().__init__(
             trigger_id=trigger_id,
@@ -414,6 +490,7 @@ class TriggerEventAnyCharacter(EnvironmentTrigger):
             req_trigger_ids=req_trigger_ids,
             exl_trigger_ids=exl_trigger_ids,
             req_characters=req_characters,
+            ids_to_exclude=ids_to_exclude,
         )
         self.narrative_prompt_player = narrative_prompt_player
         self.narrative_prompt_npc = narrative_prompt_npc
@@ -437,6 +514,7 @@ class TriggerEventAnyCharacter(EnvironmentTrigger):
         self.attributes["narrative_prompt_player"] = self.narrative_prompt_player
         self.attributes["narrative_prompt_npc"] = self.narrative_prompt_npc
         environment.arm_trigger(self)
+        print("Armed: ", self.trigger_id)
 
     def activate(
             self,
@@ -455,12 +533,14 @@ class TriggerEventAnyCharacter(EnvironmentTrigger):
         game.add_to_npc_narrator(
             text=self.narrative_prompt_npc, 
             text_tag=NarrationType.stage.value,
-            characters=self.attributes["characters"],
             ai_generate=True
         )
         game.switch_game_mode(self.event_type)
-
-        return TriggerResponse(log_message=f"Trigger {self.trigger_id} activated.")
+        game.player.quest_log.add_completed_trigger(self.ids_to_exclude)
+        return TriggerResponse(
+            log_path=game.data_paths.logs_path,
+            log_message=f"Trigger {self.trigger_id} activated."
+        )
     
 class TriggerEventAllCharacter(EnvironmentTrigger):
     """
@@ -483,6 +563,7 @@ class TriggerEventAllCharacter(EnvironmentTrigger):
             req_trigger_ids: List[str] = [], # Triggers that need to have been active for trigger
             exl_trigger_ids: List[str] = [], # Triggers that can't have been active for trigger
             req_characters: List[str] = [], # Characters that need to be present in the location
+            ids_to_exclude: List[str] = [],
     ):
         super().__init__(
             trigger_id=trigger_id,
@@ -496,6 +577,7 @@ class TriggerEventAllCharacter(EnvironmentTrigger):
             req_trigger_ids=req_trigger_ids,
             exl_trigger_ids=exl_trigger_ids,
             req_characters=req_characters,
+            ids_to_exclude=ids_to_exclude,
         )
         self.narrative_prompt_player = narrative_prompt_player
         self.narrative_prompt_npc = narrative_prompt_npc
@@ -518,6 +600,7 @@ class TriggerEventAllCharacter(EnvironmentTrigger):
         self.attributes["narrative_prompt_player"] = self.narrative_prompt_player
         self.attributes["narrative_prompt_npc"] = self.narrative_prompt_npc
         environment.arm_trigger(self)
+        print("Armed: ", self.trigger_id)
 
     def activate(
             self,
@@ -526,7 +609,7 @@ class TriggerEventAllCharacter(EnvironmentTrigger):
         game.add_to_player_narrator(
             text=self.narrative_prompt_player, 
             text_tag=NarrationType.stage.value, 
-            ai_generate=True
+            ai_generate=False
         )
         game.add_to_characters(
             characters=self.attributes["characters"],
@@ -534,9 +617,11 @@ class TriggerEventAllCharacter(EnvironmentTrigger):
         game.add_to_npc_narrator(
             text=self.narrative_prompt_npc, 
             text_tag=NarrationType.stage.value,
-            characters=self.attributes["characters"],
             ai_generate=True
         )
         game.switch_game_mode(self.event_type)
-
-        return TriggerResponse(log_message=f"Trigger {self.trigger_id} activated.")
+        game.player.quest_log.add_completed_trigger(self.ids_to_exclude)
+        return TriggerResponse(
+            log_path=game.data_paths.logs_path,
+            log_message=f"Trigger {self.trigger_id} activated."
+        )

@@ -10,20 +10,19 @@
             {   
                 "position_type_id": "character_position",
                 "characters": ["Wyatt \"Ace\" Thompson"],
-                "position_description": "",
-                "activity_description": "",
+                "position_description": "Wyatt is still sat in the chair, staring blankly ahead.",
                 "reveal_description": "You suddenly notice a man sat in a chair in the center of the room. He is staring directly in-front into nothingness, no expression on his face, his eyes glazed over.",
                 "hidden": true,
                 "triggers": [
-                    "wyatt_on_reveal"
+                    "reveal_wyatt"
                     ]
             }
         ],
         "object_locations": [
-            
+
         ],
         "triggers": [
-            "the_room_on_entry_description"
+            "the_room_on_entry_description", "wyatt_on_reveal"
         ]
     }
 }

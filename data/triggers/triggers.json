@@ -13,6 +13,29 @@
         "exl_trigger_ids": [],
         "req_characters": []
     },
+    "reveal_wyatt":{
+        "trigger_id": "reveal_wyatt",
+        "trigger_type_id": "RevealTrigger",
+        "ids_to_trigger": [],
+        "narrative_prompt": null,
+        "random_chance": 1.0,
+        "req_active_quest_ids": [],
+        "req_quest_completed_ids": [],
+        "exl_quest_active_ids": [],
+        "exl_quest_completed_ids": [],
+        "req_trigger_ids": [],
+        "exl_trigger_ids": ["reveal_wyatt"],
+        "ids_to_exclude": ["reveal_wyatt"],
+        "req_characters": ["Wyatt \"Ace\" Thompson"],
+        "attributes": {
+            "reveal_objects" :[
+                {
+                    "object_type": "character",
+                    "object_id": "Wyatt \"Ace\" Thompson"
+                }
+            ]
+        }
+    },
     "wyatt_on_reveal": {
         "trigger_id": "wyatt_on_reveal",
         "trigger_type_id": "OnRevealTrigger",
@@ -24,7 +47,8 @@
         "exl_quest_active_ids": [],
         "exl_quest_completed_ids": [],
         "req_trigger_ids": [],
-        "exl_trigger_ids": [],
+        "exl_trigger_ids": ["wyatt_on_reveal"],
+        "ids_to_exclude": ["wyatt_on_reveal"],
         "req_characters": ["Wyatt \"Ace\" Thompson"],
         "attributes": {
             "reveal_objects" :[
@@ -55,8 +79,8 @@
         "trigger_type_id": "TriggerEventAllCharacter",
         "ids_to_trigger": [],
         "narrative_prompt": null,
-        "narrative_prompt_player": "Wyatt suddenly appears in front of you, wishing to talk.",
-        "narrative_prompt_npc": "You appear in a random room. There is a weird-looking person in front of you, gawking rudely. You feel a sudden urge to talk to them.",
+        "narrative_prompt_player": "The man's eyes suddenly spring to life, darting towards your face.",
+        "narrative_prompt_npc": "You appear in a random room, completely bewildered by how you got there. There is a weird-looking person in front of you, gawking rudely. You feel a sudden urge to talk to them.",
         "random_chance": 1.0,
         "req_active_quest_ids": [],
         "req_quest_completed_ids": [],
@@ -64,6 +88,7 @@
         "exl_quest_completed_ids": [],
         "req_trigger_ids": [],
         "exl_trigger_ids": [],
+        "ids_to_exclude": ["begin_dialogue_wyatt"],
         "req_characters": ["Wyatt \"Ace\" Thompson"]
     }
 }

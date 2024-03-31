@@ -18,7 +18,7 @@ GAME_DATA_PATH = "./data/game/game.json"
 
 class AgentConfigs(Enum):
 
-    VERBOSE = False
+    VERBOSE = True
 
 class GameDataPaths:
 

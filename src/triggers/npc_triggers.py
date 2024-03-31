@@ -98,8 +98,8 @@ class Speak(NPCAction):
 
         game.add_to_npc_narrator(
             text=dialogue,
-            characters=[char.name for char in game.characters],
-            ai_generate=True,
+            ai_generate=False,
+            text_tag=self.character.name,
         )
         
         game.add_character_dialogue_to_narrator(

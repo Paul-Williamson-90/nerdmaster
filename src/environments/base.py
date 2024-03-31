@@ -65,17 +65,103 @@ class Environment:
             trigger: Trigger,
     ):
         self.armed_triggers.append(trigger)
+
+    def _reveal_trigger_parse(
+            self,
+            trigger: Trigger,
+            quest_log: QuestLog,
+    ):
+        if trigger.__class__.__name__ == "RevealTrigger":
+            print("Attempting to arm trigger: ", trigger.trigger_id)
+            trigger.prepare(
+                quest_log=quest_log,
+                environment=self,
+            )
+
+    def arm_reveal_triggers(
+            self,
+            quest_log: QuestLog,
+    )->List[Trigger]:
+        
+        for trigger in self.triggers:
+            self._reveal_trigger_parse(
+                trigger=trigger,
+                quest_log=quest_log,
+            )
+        for location in self.local_locations:
+            loc_triggers = location.triggers
+            for trigger in loc_triggers:
+                self._reveal_trigger_parse(
+                    trigger=trigger,
+                    quest_log=quest_log,
+                )
+        for location in self.character_locations:
+            loc_triggers = location.triggers
+            for trigger in loc_triggers:
+                self._reveal_trigger_parse(
+                    trigger=trigger,
+                    quest_log=quest_log,
+                )
+        for location in self.object_locations:
+            loc_triggers = location.triggers
+            for trigger in loc_triggers:
+                self._reveal_trigger_parse(
+                    trigger=trigger,
+                    quest_log=quest_log,
+                )
+        # armed_triggers = self.armed_triggers
+        # self.armed_triggers = []
+        # return armed_triggers
+
+    def fetch_reveal_triggers(
+            self,
+            quest_log: QuestLog,
+    )->List[Trigger]:
+        
+        for trigger in self.triggers:
+            self._reveal_trigger_parse(
+                trigger=trigger,
+                quest_log=quest_log,
+            )
+        for location in self.local_locations:
+            loc_triggers = location.triggers
+            for trigger in loc_triggers:
+                self._reveal_trigger_parse(
+                    trigger=trigger,
+                    quest_log=quest_log,
+                )
+        for location in self.character_locations:
+            loc_triggers = location.triggers
+            for trigger in loc_triggers:
+                self._reveal_trigger_parse(
+                    trigger=trigger,
+                    quest_log=quest_log,
+                )
+        for location in self.object_locations:
+            loc_triggers = location.triggers
+            for trigger in loc_triggers:
+                self._reveal_trigger_parse(
+                    trigger=trigger,
+                    quest_log=quest_log,
+                )
+        armed_triggers = self.armed_triggers
+        self.armed_triggers = []
+        return armed_triggers
     
     def fetch_active_triggers(
             self,
             quest_log: QuestLog,
     )->List[Trigger]:
         for trigger in self.triggers:
-            trigger.prepare(
-                quest_log=quest_log,
-                environment=self,
-            )
-        return self.armed_triggers
+            if trigger.__class__.__name__ not in ["RevealTrigger"]:
+                print("Attempting to arm trigger: ", trigger.trigger_id)
+                trigger.prepare(
+                    quest_log=quest_log,
+                    environment=self,
+                )
+        armed_triggers = self.armed_triggers
+        self.armed_triggers = []
+        return armed_triggers
 
     # def add_characters(self, characters: List[CharacterPosition], trigger: Trigger|None=None):
     #     self.character_locations.extend(characters)

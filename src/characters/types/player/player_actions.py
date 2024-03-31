@@ -8,7 +8,8 @@ from src.triggers.player_triggers import (
     StageDirection, 
     Attack,
     PrepareAttack,
-    LeaveConversation
+    LeaveConversation,
+    LookAround
 )
 
 from typing import Dict
@@ -42,7 +43,7 @@ class PlayerReActionMap(ReActionMap):
                 "search_memory": SearchMemory(character=character).prepare,
                 "stage_direction": StageDirection(character=character).prepare,
                 # "look_at_character": None, # TODO: Implement this
-                # "look_around": None, # TODO: Implement this
+                "look_around": LookAround(character=character).prepare,
             }
         }
 
