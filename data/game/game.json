@@ -1,13 +1,15 @@
 {
-    "data_paths": {
+    "Jimmy Beanstork": {
         "item_data_path" : "./data/items/items.json",
         "temp_image_data_path" : "./data/images/",
         "temp_audio_data_path" : "./data/audio/",
+        "player_data_path" : "./data/player/player.json",
         "map_data_path" : "./data/environments/map.json",
         "quest_data_path" : "./data/quests/quests.json",
         "npc_data_path" : "./data/characters/characters.json",
         "local_locations_data_path" : "./data/environments/local_locations.json",
         "triggers_data_path" : "./data/triggers/triggers.json",
-        "environments_data_path" : "./data/environments/environments.json"
+        "environments_data_path" : "./data/environments/environments.json",
+        "memories_root_dir" : "./data/memories/"
     }
 }

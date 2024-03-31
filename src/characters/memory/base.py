@@ -22,13 +22,16 @@ class Memory:
 
     def __init__(
             self,
+            # TODO: Memories root dir
             background: Background,
             long_term: MemoryAgent|Path|None = None,
             short_term: List[str] = [],
             model: StandardGPT = StandardGPT,
             model_name: str = "gpt-3.5-turbo",
             names: Dict[str, str] = {},
+            memories_root_dir: Path = Path("./data/memories/"),
     )->None:
+        self.memories_root_dir = memories_root_dir
         self.long_term_file_path = long_term if isinstance(long_term, Path) else None
         self.background = background
         self.names: Dict[str, str] = names
@@ -88,7 +91,7 @@ class Memory:
             data = data.replace(
                 f"{name}", f"{self.names[name]}"
             )
-        new_file_path = long_term.parent / f"{long_term.stem}_temp{long_term.suffix}"
+        new_file_path = self.memories_root_dir + "/" + f"{long_term.stem}_temp{long_term.suffix}"
         with open(new_file_path, 'w') as file:
             file.write(data)
         return new_file_path
@@ -104,7 +107,7 @@ class Memory:
                 new_file_path = self._process_long_term(long_term)
                 return MemoryAgent(new_file_path)
         else:
-            new_file_path = Path(f"./data/memories/{uuid4()}.txt")
+            new_file_path = Path(f"{str(self.memories_root_dir)}/{uuid4()}.txt")
             with open(new_file_path, "w") as f:
                 f.write(self.background.__str__())
             self.long_term_file_path = new_file_path

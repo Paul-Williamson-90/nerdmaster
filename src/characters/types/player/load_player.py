@@ -22,10 +22,12 @@ class PlayerLoader:
             player_data_path: Path = Path(PLAYER_DATA_PATH),
             trigger_loader: TriggerLoader=TriggerLoader,
             quest_loader: QuestLoader=QuestLoader,
+            memories_root_dir: Path = Path("./data/memories/"),
     ):
+        self.memories_root_dir = memories_root_dir
         self.player_data = self._load_player_data(player_data_path)
-        self.trigger_loader = trigger_loader()
-        self.quest_loader = quest_loader()
+        self.trigger_loader = trigger_loader
+        self.quest_loader = quest_loader
 
     def _load_player_data(
             self,
@@ -62,7 +64,8 @@ class PlayerLoader:
         return Memory(
             background=background,
             long_term=data["long_term"],
-            short_term=data["short_term"]
+            short_term=data["short_term"],
+            memories_root_dir=self.memories_root_dir
         )
     
     def _load_avatar(

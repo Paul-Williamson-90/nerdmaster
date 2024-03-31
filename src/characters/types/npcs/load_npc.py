@@ -21,7 +21,9 @@ class NPCLoader:
             self,
             data_path: Path = Path(NPC_DATA_PATH),
             trigger_loader: TriggerLoader = TriggerLoader,
+            memories_root_dir: Path = Path("./data/memories/"),
     ):
+        self.memories_root_dir = memories_root_dir
         self.data_path = data_path
         self.data = self._load_data(data_path)
         self.trigger_loader = trigger_loader()
@@ -49,6 +51,7 @@ class NPCLoader:
             factions=character_data["background"]["factions"],
         )
         character_data["memory"] = Memory(background=character_data["background"],
+                                          memories_root_dir=self.memories_root_dir,
                                         **character_data["memory"])
         character_data["avatar"] = Avatar(visual_description=character_data["visual_description"],
                                         avatar=character_data["avatar"]["image"])
