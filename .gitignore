@@ -11,3 +11,6 @@ scratchpad.ipynb
 /src/object_creation/*
 ./saves/*
 ./data/logs/*
+
+# Excluding
+!./data/logs/ignoreme.txt
