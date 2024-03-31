@@ -10,3 +10,4 @@ scratchpad.ipynb
 **/__pycache__/*
 /src/object_creation/*
 ./saves/*
+./data/logs/*
