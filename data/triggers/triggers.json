@@ -13,10 +13,32 @@
         "exl_trigger_ids": [],
         "req_characters": []
     },
+    "wyatt_on_reveal": {
+        "trigger_id": "wyatt_on_reveal",
+        "trigger_type_id": "OnRevealTrigger",
+        "ids_to_trigger": ["begin_dialogue_wyatt"],
+        "narrative_prompt": null,
+        "random_chance": 1.0,
+        "req_active_quest_ids": [],
+        "req_quest_completed_ids": [],
+        "exl_quest_active_ids": [],
+        "exl_quest_completed_ids": [],
+        "req_trigger_ids": [],
+        "exl_trigger_ids": [],
+        "req_characters": ["Wyatt \"Ace\" Thompson"],
+        "attributes": {
+            "reveal_objects" :[
+                {
+                    "object_type": "character",
+                    "object_id": "Wyatt \"Ace\" Thompson"
+                }
+            ]
+        }
+    },
     "the_room_description": {
         "trigger_id": "the_room_description",
         "trigger_type_id": "DescribeLocationTrigger",
-        "ids_to_trigger": ["begin_dialogue_wyatt"],
+        "ids_to_trigger": [],
         "narrative_prompt": null,
         "random_chance": 1.0,
         "req_active_quest_ids": [],

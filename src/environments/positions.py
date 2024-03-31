@@ -29,7 +29,7 @@ class CharacterPosition(Position):
 
     def __init__(
             self,
-            characters: List[Character],
+            characters: List[str],
             position_description: str,
             activity_description: str,
             reveal_description: str|None,
@@ -52,7 +52,7 @@ class ObjectPosition(Position):
     def __init__(
             self,
             object_id: str,
-            items: List[Item],
+            items: List[str],
             position_description: str,
             reveal_description: str|None,
             hidden: bool,

@@ -195,6 +195,29 @@ class EnvironmentTrigger(Trigger, ABC):
                       for character in character_locations.characters]
         return all([character in characters for character in self.req_characters])
     
+    def val_reveal_conditions(
+            self,
+            object: dict,
+            environment: Environment,
+    ):
+        """
+        Validate the reveal conditions for the trigger
+        """
+        object_type = object["object_type"]
+        object_id = object["object_id"]
+
+        if object_type == "character":
+            for character_position in environment.character_locations:
+                if object_id in character_position.characters:
+                    for character in character_position.characters:
+                        if character == object_id:
+                            if character_position.hidden is True:
+                                return False
+        
+        # TODO: Implement other object types
+        
+        return True
+    
     def get_characters_present_names(
             self,
             environment: Environment,
@@ -331,6 +354,30 @@ class OnEntryTrigger(EnvironmentTrigger):
             return
         if not self.val_random_chance_trigger():
             return 
+        environment.arm_trigger(self)
+
+class OnRevealTrigger(EnvironmentTrigger):
+    """
+    Trigger another trigger when a location or object is revealed
+    """
+    def validate(
+            self,
+            environment: Environment,
+            active_quest_ids: List[str]=[], # Quests that need to be completed before this can be triggered
+            completed_quest_ids: List[str]=[], # Quests that can't be active/already triggered for this to trigger
+            completed_trigger_ids: List[str]=[], # Triggers that can't be active/already triggered for this to trigger
+    ):
+        if not self.val_quest_log_requirements(active_quest_ids, completed_quest_ids, completed_trigger_ids):
+            return
+        if not self.val_random_chance_trigger():
+            return 
+        
+        reveal_objects = self.attributes["reveal_objects"]
+
+        for object in reveal_objects:
+            if not self.val_reveal_conditions(object, environment):
+                return
+
         environment.arm_trigger(self)
         
 

@@ -2,34 +2,25 @@
     "The Room": {
         "name": "Room",
         "description": "A room",
-        "visual_description": "A room",
-        "scenario_description_tags": ["plain", "uninteresting"],
+        "visual_description": "You are in a small room. The walls, pristine in their coat of sterile white, seem to shimmer under the harsh glare of artificial light, reflecting the bleakness of their surroundings. Each surface is scrubbed clean of any hint of imperfection, as if the very fabric of reality itself had been scrubbed away to reveal the void beneath. And yet, despite its pristine appearance, there is an unsettling emptiness that hangs heavy in the air, a void that seems to swallow all sound and light. It is a silence that stretches on into infinity, a vacuum.",
+        "scenario_description_tags": ["Claustrophobic", "Sterile Environment", "Empty Spaces", "Artificial Light", "Eerie Silence"],
         "turns_in_location": 0,
-        "local_locations": ["Door"],
+        "local_locations": [],
         "character_locations": [
             {   
                 "position_type_id": "character_position",
                 "characters": ["Wyatt \"Ace\" Thompson"],
-                "position_description": "A table.",
-                "activity_description": "You see a person sat at a table.",
-                "reveal_description": "",
-                "hidden": false,
+                "position_description": "",
+                "activity_description": "",
+                "reveal_description": "You suddenly notice a man sat in a chair in the center of the room. He is staring directly in-front into nothingness, no expression on his face, his eyes glazed over.",
+                "hidden": true,
                 "triggers": [
+                    "wyatt_on_reveal"
                     ]
             }
         ],
         "object_locations": [
-            {   
-                "position_type_id": "object_position",
-                "object_id": "table_1",
-                "items": [
-                    "blaster_1"
-                ],
-                "position_description": "A table in the corner of the room.",
-                "reveal_description": "You notice a blaster on the table.",
-                "hidden": false,
-                "triggers": []
-            }
+            
         ],
         "triggers": [
             "the_room_on_entry_description"
