@@ -182,6 +182,9 @@ class GameLoader:
         os.mkdir("./saves/" + player_id.replace(" ", "_") + "/memories")
         os.mkdir("./saves/" + player_id.replace(" ", "_") + "/audio")
         
+        if not os.path.exists("./data/logs"):
+            os.mkdir("./data/logs")
+        
         data_paths = {
             "item_data_path" : "./data/items/items.json",
             "temp_image_data_path" : "./saves/" + player_id.replace(" ", "_")+"/images/",
