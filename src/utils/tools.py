@@ -54,3 +54,9 @@ def create_action_tool(callable:Callable, name: str):
         return_direct=False,
     )
     return tool
+
+def print_func_name(func):
+    def inner(*args, **kwargs):
+        print(f"Function name: {func.__name__}")
+        return func(*args, **kwargs)
+    return inner

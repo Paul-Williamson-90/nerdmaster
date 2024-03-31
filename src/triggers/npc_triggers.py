@@ -60,7 +60,7 @@ class Speak(NPCAction):
             "dialogue": dialogue,
         }
         self.character.add_to_action_queue(self)
-        return f"**Tool Action Accepted**: You will say '{dialogue}' at the end of your turn."
+        return "**Tool Action Accepted**"
 
     def activate(
             self,
@@ -106,7 +106,7 @@ class Attack(NPCAction):
             "defending": character_to_attack,
         }
         self.character.add_to_action_queue(self)
-        return f"Tool Action Accepted: You will attack {character_to_attack} at the end of your turn."
+        return "**Tool Action Accepted**"
 
     def activate(
             self,
@@ -146,7 +146,7 @@ class PrepareAttack(NPCAction):
             "target_character": character_to_attack,
         }
         self.character.add_to_action_queue(self)
-        return f"**Tool Action Accepted**: You will prepare to attack {character_to_attack} at the end of your turn."
+        return "**Tool Action Accepted**"
 
     def activate(
             self,

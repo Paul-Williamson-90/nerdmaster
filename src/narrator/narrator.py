@@ -39,6 +39,7 @@ class Narrator:
             audio_path=audio_path,
             image_path=image_path,
         )
+        print(narration.to_dict())
         self.narration_queue.append(narration)
 
     def get_narration_queue(

@@ -15,6 +15,9 @@ from src.utils.tools import create_tool
 import os 
 from dotenv import load_dotenv
 
+from src.game.configs import AgentConfigs
+
+
 load_dotenv()
 
 class NerdMasterAgent(ABC):
@@ -23,7 +26,7 @@ class NerdMasterAgent(ABC):
             system_message: str = CUSTOM_SYSTEM_MESSAGE,
             prompt_id: str = "hwchase17/openai-tools-agent",
             openai_api_key: str = os.getenv("OPENAI_API_KEY"),
-            verbose: bool = True,
+            verbose: bool = AgentConfigs.VERBOSE.value,
             event_outcome_format: str = DEFAULT_EVENT_OUTCOME_FORMAT,
             model: str = "gpt-4-turbo-preview"
     )->None:

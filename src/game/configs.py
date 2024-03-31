@@ -13,6 +13,9 @@ TRIGGERS_DATA_PATH = "./data/triggers/triggers.json"
 ENVIRONMENT_DATA_PATH = "./data/environments/environments.json"
 PLAYER_DATA_PATH = "./data/player/player.json"
 
+class AgentConfigs(Enum):
+
+    VERBOSE = False
 
 class GameDataPaths:
 

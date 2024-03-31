@@ -18,13 +18,14 @@ class PlayerAction(Trigger, ABC):
             self.attributes = attributes
             self.character: Character = character
             
-    
+        # @print_func_name
         @abstractmethod
         def prepare(
                 self,
         ):
             ...
 
+        # @print_func_name
         @abstractmethod
         def activate(
                 self,
@@ -34,6 +35,7 @@ class PlayerAction(Trigger, ABC):
 
 class StageDirection(PlayerAction):
 
+    # @print_func_name
     def prepare(
             self,
             stage_direction: str,
@@ -44,14 +46,17 @@ class StageDirection(PlayerAction):
         Args
         str - <stage_direction>: The stage direction for the player's character.
         """
+        print(self.__class__.__name__, "prepare")
         self.attributes["stage_direction"] = stage_direction
         self.character.add_to_action_queue(self)
-        return f"Stage direction prepared: {stage_direction}"
+        return "**Tool Action Accepted**"
 
+    # @print_func_name
     def activate(
             self,
             game
     ):
+        print(self.__class__.__name__, "activate")
         game.add_to_player_narrator(
             text=self.attributes["stage_direction"],
             text_tag=NarrationType.stage.value,
@@ -71,6 +76,7 @@ class StageDirection(PlayerAction):
 
 class Speak(PlayerAction):
 
+    # @print_func_name
     def prepare(
             self,
             dialogue: str,
@@ -81,14 +87,17 @@ class Speak(PlayerAction):
         Args
         str - <dialogue>: The dialogue the player's character will say.
         """
+        print(self.__class__.__name__, "prepare")
         self.attributes["dialogue"] = dialogue
         self.character.add_to_action_queue(self)
-        return f"Dialogue prepared: {dialogue}"
+        return "**Tool Action Accepted**"
 
+    # @print_func_name
     def activate(
             self,
             game
     ):
+        print(self.__class__.__name__, "activate")
         player_name = game.player.name
         dialogue = self.attributes["dialogue"]
         characters = [char.name for char in game.characters]
@@ -102,7 +111,7 @@ class Speak(PlayerAction):
                 log_message=f"Trigger {self.trigger_id} activated. No characters to speak to.",)
         
         game.add_to_player_narrator(
-            text=self.attributes["stage_direction"],
+            text=f"\"{self.attributes["dialogue"]}\"",
             text_tag=self.character.name,
             ai_generate=False,
             voice=self.character.voice,
@@ -175,7 +184,7 @@ class Attack(PlayerAction):
             "defending": character_to_attack,
         }
         self.character.add_to_action_queue(self)
-        return f"Attack prepared: {self.character.name} will attack {character_to_attack} at the end of the turn."
+        return "**Tool Action Accepted**"
 
     def activate(
             self,
@@ -215,7 +224,7 @@ class PrepareAttack(PlayerAction):
             "target_character": character_to_attack,
         }
         self.character.add_to_action_queue(self)
-        return f"**Tool Action Accepted**: You will prepare to attack {character_to_attack} at the end of your turn."
+        return "**Tool Action Accepted**"
 
     def activate(
             self,

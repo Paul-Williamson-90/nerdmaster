@@ -13,7 +13,7 @@ from src.agents.prompts import (
     NPC_SYSTEM_PROMPT
 )
 
-from typing import List
+from src.game.configs import AgentConfigs
 
 load_dotenv()
 
@@ -25,7 +25,7 @@ class NPCAgent(NerdMasterAgent):
             system_message: str = CUSTOM_SYSTEM_MESSAGE,
             prompt_id: str = "hwchase17/openai-tools-agent",
             openai_api_key: str = os.getenv("OPENAI_API_KEY"),
-            verbose: bool = True,
+            verbose: bool = AgentConfigs.VERBOSE.value,
             event_outcome_format: str = DEFAULT_EVENT_OUTCOME_FORMAT,
             model: str = "gpt-4-turbo-preview"
     )->None:

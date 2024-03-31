@@ -17,7 +17,7 @@ from src.narrator.narrator import Narrator
 from src.game.terms import GameMode, Turn, NarrationType
 
 from typing import List, Dict
-
+from src.utils.tools import print_func_name
     
     
 class GameEnvironmentTurn:
@@ -28,6 +28,7 @@ class GameEnvironmentTurn:
     ):
         self.game = game
 
+    @print_func_name
     def fetch_triggers_environment(self):
         quest_log = self.game.player.quest_log
         armed_triggers = self.game.environment.fetch_active_triggers(
@@ -35,6 +36,7 @@ class GameEnvironmentTurn:
         )
         return armed_triggers
     
+    @print_func_name
     def game_environment_turn(
             self,
     ):
@@ -83,12 +85,14 @@ class Game:
         self.next_turn: str = Turn.GAME.value
         self.action_queue: List[Trigger] = []
 
+    @print_func_name
     def add_character_actions_to_queue(
             self,
             character: Character
     ):
         self.action_queue += character.get_action_queue()
 
+    @print_func_name
     def save_game(self):
         """
         Triggers the save game process (only during exploration mode)
@@ -98,6 +102,7 @@ class Game:
         )
         # TODO: Save game state
 
+    @print_func_name
     def add_turn(
             self,
     ):
@@ -107,6 +112,7 @@ class Game:
         # TODO: Character tickers
         self.environment.add_turn()
     
+    @print_func_name
     def add_to_characters(
             self,
             characters: List[str],
@@ -121,6 +127,7 @@ class Game:
             loaded_character = self.npc_loader.load_character(character)
             self.characters.append(loaded_character)
 
+    @print_func_name
     def remove_from_characters(
             self,
             characters: List[str]|str,
@@ -136,6 +143,7 @@ class Game:
         for character in characters:
             self.characters = [c for c in self.characters if c.name != character]
 
+    @print_func_name
     def _ai_generate_narration(
             self,
             text: str,
@@ -147,6 +155,7 @@ class Game:
         response = self.model.generate(prompt=text, system_prompt=system_message)
         return response
     
+    @print_func_name
     def _add_to_npc_narrator_single(
             self,
             text: str,
@@ -165,6 +174,7 @@ class Game:
         for character in self.characters:
             character.add_short_term_memory(text)
 
+    @print_func_name
     def _add_to_npc_narrator_multiple(
             self,
             text: Dict[str, str],
@@ -185,11 +195,12 @@ class Game:
             text = f"<{text_tag}>{response}</{text_tag}>"
             character.add_short_term_memory(text)
 
+    @print_func_name
     def add_to_npc_narrator(
             self,
             text: str|Dict[str, str],
             text_tag: str, # stage or character name
-            characters: List[str],
+            characters: List[str], # TODO: Need to remove this arg and from all calling it
             ai_generate: bool = False,
     ):
         if isinstance(text, str):
@@ -197,12 +208,14 @@ class Game:
         else:
             self._add_to_npc_narrator_multiple(text, text_tag, ai_generate)
 
+    @print_func_name
     def switch_game_mode(
             self,
             mode: GameMode,
     ):
         self.game_mode = GameMode(mode).value
     
+    @print_func_name
     def add_to_player_narrator(
             self,
             text: str,
@@ -228,6 +241,7 @@ class Game:
         )
         self.player.add_short_term_memory(text)
 
+    @print_func_name
     def add_character_dialogue_to_narrator(
             self,
             text: str,
@@ -247,6 +261,7 @@ class Game:
             # image_path=image_path,
         )
 
+    @print_func_name
     def get_in_focus_character(
             self,
             name: str,
@@ -256,6 +271,7 @@ class Game:
                 return character
         return None
     
+    @print_func_name
     def activate_trigger(
             self, 
             trigger:Trigger,
@@ -263,6 +279,7 @@ class Game:
         out = trigger.activate(self)
         return out
     
+    @print_func_name
     def _prepare_triggers(
             self,
             triggers: List[Trigger],
@@ -285,16 +302,15 @@ class Game:
                     prepared_triggers.append(trigger)
             return prepared_triggers
         return []
-        
+    
+    @print_func_name
     def _reconcile_triggers(
             self,
             triggers: List[Trigger],
     ):
-        print("Triggers:", triggers)
         if len(triggers) == 0:
             return 
         elif len(triggers) == 1:
-            print(triggers[0].trigger_id)
             trigger_response = self.activate_trigger(triggers[0])
             triggers = trigger_response.triggers
             triggers = self._prepare_triggers(triggers)
@@ -302,13 +318,13 @@ class Game:
         else:
             new_triggers = []
             for trigger in triggers:
-                print(trigger.trigger_id)
                 trigger_response = self.activate_trigger(trigger)
                 trig_adds = trigger_response.triggers
                 trig_adds = self._prepare_triggers(trig_adds)
                 new_triggers.extend(trig_adds)
             self._reconcile_triggers(new_triggers)
 
+    @print_func_name
     def reconcile_all_characters(
             self,
     ):
@@ -316,7 +332,9 @@ class Game:
             self.add_character_actions_to_queue(character)
         self.add_character_actions_to_queue(self.player)
         self._reconcile_triggers(self.action_queue)
+        self.action_queue = []
     
+    @print_func_name
     def NPC_reaction_turn(
             self,
     ):
@@ -330,30 +348,35 @@ class Game:
 
         self.reconcile_all_characters()
 
+    @print_func_name
     def game_turn(
             self,
     ):
+        if self.game_mode not in [GameMode.EXPLORE.value, GameMode.DIALOGUE.value, GameMode.COMBAT.value]:
+            raise ValueError(f"Game mode {self.game_mode} not recognized")
+        
         if self.game_mode == GameMode.EXPLORE.value and self.next_turn == Turn.GAME.value:
             self.environment_turn.game_environment_turn()
         
         if (self.game_mode in [GameMode.DIALOGUE.value, GameMode.COMBAT.value]
             and self.next_turn == Turn.GAME.value):
             self.NPC_reaction_turn()
-
-        if self.game_mode not in [GameMode.EXPLORE.value, GameMode.DIALOGUE.value, GameMode.COMBAT.value]:
-            raise ValueError(f"Game mode {self.game_mode} not recognized")
-        
+    
+    @print_func_name
     def load_new_map(
             self,
     ):
         raise NotImplementedError("NEW_MAP mode not implemented")
     
+    @print_func_name
     def activate_player_actions(
             self,
     ):
         self.add_character_actions_to_queue(self.player)
         self._reconcile_triggers(self.action_queue)
-        
+        self.action_queue = []
+
+    @print_func_name 
     def turn_order(
             self,
     ):
@@ -372,20 +395,21 @@ class Game:
             raise ValueError(f"Turn {self.next_turn} not recognized")
         self.next_turn = Turn.PLAYER.value
         
+    @print_func_name
     def get_player_reaction(
             self,
             event: str
     ):
-        return self.player.reactions.get_reaction(event, self.game_mode)
+        self.player.reactions.get_reaction(event, self.game_mode)
         
+    @print_func_name
     def player_turn(
             self,
             player_input: str,
     ):
-        _ = self.get_player_reaction(player_input)
-        self.turn_order()
-        return self.narrator_collector.get_narration_queue()
+        self.get_player_reaction(player_input)
     
+    @print_func_name
     def play(
             self,
             player_input: str|None = None,
@@ -393,10 +417,10 @@ class Game:
         if self.next_turn == Turn.PLAYER.value:
             if player_input is None:
                 raise ValueError("Player input required for player turn")
-            return self.player_turn(player_input)
-        else:
-            self.turn_order()
-            return self.narrator_collector.get_narration_queue()
+            self.player_turn(player_input)
+
+        self.turn_order()
+        return self.narrator_collector.get_narration_queue()
         
         
     
