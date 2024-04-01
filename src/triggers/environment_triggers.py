@@ -3,6 +3,7 @@ from src.quests.base import QuestLog
 from src.environments.base import Environment
 from src.game.terms import NarrationType
 from abc import ABC, abstractmethod
+from src.game.terms import GameMode, Turn
 
 from typing import List, Dict
 import numpy as np
@@ -391,6 +392,43 @@ class RevealTrigger(EnvironmentTrigger):
     """
     Trigger for revealing an object or location
     """
+    def __init__(
+            self,
+            trigger_id: str,
+            ids_to_trigger: List[str],
+            ids_to_exclude: List[str] = [],
+            narrative_prompt: str|None = None,
+            random_chance: float = 1.0,
+            req_active_quest_ids: List[str] = [], # Quests that need to be active for trigger
+            req_quest_completed_ids: List[str] = [], # Quests that need to be completed for trigger
+            exl_quest_active_ids: List[str] = [], # Quests that can't be active for trigger
+            exl_quest_completed_ids: List[str] = [], # Quests that can't be completed for trigger
+            req_trigger_ids: List[str] = [], # Triggers that need to have been active for trigger
+            exl_trigger_ids: List[str] = [], # Triggers that can't have been active for trigger
+            req_characters: List[str] = [], # Characters that need to be present in the location
+            attributes: Dict[str, str] = {},
+            game_mode_switch: GameMode|None = None,
+            turn_switch: Turn|None = None,
+    ):
+        super().__init__(
+            trigger_id=trigger_id,
+            ids_to_trigger=ids_to_trigger,
+            narrative_prompt=narrative_prompt,
+            random_chance=random_chance,
+            req_active_quest_ids=req_active_quest_ids,
+            req_quest_completed_ids=req_quest_completed_ids,
+            exl_quest_active_ids=exl_quest_active_ids,
+            exl_quest_completed_ids=exl_quest_completed_ids,
+            req_trigger_ids=req_trigger_ids,
+            exl_trigger_ids=exl_trigger_ids,
+            req_characters=req_characters,
+            ids_to_exclude=ids_to_exclude,
+            attributes=attributes,
+        )
+        self.game_mode_switch = game_mode_switch
+        self.turn_switch = turn_switch
+        
+    
     def validate(
             self,
             environment: Environment,
@@ -420,6 +458,12 @@ class RevealTrigger(EnvironmentTrigger):
                 text_tag=NarrationType.stage.value,
                 ai_generate=False,
             )
+
+        if self.game_mode_switch:
+            game.switch_game_mode(self.game_mode_switch)
+        if self.turn_switch:
+            game.switch_turn(self.turn_switch)
+
         game.player.quest_log.add_completed_trigger(self.ids_to_exclude)
         return TriggerResponse(
             log_path=game.data_paths.logs_path,

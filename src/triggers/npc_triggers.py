@@ -149,7 +149,7 @@ class Attack(NPCAction):
         
         assert defending, f"Character {self.attributes['defending']} not found in game characters."
         
-        game.next_turn = Turn.PLAYER.value
+        game.switch_turn(Turn.PLAYER.value)
         
         return combat(
             game=game,

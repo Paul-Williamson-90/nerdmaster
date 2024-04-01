@@ -20,6 +20,8 @@ from src.characters.types.player.load_player import PlayerLoader
 from typing import List, Dict
 # from src.utils.tools import print_func_name
     
+class GameError(Exception):
+    pass
     
 class GameEnvironmentTurn:
 
@@ -231,9 +233,21 @@ class Game:
     # @print_func_name
     def switch_game_mode(
             self,
-            mode: GameMode,
+            mode,
     ):
+        # check if mode is valid
+        if mode not in [x.value for x in GameMode.__members__.values()]:
+            raise GameError(f"Game mode {mode} not recognized")
         self.game_mode = GameMode(mode).value
+
+    def switch_turn(
+            self,
+            turn
+    ):
+        # check if turn is valid
+        if turn not in [x.value for x in Turn.__members__.values()]:
+            raise GameError(f"Turn {turn} not recognized")
+        self.next_turn = Turn(turn).value
     
     # @print_func_name
     def add_to_player_narrator(
@@ -375,7 +389,7 @@ class Game:
             self,
     ):
         if self.game_mode not in [GameMode.EXPLORE.value, GameMode.DIALOGUE.value, GameMode.COMBAT.value]:
-            raise ValueError(f"Game mode {self.game_mode} not recognized")
+            raise GameError(f"Game mode {self.game_mode} not recognized")
         
         if self.game_mode == GameMode.EXPLORE.value and self.next_turn == Turn.GAME.value:
             self.environment_turn.game_environment_turn()
@@ -418,9 +432,7 @@ class Game:
         elif self.next_turn == Turn.QUIT.value:
             self.save_game()
             return
-        else:
-            raise ValueError(f"Turn {self.next_turn} not recognized")
-        self.next_turn = Turn.PLAYER.value
+        self.switch_turn(Turn.PLAYER.value)
         
     # @print_func_name
     def get_player_reaction(
@@ -443,7 +455,7 @@ class Game:
     ):
         if self.next_turn == Turn.PLAYER.value:
             if player_input is None:
-                raise ValueError("Player input required for player turn")
+                raise GameError("Player input required for player turn")
             self.player_turn(player_input)
 
         self.turn_order()

@@ -44,8 +44,8 @@ class PlayerReActionMap(ReActionMap):
                 "search_memory": SearchMemory(character=character).prepare,
                 "stage_direction": StageDirection(character=character).prepare,
                 "look_around": LookAround(character=character).prepare,
-                "speak_to_character": None, # TODO: Implement this
-                "interact_with_object": None, # TODO: Implement this
+                # "speak_to_character": None, # TODO: Implement this
+                # "interact_with_object": None, # TODO: Implement this
                 # TODO: How to get agent to select the character or object to interact with?
             },
             GameMode.INTERACT.value: {

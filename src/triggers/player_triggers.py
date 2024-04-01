@@ -100,7 +100,7 @@ class StageDirection(PlayerAction):
             ai_generate=False,
         )
 
-        game.next_turn = Turn.GAME.value
+        game.switch_turn(Turn.GAME.value)
 
         return TriggerResponse(
             log_path=game.data_paths.logs_path,
@@ -142,8 +142,8 @@ class LeaveConversation(PlayerAction):
 
         game.remove_from_characters()
 
-        game.game_mode = GameMode.EXPLORE.value
-        game.next_turn = Turn.PLAYER.value
+        game.switch_game_mode(GameMode.EXPLORE.value)
+        game.switch_turn(Turn.PLAYER.value)
 
         return TriggerResponse(
             log_path=game.data_paths.logs_path,
@@ -199,7 +199,7 @@ class Speak(PlayerAction):
             ai_generate=False,
         )
 
-        game.next_turn = Turn.GAME.value
+        game.switch_turn(Turn.GAME.value)
         game.switch_game_mode(GameMode.DIALOGUE.value)
 
         return TriggerResponse(
@@ -280,7 +280,7 @@ class Attack(PlayerAction):
         
         assert defending, f"Character {self.attributes['defending']} not found in game characters."
         
-        game.next_turn = Turn.GAME.value
+        game.switch_turn(Turn.GAME.value)
         
         return combat(
             game=game,
@@ -405,7 +405,7 @@ class LookDeeper(PlayerAction):
                 text_tag=NarrationType.stage.value,
                 ai_generate=False,
             )
-            game.game_mode = GameMode.TRADE.value
+            game.switch_game_mode(GameMode.TRADE.value)
             # TODO: Trigger item management screen
             # TODO: On exit, revert to Explore mode
 

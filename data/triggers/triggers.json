@@ -34,7 +34,9 @@
                     "object_id": "Wyatt \"Ace\" Thompson"
                 }
             ]
-        }
+        },
+        "game_mode_switch": null,
+        "turn_switch": "game"
     },
     "wyatt_on_reveal": {
         "trigger_id": "wyatt_on_reveal",
