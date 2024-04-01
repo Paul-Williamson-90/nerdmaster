@@ -240,6 +240,7 @@ class EnvironmentTrigger(Trigger, ABC):
                 if object_id in character_position.characters:
                     character_position.hidden = False
                     narrative = character_position.get_reveal_description()
+                    self.attributes["characters"] += [object_id]
                     self.attributes["reveal_narratives"] += [narrative]
                     print(f"Revealed: {object_id}, with narrative: {narrative}")
 
@@ -283,6 +284,7 @@ class DescribeLocationTrigger(EnvironmentTrigger):
         game.add_to_player_narrator(
             text=self.attributes["location_description"],
             text_tag=NarrationType.stage.value,
+            characters = [],
             ai_generate=False,
         )
         game.player.quest_log.add_completed_trigger(self.ids_to_exclude)
@@ -442,6 +444,7 @@ class RevealTrigger(EnvironmentTrigger):
             return 
         reveal_objects = self.attributes["reveal_objects"]
         self.attributes["reveal_narratives"] = []
+        self.attributes["characters"] = []
 
         for object in reveal_objects:
             self.reveal_object(object, environment)
@@ -452,10 +455,11 @@ class RevealTrigger(EnvironmentTrigger):
             self,
             game
     ):
-        for narrative in self.attributes["reveal_narratives"]:
+        for narrative, character in zip(self.attributes["reveal_narratives"], self.attributes["characters"]):
             game.add_to_player_narrator(
                 text=narrative,
                 text_tag=NarrationType.stage.value,
+                characters = [character],
                 ai_generate=False,
             )
 
@@ -572,6 +576,7 @@ class TriggerEventAnyCharacter(EnvironmentTrigger):
         game.add_to_player_narrator(
             text=self.narrative_prompt_player,
             text_tag=NarrationType.stage.value,
+            characters = self.attributes["characters"],
             ai_generate=True,
         )
         
@@ -677,6 +682,7 @@ class TriggerEventAllCharacter(EnvironmentTrigger):
         game.add_to_player_narrator(
             text=self.narrative_prompt_player, 
             text_tag=NarrationType.stage.value, 
+            characters = self.attributes["characters"],
             ai_generate=False
         )
         game.add_to_characters(

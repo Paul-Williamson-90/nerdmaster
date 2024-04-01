@@ -62,6 +62,7 @@ class LookAround(PlayerAction):
         game.add_to_player_narrator(
             text=f"You look around at the environment around you, looking for {suffix}...",
             text_tag=NarrationType.stage.value,
+            characters = ["player"],
             ai_generate=False,
         )
 
@@ -101,6 +102,7 @@ class StageDirection(PlayerAction):
         # print(self.__class__.__name__, "activate")
         game.add_to_player_narrator(
             text=self.attributes["stage_direction"],
+            characters = ["player"],
             text_tag=NarrationType.stage.value,
             ai_generate=False,
         )
@@ -141,6 +143,7 @@ class LeaveConversation(PlayerAction):
 
         game.add_to_player_narrator(
             text=f"{self.character.name} leaves the conversation.",
+            characters = ["player"],
             text_tag=NarrationType.stage.value,
             ai_generate=True,
         )
@@ -191,6 +194,7 @@ class Speak(PlayerAction):
         game.add_to_player_narrator(
             text=f"\"{self.attributes["dialogue"]}\"",
             text_tag=self.character.name,
+            characters = ["player"],
             ai_generate=False,
             voice=self.character.voice,
         )
@@ -239,6 +243,7 @@ class SearchMemory(PlayerAction):
         game.add_to_player_narrator(
             text=response,
             text_tag=NarrationType.stage.value,
+            characters = ["player"],
             ai_generate=False,
             voice=self.character.voice,
         )
@@ -350,12 +355,14 @@ class LookAtCharacter(PlayerAction):
 
         game.add_to_player_narrator(
             text=f"You take a deep look at the person in front of you.",
+            characters = ["player"],
             text_tag=NarrationType.stage.value,
             ai_generate=False,
         )
 
         game.add_to_player_narrator(
             text=target_character.get_visual_description(),
+            characters = [target_character.name],
             text_tag=NarrationType.stage.value,
             ai_generate=False,
         )
@@ -389,6 +396,7 @@ class LookDeeper(PlayerAction):
 
         game.add_to_player_narrator(
             text=f"You take a deeper look at the {name}.",
+            characters = ["player"],
             text_tag=NarrationType.stage.value,
             ai_generate=False,
         )
@@ -396,6 +404,7 @@ class LookDeeper(PlayerAction):
         if len(items)==0:
             game.add_to_player_narrator(
                 text=f"You find nothing of interest.",
+                characters = ["player"],
                 text_tag=NarrationType.stage.value,
                 ai_generate=False,
             )
@@ -404,6 +413,7 @@ class LookDeeper(PlayerAction):
         elif len(items)>0:
             game.add_to_player_narrator(
                 text=f"You notice the following items: {', '.join([x.name for x in items])}",
+                items=', '.join([x.name for x in items]),
                 text_tag=NarrationType.stage.value,
                 ai_generate=False,
             )
@@ -489,6 +499,7 @@ class BeginDialogue(PlayerAction):
 
         game.add_to_player_narrator(
                 text=f"You approach, ready for conversation. What will you say?",
+                characters = ["player"],
                 text_tag=NarrationType.stage.value,
                 ai_generate=False,
         )
@@ -545,6 +556,7 @@ class InteractWithObject(PlayerAction):
 
         game.add_to_player_narrator(
             text=f"You approach to get a closer look.",
+            characters = ["player"],
             text_tag=NarrationType.stage.value,
             ai_generate=False,
         )
@@ -580,6 +592,7 @@ class ClarifyPlayerInput(PlayerAction):
         game.add_to_player_narrator(
             text=self.attributes["query"],
             text_tag="clarification",
+            image=False,
             ai_generate=False,
         )
 
@@ -642,6 +655,7 @@ class AttackCharacters(PlayerAction):
         game.add_to_player_narrator(
                 text=f"You approach {characters_str}, ready for a fight! What will you do?",
                 text_tag=NarrationType.stage.value,
+                characters = ["player"]+[char.name for char in characters],
                 ai_generate=False,
         )
 
