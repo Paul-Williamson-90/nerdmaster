@@ -397,6 +397,7 @@ class LookDeeper(PlayerAction):
                 text_tag=NarrationType.stage.value,
                 ai_generate=False,
             )
+            game.game_mode = GameMode.EXPLORE.value
         
         elif len(items)>0:
             game.add_to_player_narrator(
@@ -404,7 +405,9 @@ class LookDeeper(PlayerAction):
                 text_tag=NarrationType.stage.value,
                 ai_generate=False,
             )
+            game.game_mode = GameMode.TRADE.value
             # TODO: Trigger item management screen
+            # TODO: On exit, revert to Explore mode
 
         return TriggerResponse(
             log_path=game.data_paths.logs_path,
