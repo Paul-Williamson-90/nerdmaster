@@ -110,3 +110,18 @@ class Dalle:
         img = Image.open(BytesIO(img.content))
         img = self.scale_image(img, scale)
         return img
+    
+    def _generate_stage_art(
+            self,
+            prompt: str,
+    ):
+        return self.generate(prompt)
+    
+    def _generate_character_art(
+            self,
+            prompt:str,
+            character_images: List[np.ndarray],
+    ):
+        prompt = "Use the images provided to create the scene described below. " + prompt
+        return self.generate_from_image(character_images, prompt)
+        

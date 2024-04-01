@@ -8,6 +8,7 @@
         "local_locations": [],
         "character_locations": [
             {   
+                "name": "Wyatt in chair",
                 "position_type_id": "character_position",
                 "characters": ["Wyatt \"Ace\" Thompson"],
                 "position_description": "Wyatt is still sat in the chair, staring blankly ahead.",

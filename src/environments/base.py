@@ -41,6 +41,12 @@ class Environment:
 
     def get_object_of_interest(self):
         return self.object_of_interest
+    
+    def add_object_of_interest(self, object_name: str):
+        for object in self.object_locations:
+            if object.name == object_name:
+                self.object_of_interest = object
+                break
 
     def get_character_position_descriptions(self):
         return [character.get_position_description() for character in self.character_locations]
@@ -166,6 +172,31 @@ class Environment:
         armed_triggers = self.armed_triggers
         self.armed_triggers = []
         return armed_triggers
+    
+    def get_revealed(self):
+        revealed = []
+        for loc in self.character_locations:
+            if loc.hidden is False:
+                revealed.append(
+                    self._get_revealed(loc)
+                )
+    
+        for loc in self.object_locations:
+            if loc.hidden is False:
+                revealed.append(
+                    self._get_revealed(loc)
+                )
+        return revealed
+    
+    def _get_revealed(
+            self,
+            loc: ObjectPosition|CharacterPosition
+    ):
+        return {
+            "name": loc.name,
+            "description": loc.position_description,
+            "type": str(loc.__class__.__name__)
+        }
 
     # def add_characters(self, characters: List[CharacterPosition], trigger: Trigger|None=None):
     #     self.character_locations.extend(characters)

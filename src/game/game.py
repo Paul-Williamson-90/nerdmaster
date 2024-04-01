@@ -11,11 +11,19 @@ from src.triggers.trigger_loaders import TriggerLoader
 from src.characters.types.npcs.npc import NPC
 from src.characters.base import Character
 from src.endpoints.gpt import StandardGPT
-from src.game.prompts import PLAYER_NARRATION_SYSTEM_MESSAGE
+from src.game.prompts import (
+    PLAYER_NARRATION_SYSTEM_MESSAGE, 
+    ART_DIRECTOR_CHARACTERS, 
+    ART_DIRECTOR_ITEMS, 
+    ART_DIRECTOR_STAGE,
+    ART_DIRECTOR_PROMPT_ITEMS,
+    ART_DIRECTOR_PROMPT
+)
 from src.voices.voice import Voice
 from src.narrator.narrator import Narrator
 from src.game.terms import GameMode, Turn, NarrationType
 from src.characters.types.player.load_player import PlayerLoader
+from src.endpoints.image_generation import Dalle as ImageGenerator
 
 from typing import List, Dict
     
@@ -84,6 +92,7 @@ class Game:
             trigger_loader: TriggerLoader = TriggerLoader,
             narrator_collector: Narrator = Narrator,
             game_mode: GameMode = GameMode.EXPLORE.value,
+            image_generator: ImageGenerator = ImageGenerator,
     ):  
         # loaders
         self.environment_loader: EnvironmentLoader = environment_loader
@@ -93,6 +102,7 @@ class Game:
         # in game data
         self.data_paths: GameDataPaths = data_paths
         self.player: Player = player
+        self.player.game = self
         self.environment: Environment = environment
         self.game_mode: GameMode = game_mode
         self.characters: List[NPC] = []
@@ -101,6 +111,7 @@ class Game:
         self.narrator_collector: Narrator = narrator_collector()
         self.environment_turn: GameEnvironmentTurn = environment_turn(self)
         self.next_turn: Turn = Turn.GAME.value
+        self.image_generator: ImageGenerator = image_generator()
         self.action_queue: List[Trigger] = []
 
     
@@ -147,6 +158,7 @@ class Game:
         """
         for character in characters:
             loaded_character = self.npc_loader.load_character(character)
+            loaded_character.game = self
             self.characters.append(loaded_character)
 
     
@@ -254,6 +266,9 @@ class Game:
             text: str,
             text_tag: str = NarrationType.stage.value,
             voice: Voice = None,
+            characters: List[str] = [],
+            items: str = None,
+            image: bool = True,
             ai_generate: bool = False,
     ):  
         if ai_generate:
@@ -267,10 +282,16 @@ class Game:
 
         text = f"<{text_tag}>{text}</{text_tag}>"
 
+        if image:
+            characters = [self.get_in_focus_character(x) for x in characters]
+            image_path = self._get_narration_image(characters=characters, items=items, text=text)
+        else:
+            image_path = None
+
         self.narrator_collector.add_narration(
             text=text, 
             audio_path=audio_path,
-            # image_path=image_path,
+            image_path=image_path,
         )
         self.player.add_short_term_memory(text)
 
@@ -279,6 +300,7 @@ class Game:
             self,
             text: str,
             character: Character,
+            image: bool = True,
     ):
         if text[0] != "\"":
             text = "\""+text
@@ -286,13 +308,64 @@ class Game:
             text = text+"\""
 
         text = f"<{character.name}>{text}</{character.name}>"
+
+        if image:
+            characters = [self.get_in_focus_character(x) for x in characters]
+            image_path = self._get_narration_image(characters=characters, text=text)
+        else:
+            image_path = None
         
         audio_path = character.voice.generate(text)
         self.narrator_collector.add_narration(
             text=text, 
             audio_path=audio_path,
-            # image_path=image_path,
+            image_path=image_path,
         )
+
+    def _get_narration_image(
+            self,
+            text: str,
+            characters: List[Character]=[],
+            items: str=None,
+    ):
+        env_description = self.environment.get_visual_description()
+        events = self.player.get_short_term_memory() + '\n\n' + text
+
+        if len(characters)>0:
+            character_images = [character.get_avatar() for character in characters]
+            system_message = ART_DIRECTOR_CHARACTERS
+            prompt = ART_DIRECTOR_PROMPT.format(
+                env_description=env_description,
+                events=events
+            )
+            art_prompt = self.model.generate(prompt=prompt, system_prompt=system_message)
+            return self.image_generator._generate_character_art(
+                prompt=art_prompt,
+                character_images=character_images,
+            )
+        elif items != "":
+            system_message = ART_DIRECTOR_ITEMS
+            prompt = ART_DIRECTOR_PROMPT_ITEMS.format(
+                env_description=env_description,
+                events=events,
+                items=items
+            )
+            art_prompt = self.model.generate(prompt=prompt, system_prompt=system_message)
+            return self.image_generator._generate_stage_art(
+                prompt=art_prompt
+            )
+        else:
+            system_message = ART_DIRECTOR_STAGE
+            prompt = ART_DIRECTOR_PROMPT.format(
+                env_description=env_description,
+                events=events
+            )
+            art_prompt = self.model.generate(prompt=prompt, system_prompt=system_message)
+            return self.image_generator._generate_stage_art(
+                prompt=art_prompt
+            )
+
+        
 
     
     def get_in_focus_character(
@@ -454,6 +527,9 @@ class Game:
 
         self.turn_order()
         return self.narrator_collector.get_narration_queue()
+    
+
+    
         
         
     
