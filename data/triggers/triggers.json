@@ -89,6 +89,8 @@
         "req_trigger_ids": [],
         "exl_trigger_ids": [],
         "ids_to_exclude": ["begin_dialogue_wyatt"],
-        "req_characters": ["Wyatt \"Ace\" Thompson"]
+        "req_characters": ["Wyatt \"Ace\" Thompson"],
+        "add_character_description": false,
+        "add_player_description": true
     }
 }

@@ -320,4 +320,93 @@ class PrepareAttack(PlayerAction):
             defending=defending, 
             attack_action=Attack
         )
+    
+class LookAtCharacter(PlayerAction):
 
+    def prepare(
+            self,
+            character_to_look_at: str,
+    ):
+        """
+        <desc>Make the player's character look at another character, getting a visual description of the character of interest.</desc>
+
+        Args
+        str - <character_to_look_at>: The name of the character the player's character will look at.
+        """
+        self.attributes = {
+            "target_character": character_to_look_at,
+        }
+        self.character.add_to_action_queue(self)
+        return "**Tool Action Accepted**"
+
+    def activate(
+            self,
+            game
+    ):
+
+        target_character = game.get_in_focus_character(self.attributes["target_character"])
+
+        game.add_to_player_narrator(
+            text=f"You take a deep look at the person in front of you.",
+            text_tag=NarrationType.stage.value,
+            ai_generate=False,
+        )
+
+        game.add_to_player_narrator(
+            text=target_character.get_visual_description(),
+            text_tag=NarrationType.stage.value,
+            ai_generate=False,
+        )
+
+        return TriggerResponse(
+            log_path=game.data_paths.logs_path,
+            log_message=f"Trigger {self.trigger_id} activated."
+        )
+    
+class LookDeeper(PlayerAction):
+    """
+    Deeper interaction with observed object.
+    """
+    def prepare(
+            self,
+    ):
+        """
+        <desc>Make the player's character look around the environment</desc>
+        """
+        self.character.add_to_action_queue(self)
+        return "**Tool Action Accepted**"
+    
+    def activate(
+            self,
+            game
+    ):
+        object_of_interest = game.environment.get_object_of_interest()
+
+        name = object_of_interest.name
+        items = object_of_interest.reveal_items_and_triggers(game.player.quest_log)
+
+        game.add_to_player_narrator(
+            text=f"You take a deeper look at the {name}.",
+            text_tag=NarrationType.stage.value,
+            ai_generate=False,
+        )
+
+        if len(items)==0:
+            game.add_to_player_narrator(
+                text=f"You find nothing of interest.",
+                text_tag=NarrationType.stage.value,
+                ai_generate=False,
+            )
+        
+        elif len(items)>0:
+            game.add_to_player_narrator(
+                text=f"You notice the following items: {', '.join([x.name for x in items])}",
+                text_tag=NarrationType.stage.value,
+                ai_generate=False,
+            )
+            # TODO: Trigger item management screen
+
+        return TriggerResponse(
+            log_path=game.data_paths.logs_path,
+            log_message=f"Trigger {self.trigger_id} activated."
+        )

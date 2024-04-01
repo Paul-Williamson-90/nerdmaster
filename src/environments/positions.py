@@ -2,6 +2,7 @@ from src.characters.base import Character
 from src.items.base import Item
 from src.triggers.base import Trigger
 from typing import List
+from src.quests.base import QuestLog
 
 
 class Position:
@@ -52,7 +53,7 @@ class ObjectPosition(Position):
     def __init__(
             self,
             object_id: str,
-            items: List[str],
+            items: List[Item],
             position_description: str,
             reveal_description: str|None,
             hidden: bool,
@@ -80,4 +81,18 @@ class ObjectPosition(Position):
     def _check_trigger(self, item_id: str):
         # TODO: Implement trigger check
         pass
+
+    def reveal_items_and_triggers(
+            self,
+            quest_log,
+            environment,
+    ):
+        for trigger in self.triggers:
+            if trigger:
+                if trigger.__class__.__name__ == "InteractTrigger":
+                    trigger.prepare(
+                        quest_log=quest_log,
+                        environment=environment,
+                    )
+        return self.get_items()
 

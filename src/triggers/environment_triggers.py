@@ -477,6 +477,8 @@ class TriggerEventAnyCharacter(EnvironmentTrigger):
             exl_trigger_ids: List[str] = [], # Triggers that can't have been active for trigger
             req_characters: List[str] = [], # Characters that need to be present in the location
             ids_to_exclude: List[str] = [], # Triggers to exclude from the quest log
+            add_character_description: bool = False,
+            add_player_description: bool = False,
     ):
         super().__init__(
             trigger_id=trigger_id,
@@ -490,11 +492,13 @@ class TriggerEventAnyCharacter(EnvironmentTrigger):
             req_trigger_ids=req_trigger_ids,
             exl_trigger_ids=exl_trigger_ids,
             req_characters=req_characters,
-            ids_to_exclude=ids_to_exclude,
+            ids_to_exclude=ids_to_exclude,   
         )
         self.narrative_prompt_player = narrative_prompt_player
         self.narrative_prompt_npc = narrative_prompt_npc
         self.event_type = event_type
+        self.add_character_description = add_character_description
+        self.add_player_description = add_player_description
         
     
     def validate(
@@ -535,6 +539,22 @@ class TriggerEventAnyCharacter(EnvironmentTrigger):
             text_tag=NarrationType.stage.value,
             ai_generate=True
         )
+        if self.add_player_description:
+            game.add_to_npc_narrator(
+            text=game.player.get_visual_description(),
+            text_tag=NarrationType.stage.value,
+            ai_generate=False,
+            )
+
+        if self.add_character_description:
+            for character in [character for character in game.characters 
+                              if character.name in self.attributes["characters"]]:
+                game.add_to_npc_narrator(
+                    text=character.get_visual_description(),
+                    text_tag=NarrationType.stage.value,
+                    ai_generate=False,
+                )
+
         game.switch_game_mode(self.event_type)
         game.player.quest_log.add_completed_trigger(self.ids_to_exclude)
         return TriggerResponse(
@@ -564,6 +584,8 @@ class TriggerEventAllCharacter(EnvironmentTrigger):
             exl_trigger_ids: List[str] = [], # Triggers that can't have been active for trigger
             req_characters: List[str] = [], # Characters that need to be present in the location
             ids_to_exclude: List[str] = [],
+            add_character_description: bool = False,
+            add_player_description: bool = False,
     ):
         super().__init__(
             trigger_id=trigger_id,
@@ -582,6 +604,8 @@ class TriggerEventAllCharacter(EnvironmentTrigger):
         self.narrative_prompt_player = narrative_prompt_player
         self.narrative_prompt_npc = narrative_prompt_npc
         self.event_type = event_type
+        self.add_character_description = add_character_description
+        self.add_player_description = add_player_description
 
     def validate(
             self,
@@ -619,9 +643,43 @@ class TriggerEventAllCharacter(EnvironmentTrigger):
             text_tag=NarrationType.stage.value,
             ai_generate=True
         )
+
+        if self.add_player_description:
+            game.add_to_npc_narrator(
+            text=game.player.get_visual_description(),
+            text_tag=NarrationType.stage.value,
+            ai_generate=False,
+            )
+
+        if self.add_character_description:
+            for character in [character for character in game.characters 
+                              if character.name in self.attributes["characters"]]:
+                game.add_to_npc_narrator(
+                    text=character.get_visual_description(),
+                    text_tag=NarrationType.stage.value,
+                    ai_generate=False,
+                )
+
         game.switch_game_mode(self.event_type)
         game.player.quest_log.add_completed_trigger(self.ids_to_exclude)
         return TriggerResponse(
             log_path=game.data_paths.logs_path,
             log_message=f"Trigger {self.trigger_id} activated."
         )
+    
+
+class InteractTrigger(EnvironmentTrigger):
+
+    def validate(
+            self,
+            environment: Environment,
+            active_quest_ids: List[str]=[], # Quests that need to be completed before this can be triggered
+            completed_quest_ids: List[str]=[], # Quests that can't be active/already triggered for this to trigger
+            completed_trigger_ids: List[str]=[], # Triggers that can't be active/already triggered for this to trigger
+    ):
+        if not self.val_quest_log_requirements(active_quest_ids, completed_quest_ids, completed_trigger_ids):
+            return
+        if not self.val_random_chance_trigger():
+            return 
+        environment.arm_trigger(self)
+        print("Armed: ", self.trigger_id)

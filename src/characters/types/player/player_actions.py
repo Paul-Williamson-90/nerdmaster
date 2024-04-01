@@ -9,7 +9,9 @@ from src.triggers.player_triggers import (
     Attack,
     PrepareAttack,
     LeaveConversation,
-    LookAround
+    LookAround,
+    LookAtCharacter,
+    LookDeeper
 )
 
 from typing import Dict
@@ -28,8 +30,7 @@ class PlayerReActionMap(ReActionMap):
                 "stage_direction": StageDirection(character=character).prepare,
                 "prepare_attack": PrepareAttack(character=character).prepare,
                 "leave_conversation": LeaveConversation(character=character).prepare,
-                # "look_at_character": None, # TODO: Implement this
-                # "look_around": None, # TODO: Implement this
+                "look_at_character": LookAtCharacter(character=character).prepare, 
             },
             GameMode.COMBAT.value: {
                 "attack": Attack(character=character).prepare,
@@ -42,8 +43,14 @@ class PlayerReActionMap(ReActionMap):
             GameMode.EXPLORE.value: {
                 "search_memory": SearchMemory(character=character).prepare,
                 "stage_direction": StageDirection(character=character).prepare,
-                # "look_at_character": None, # TODO: Implement this
                 "look_around": LookAround(character=character).prepare,
+                "speak_to_character": None, # TODO: Implement this
+                "interact_with_object": None, # TODO: Implement this
+            },
+            GameMode.INTERACT.value: {
+                "search_memory": SearchMemory(character=character).prepare,
+                "stage_direction": StageDirection(character=character).prepare,
+                "look_deeper_at_object": LookDeeper(character=character).prepare,
             }
         }
 
