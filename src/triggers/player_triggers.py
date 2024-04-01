@@ -57,7 +57,7 @@ class LookAround(PlayerAction):
         # game.environment.fetch_triggers_explore()
         game.environment.arm_reveal_triggers(game.player.quest_log)
 
-        game.next_turn = Turn.GAME.value
+        game.switch_turn(Turn.GAME.value) # Do not remove, it means that the game checks any triggers after explore mode
 
         return TriggerResponse(
             log_path=game.data_paths.logs_path,
