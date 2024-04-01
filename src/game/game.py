@@ -93,6 +93,7 @@ class Game:
         # in game data
         self.data_paths: GameDataPaths = data_paths
         self.player: Player = player
+        self.player.game = self
         self.environment: Environment = environment
         self.game_mode: GameMode = game_mode
         self.characters: List[NPC] = []

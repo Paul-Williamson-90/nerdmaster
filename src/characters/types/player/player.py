@@ -28,6 +28,7 @@ class Player(Character):
             visual_description: str,
             memory: Memory|Dict[str, List[str]|str], 
             avatar: Avatar|np.ndarray|None, 
+            game = None,
             health: Health|dict = DEFAULT_HEALTH,
             skills: SkillTree|Dict[str, str] = DEFAULT_SKILL_TREE,
             backpack: Backpack|List[str] = [], 
@@ -56,6 +57,7 @@ class Player(Character):
             agent=agent,
             reactions=reactions,
         )
+        self.game = game
         self.current_location = current_location
         self.quest_log = quest_log
 

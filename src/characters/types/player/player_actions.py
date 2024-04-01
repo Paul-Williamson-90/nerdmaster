@@ -11,7 +11,9 @@ from src.triggers.player_triggers import (
     LeaveConversation,
     LookAround,
     LookAtCharacter,
-    LookDeeper
+    LookDeeper,
+    GetRevealedAttributes,
+    BeginDialogue
 )
 
 from typing import Dict
@@ -44,8 +46,10 @@ class PlayerReActionMap(ReActionMap):
                 "search_memory": SearchMemory(character=character).prepare,
                 "stage_direction": StageDirection(character=character).prepare,
                 "look_around": LookAround(character=character).prepare,
-                # "speak_to_character": None, # TODO: Implement this
-                # "interact_with_object": None, # TODO: Implement this
+                "get_information_on_objects_available_to_interact_with": GetRevealedAttributes(character=character).prepare,
+                "speak_to_a_character": BeginDialogue(character=character).prepare, 
+                # "interact_with_an_object": None, # TODO: Implement this
+                # "get_clarification_from_player": None, # TODO: Implement this
                 # TODO: How to get agent to select the character or object to interact with?
             },
             GameMode.INTERACT.value: {

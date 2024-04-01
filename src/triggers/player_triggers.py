@@ -4,6 +4,8 @@ from src.characters.base import Character
 from src.utils.combat import combat
 from src.utils.prepare_attack import prepare_attack_action
 
+from typing import Dict
+
 from abc import ABC, abstractmethod
 
 
@@ -408,6 +410,88 @@ class LookDeeper(PlayerAction):
             game.switch_game_mode(GameMode.TRADE.value)
             # TODO: Trigger item management screen
             # TODO: On exit, revert to Explore mode
+
+        return TriggerResponse(
+            log_path=game.data_paths.logs_path,
+            log_message=f"Trigger {self.trigger_id} activated."
+        )
+    
+class GetRevealedAttributes(PlayerAction):
+
+    def prepare(
+            self,
+    ):
+        """
+        <desc>Get details on what objects and characters the player can interact with. This should be used to get the information to correctly select objects for player interactions.</desc>
+        """
+        # TODO: How do we get game/environment?
+        revealed: Dict[str, str] = self.character.game.environment.get_revealed()
+        revealed_str = ""
+        for obj in revealed:
+            revealed_str += f"Name: {obj['name']}\nDescription: {obj['description']}\nObject Type: {obj["type"]}\n\n"
+        return revealed_str
+    
+    def activate(
+            self,
+            game
+    ):
+        pass
+
+class BeginDialogue(PlayerAction):
+
+    def prepare(
+            self,
+            characters_to_speak_to: str,
+    ):
+        """
+        <desc>Make the player's character begin a dialogue with other character(s)</desc>
+
+        Args
+        str - <characters_to_speak_to>: The **name** of the characters the player's character will approach to speak to.
+        """
+        # Validate if choice is valid
+        valid = False
+        acceptable_choices = self.character.game.environment.get_revealed()
+        acceptable_choices = [x for x in acceptable_choices if x["type"]=="CharacterPosition"]
+
+        for choice in acceptable_choices:
+            if choice["name"] == characters_to_speak_to:
+                valid = True
+                break
+
+        if valid:
+            self.attributes = {
+                "character_position": characters_to_speak_to,
+            }
+            self.character.add_to_action_queue(self)
+            return "**Tool Action Accepted**"
+        
+        else:
+            message = "**Tool Action Rejected**: Invalid character choice."
+            for choice in acceptable_choices:
+                message += f"Name: {choice['name']}\nDescription: {choice['description']}\nObject Type: {choice["type"]}\n\n"
+            return message
+
+    def activate(
+            self,
+            game
+    ):
+
+        characters = [x for x in game.environment.character_locations 
+         if x.name == self.attributes["character_position"] and x.hidden is False][0].characters
+
+        game.add_to_characters(
+            characters=characters,
+        )
+
+        game.add_to_player_narrator(
+                text=f"You approach, ready for conversation. What will you say?",
+                text_tag=NarrationType.stage.value,
+                ai_generate=False,
+        )
+
+        game.switch_turn(Turn.PLAYER.value)
+        game.switch_game_mode(GameMode.DIALOGUE.value)
 
         return TriggerResponse(
             log_path=game.data_paths.logs_path,
