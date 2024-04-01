@@ -393,12 +393,10 @@ class Game:
         
         if self.game_mode == GameMode.EXPLORE.value and self.next_turn == Turn.GAME.value:
             self.environment_turn.game_environment_turn()
-            print("Post-env",self.action_queue)
         
         if (self.game_mode in [GameMode.DIALOGUE.value, GameMode.COMBAT.value]
             and self.next_turn == Turn.GAME.value):
             self.NPC_reaction_turn()
-            print("Post-npc",self.action_queue)
     
     # @print_func_name
     def load_new_map(
@@ -424,7 +422,6 @@ class Game:
             # self.action_queue = []
         if self.next_turn == Turn.GAME.value:
             self.game_turn()
-            print("Post Game",self.action_queue)
         elif self.next_turn == Turn.SAVE.value:
             self.save_game()
         elif self.next_turn == Turn.NEW_MAP.value:
