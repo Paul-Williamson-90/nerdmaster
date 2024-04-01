@@ -18,7 +18,6 @@ from src.game.terms import GameMode, Turn, NarrationType
 from src.characters.types.player.load_player import PlayerLoader
 
 from typing import List, Dict
-# from src.utils.tools import print_func_name
     
 class GameError(Exception):
     pass
@@ -31,7 +30,7 @@ class GameEnvironmentTurn:
     ):
         self.game = game
 
-    # @print_func_name
+    
     def fetch_triggers_environment(self):
         """
         These triggers are provided on game environment turn.
@@ -52,7 +51,7 @@ class GameEnvironmentTurn:
         )
         self.game.action_queue += prepared_triggers
     
-    # @print_func_name
+    
     def game_environment_turn(
             self,
     ):
@@ -104,14 +103,14 @@ class Game:
         self.next_turn: Turn = Turn.GAME.value
         self.action_queue: List[Trigger] = []
 
-    # @print_func_name
+    
     def add_character_actions_to_queue(
             self,
             character: Character
     ):
         self.action_queue += character.get_action_queue()
 
-    # @print_func_name
+    
     def save_game(self):
         """
         Triggers the save game process (only during exploration mode)
@@ -125,7 +124,7 @@ class Game:
         )
         # TODO: Save game state
 
-    # @print_func_name
+    
     def add_turn(
             self,
     ):
@@ -135,7 +134,7 @@ class Game:
         # TODO: Character tickers
         self.environment.add_turn()
     
-    # @print_func_name
+    
     def add_to_characters(
             self,
             characters: List[str],
@@ -150,7 +149,7 @@ class Game:
             loaded_character = self.npc_loader.load_character(character)
             self.characters.append(loaded_character)
 
-    # @print_func_name
+    
     def remove_from_characters(
             self,
     ):
@@ -166,7 +165,7 @@ class Game:
             self.npc_loader.character_save(character.name, save_json)
         self.characters = []
 
-    # @print_func_name
+    
     def _ai_generate_narration(
             self,
             text: str,
@@ -178,7 +177,7 @@ class Game:
         response = self.model.generate(prompt=text, system_prompt=system_message)
         return response
     
-    # @print_func_name
+    
     def _add_to_npc_narrator_single(
             self,
             text: str,
@@ -197,7 +196,7 @@ class Game:
         for character in self.characters:
             character.add_short_term_memory(text)
 
-    # @print_func_name
+    
     def _add_to_npc_narrator_multiple(
             self,
             text: Dict[str, str],
@@ -218,7 +217,7 @@ class Game:
             text = f"<{text_tag}>{response}</{text_tag}>"
             character.add_short_term_memory(text)
 
-    # @print_func_name
+    
     def add_to_npc_narrator(
             self,
             text: str|Dict[str, str],
@@ -230,7 +229,7 @@ class Game:
         else:
             self._add_to_npc_narrator_multiple(text, text_tag, ai_generate)
 
-    # @print_func_name
+    
     def switch_game_mode(
             self,
             mode,
@@ -249,7 +248,7 @@ class Game:
             raise GameError(f"Turn {turn} not recognized")
         self.next_turn = Turn(turn).value
     
-    # @print_func_name
+    
     def add_to_player_narrator(
             self,
             text: str,
@@ -275,7 +274,7 @@ class Game:
         )
         self.player.add_short_term_memory(text)
 
-    # @print_func_name
+    
     def add_character_dialogue_to_narrator(
             self,
             text: str,
@@ -295,7 +294,7 @@ class Game:
             # image_path=image_path,
         )
 
-    # @print_func_name
+    
     def get_in_focus_character(
             self,
             name: str,
@@ -305,7 +304,7 @@ class Game:
                 return character
         return None
     
-    # @print_func_name
+    
     def activate_trigger(
             self, 
             trigger:Trigger,
@@ -313,7 +312,7 @@ class Game:
         out = trigger.activate(self)
         return out
     
-    # @print_func_name
+    
     def _prepare_triggers(
             self,
             triggers: List[Trigger],
@@ -337,7 +336,7 @@ class Game:
             return prepared_triggers
         return []
     
-    # @print_func_name
+    
     def _reconcile_triggers(
             self,
             triggers: List[Trigger],
@@ -360,7 +359,7 @@ class Game:
                 new_triggers.extend(trig_adds)
             self._reconcile_triggers(new_triggers)
 
-    # @print_func_name
+    
     def reconcile_all_characters(
             self,
     ):
@@ -370,7 +369,7 @@ class Game:
         self._reconcile_triggers(self.action_queue)
         self.action_queue = []
     
-    # @print_func_name
+    
     def NPC_reaction_turn(
             self,
     ):
@@ -384,7 +383,7 @@ class Game:
 
         self.reconcile_all_characters()
 
-    # @print_func_name
+    
     def game_turn(
             self,
     ):
@@ -398,13 +397,13 @@ class Game:
             and self.next_turn == Turn.GAME.value):
             self.NPC_reaction_turn()
     
-    # @print_func_name
+    
     def load_new_map(
             self,
     ):
         raise NotImplementedError("NEW_MAP mode not implemented")
     
-    # @print_func_name
+    
     def activate_player_actions(
             self,
     ):
@@ -412,14 +411,12 @@ class Game:
         self._reconcile_triggers(self.action_queue)
         self.action_queue = []
 
-    # @print_func_name 
+     
     def turn_order(
             self,
     ):
         if self.next_turn == Turn.PLAYER.value:
             self.activate_player_actions()
-            # self._reconcile_triggers(self.action_queue) 
-            # self.action_queue = []
         if self.next_turn == Turn.GAME.value:
             self.game_turn()
         elif self.next_turn == Turn.SAVE.value:
@@ -431,21 +428,21 @@ class Game:
             return
         self.switch_turn(Turn.PLAYER.value)
         
-    # @print_func_name
+    
     def get_player_reaction(
             self,
             event: str
     ):
         self.player.reactions.get_reaction(event, self.game_mode)
         
-    # @print_func_name
+    
     def player_turn(
             self,
             player_input: str,
     ):
         self.get_player_reaction(player_input)
     
-    # @print_func_name
+    
     def play(
             self,
             player_input: str|None = None,
