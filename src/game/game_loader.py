@@ -12,9 +12,12 @@ from src.characters.types.npcs.load_npc import NPCLoader
 from src.characters.types.player.load_player import PlayerLoader
 from src.triggers.trigger_loaders import TriggerLoader
 
+from src.endpoints.image_generation import Dalle
+
 from pathlib import Path
 import os
 import json
+from uuid import uuid4
 
 class GameLoaderException(Exception):
     pass
@@ -174,6 +177,9 @@ class GameLoader:
             os.mkdir("./saves/" + player_id.replace(" ", "_") + "/" + dir)
             files = os.listdir(f"./data/{dir}")
             for file in files:
+                # if file json
+                if not file.endswith(".json"):
+                    continue
                 with open(f"./data/{dir}/{file}", 'r') as f:
                     file_data = json.load(f)
                 with open(f"./saves/{player_id.replace(' ', '_')}/{dir}/{file}", 'w') as f:
@@ -210,8 +216,9 @@ class GameLoader:
             avatar_image_path: Path = None,
             voice: str = "alloy",
     ):
-        self._create_player(name, visual_description, avatar_image_path, voice)
         self._setup_data_paths(name)
+        self._create_player(name, visual_description, avatar_image_path, voice)
+        # self._setup_data_paths(name)
         return self.load_game(name)
     
     def _create_player(
@@ -226,6 +233,14 @@ class GameLoader:
 
         if player_id in data.keys():
             raise GameLoaderException(f"Player with id {player_id} already exists.")
+        
+        if not avatar_image_path:
+            gen = Dalle()
+            img = gen.generate(visual_description+"\n<sci-fi> <western> <noir> <gritty>")
+            image_file_path = f"./saves/{player_id.replace(' ', '_')}/images/{player_id.replace(' ', '_')}.png"
+            img.save(image_file_path)
+        else:
+            image_file_path = avatar_image_path
         
         data[player_id] = {
             "name": player_id,
@@ -248,7 +263,7 @@ class GameLoader:
                     "names": {}
                 },
             "avatar": {
-                    "image": avatar_image_path
+                    "image": image_file_path,
                 },
             "health": {
                     "status": "HEALTHY",

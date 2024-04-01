@@ -4,6 +4,8 @@ from pathlib import Path
 from src.characters.avatars.prompts import AVATAR_PROMPT
 from src.endpoints.image_generation import Dalle
 
+import cv2
+
 class Avatar:
 
     def __init__(
@@ -22,7 +24,7 @@ class Avatar:
             avatar: Path|None,
     )->np.ndarray:
         if avatar:
-            return np.load(avatar)
+            return cv2.imread(str(avatar))
         else:
             pass #self.create_avatar()
 

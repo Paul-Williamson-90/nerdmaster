@@ -5,6 +5,7 @@ from PIL import Image
 import numpy as np
 import os 
 from typing import List
+from uuid import uuid4
 from src.game.configs import TEMP_IMAGE_DATA_PATH
 from dotenv import load_dotenv
 
@@ -14,9 +15,11 @@ class Dalle:
     def __init__(
             self, 
             api_key:str=os.environ.get("OPENAI_API_KEY"),
+            output_dir:str=TEMP_IMAGE_DATA_PATH,
             model:str="dall-e-3",
         ):
         self.api_key = api_key
+        self.output_dir = output_dir
         self.client = OpenAI()
         self.model = model
 
@@ -60,7 +63,8 @@ class Dalle:
     def _prepare_image(self, image:np.ndarray|Image.Image):
         if isinstance(image, np.ndarray):
             image = Image.fromarray(image)
-        image_path = TEMP_IMAGE_DATA_PATH
+        image_path = self.output_dir+str(uuid4())+".png"
+        image = image.convert("RGBA")
         image.save(image_path, "PNG")        
         return image_path
     
@@ -80,7 +84,9 @@ class Dalle:
         image = Image.fromarray(new_image)
         # scale the image
         image = self.scale_image(image, 0.6)
-        image_path = TEMP_IMAGE_DATA_PATH
+        image_path = self.output_dir+str(uuid4())+".png"
+        # convert to RGBA
+        image = image.convert("RGBA")
         image.save(image_path, "PNG")
         return image_path
 
@@ -89,7 +95,7 @@ class Dalle:
             self, 
             image:np.ndarray|Image.Image|List[np.ndarray|Image.Image], 
             prompt:str, 
-            size:str="1792x1024", 
+            size:str="1024x1024", 
             n:int=1,
             scale:float=0.6,
         ):
@@ -102,9 +108,10 @@ class Dalle:
             image=open(image_path,"rb"),
             prompt=prompt,
             size=size,
-            model=self.model,
-            n=n,
         )
+
+        os.remove(image_path)
+
         url = response.data[0].url
         img = requests.get(url)
         img = Image.open(BytesIO(img.content))
@@ -123,5 +130,6 @@ class Dalle:
             character_images: List[np.ndarray],
     ):
         prompt = "Use the images provided to create the scene described below. " + prompt
-        return self.generate_from_image(character_images, prompt)
+        # return self.generate_from_image(character_images, prompt)
+        return self.generate(prompt)
         

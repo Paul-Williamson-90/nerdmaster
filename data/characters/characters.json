@@ -19,7 +19,7 @@
             "names": {}
         },
         "avatar": {
-            "image": null
+            "image": "./data/images/wyatt.png"
         },
         "health": {
             "status": "HEALTHY",
