@@ -397,7 +397,7 @@ class LookDeeper(PlayerAction):
                 text_tag=NarrationType.stage.value,
                 ai_generate=False,
             )
-            game.game_mode = GameMode.EXPLORE.value
+            game.switch_game_mode(GameMode.EXPLORE.value)
         
         elif len(items)>0:
             game.add_to_player_narrator(
