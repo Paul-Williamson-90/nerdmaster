@@ -34,13 +34,19 @@ class Environment:
         self.triggers = triggers
         self.turns_in_location = turns_in_location
         self.armed_triggers: List[Trigger] = []
-        # self.object_of_interest: ObjectPosition|None = None
+        self.object_of_interest: ObjectPosition|None = None
 
     def add_turn(self):
         self.turns_in_location += 1
 
-    # def get_object_of_interest(self):
-    #     return self.object_of_interest
+    def get_object_of_interest(self):
+        return self.object_of_interest
+    
+    def add_object_of_interest(self, object_name: str):
+        for object in self.object_locations:
+            if object.name == object_name:
+                self.object_of_interest = object
+                break
 
     def get_character_position_descriptions(self):
         return [character.get_position_description() for character in self.character_locations]

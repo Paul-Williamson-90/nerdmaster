@@ -53,6 +53,7 @@ class NPC(Character):
             agent=agent,
             reactions=reactions,
         )
+        self.game = None
     
     def character_reaction(
             self,

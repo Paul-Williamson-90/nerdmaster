@@ -148,6 +148,7 @@ class Game:
         """
         for character in characters:
             loaded_character = self.npc_loader.load_character(character)
+            loaded_character.game = self
             self.characters.append(loaded_character)
 
     

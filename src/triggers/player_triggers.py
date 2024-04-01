@@ -39,10 +39,15 @@ class LookAround(PlayerAction):
 
     def prepare(
             self,
+            player_interest: str|None = "",
     ):
         """
         <desc>Make the player's character look around the environment</desc>
+
+        Args
+        str|None - <objective_interest>: What is the player looking for? this is an optional field.
         """
+        self.attributes["objective_interest"] = player_interest
         self.character.add_to_action_queue(self)
         return "**Tool Action Accepted**"
     
@@ -50,8 +55,12 @@ class LookAround(PlayerAction):
             self,
             game
     ):
+        if self.attributes["objective_interest"] and self.attributes["objective_interest"]!="":
+            suffix = f" {self.attributes['objective_interest'].lower()}"
+        else:
+            suffix = "things of interest"
         game.add_to_player_narrator(
-            text=f"You look around at the environment around you, looking for things of interest...",
+            text=f"You look around at the environment around you, looking for {suffix}...",
             text_tag=NarrationType.stage.value,
             ai_generate=False,
         )
@@ -178,15 +187,6 @@ class Speak(PlayerAction):
         # print(self.__class__.__name__, "activate")
         player_name = game.player.name
         dialogue = self.attributes["dialogue"]
-        characters = [char.name for char in game.characters]
-
-        if len(characters) == 0:
-            game.add_to_player_narrator(
-                text = f"{player_name} randomly starts talking to themself... Perhaps they are going mad.",
-                ai_generate=True,
-            )
-            return TriggerResponse(
-                log_message=f"Trigger {self.trigger_id} activated. No characters to speak to.",)
         
         game.add_to_player_narrator(
             text=f"\"{self.attributes["dialogue"]}\"",
@@ -422,13 +422,16 @@ class GetRevealedAttributes(PlayerAction):
             self,
     ):
         """
-        <desc>Get details on what objects and characters the player can interact with. This should be used to get the information to correctly select objects for player interactions.</desc>
+        <desc>Get a list of valid options the player is able to interact with. This should be used to validate player interactions with objects and characters to ensure they are selecting options that exist in the game.</desc>
         """
         # TODO: How do we get game/environment?
         revealed: Dict[str, str] = self.character.game.environment.get_revealed()
         revealed_str = ""
         for obj in revealed:
             revealed_str += f"Name: {obj['name']}\nDescription: {obj['description']}\nObject Type: {obj["type"]}\n\n"
+        
+        if revealed_str == "":
+            revealed_str = "**Tool Failed: No objects to interact with, ask the player for clarification using this exact text: \"Perhaps try observing your surroundings first?\"**"
         return revealed_str
     
     def activate(
@@ -467,7 +470,7 @@ class BeginDialogue(PlayerAction):
             return "**Tool Action Accepted**"
         
         else:
-            message = "**Tool Action Rejected**: Invalid character choice."
+            message = "**Tool Action Rejected**: Invalid character choice. Perhaps ask the player to clarify who they wish to speak to?"
             for choice in acceptable_choices:
                 message += f"Name: {choice['name']}\nDescription: {choice['description']}\nObject Type: {choice["type"]}\n\n"
             return message
@@ -492,6 +495,158 @@ class BeginDialogue(PlayerAction):
 
         game.switch_turn(Turn.PLAYER.value)
         game.switch_game_mode(GameMode.DIALOGUE.value)
+
+        return TriggerResponse(
+            log_path=game.data_paths.logs_path,
+            log_message=f"Trigger {self.trigger_id} activated."
+        )
+    
+class InteractWithObject(PlayerAction):
+
+    def prepare(
+            self,
+            object_to_interact_with: str,
+    ):
+        """
+        <desc>Make the player's character interact with an object</desc>
+
+        Args
+        str - <object_to_interact_with>: The name of the object the player's character will interact with.
+        """
+        # Validate if choice is valid
+        valid = False
+        acceptable_choices = self.character.game.environment.get_revealed()
+        acceptable_choices = [x for x in acceptable_choices if x["type"]=="ObjectPosition"]
+
+        for choice in acceptable_choices:
+            if choice["name"] == object_to_interact_with:
+                valid = True
+                break
+
+        if valid:
+            self.attributes = {
+                "object_position": object_to_interact_with,
+            }
+            self.character.add_to_action_queue(self)
+            return "**Tool Action Accepted**"
+        
+        else:
+            message = "**Tool Action Rejected**: Invalid object choice. Perhaps ask the player for clarification on what they want to interact with?"
+            for choice in acceptable_choices:
+                message += f"Name: {choice['name']}\nDescription: {choice['description']}\nObject Type: {choice["type"]}\n\n"
+            return message
+
+    def activate(
+            self,
+            game
+    ):
+        # Add object to object of interest in environment
+        game.environment.add_object_of_interest(self.attributes["object_position"])
+
+        game.add_to_player_narrator(
+            text=f"You approach to get a closer look.",
+            text_tag=NarrationType.stage.value,
+            ai_generate=False,
+        )
+
+        game.switch_game_mode(GameMode.INTERACT.value)
+        game.switch_turn(Turn.PLAYER.value)
+
+        return TriggerResponse(
+            log_path=game.data_paths.logs_path,
+            log_message=f"Trigger {self.trigger_id} activated."
+        )
+    
+class ClarifyPlayerInput(PlayerAction):
+
+    def prepare(
+            self,
+            query: str,
+    ):
+        """
+        <desc>Get clarification from the player/user on how to action their user input. Only use this tool if you are unsure on how to action the player's request. This tool should only be used in isolation, with no other tools activated, except for when all other tools have failed. You should not share any information from other tools in the question.</desc>
+
+        Args
+        str - <query>: The question to send to the player to clarify their input.
+        """
+        self.attributes["query"] = query
+        self.character.add_to_action_queue(self)
+        return f"**Clarification prepared, end your output now**"
+    
+    def activate(
+            self,
+            game
+    ):
+        game.add_to_player_narrator(
+            text=self.attributes["query"],
+            text_tag="clarification",
+            ai_generate=False,
+        )
+
+        game.switch_turn(Turn.PLAYER.value)
+
+        return TriggerResponse(
+            log_path=self.character.game.data_paths.logs_path,
+            log_message=f"Activated {self.trigger_id}: {self.attributes['query']}",
+        )
+    
+class AttackCharacters(PlayerAction):
+
+    def prepare(
+            self,
+            characters_to_attack: str,
+    ):
+        """
+        <desc>Make the player's character attack other characters</desc>
+
+        Args
+        str - <characters_to_attack>: The names of the characters the player's character will attack.
+        """
+        # Validate if choice is valid
+        valid = False
+        acceptable_choices = self.character.game.environment.get_revealed()
+        acceptable_choices = [x for x in acceptable_choices if x["type"]=="CharacterPosition"]
+
+        for choice in acceptable_choices:
+            if choice["name"] == characters_to_attack:
+                valid = True
+                break
+
+        if valid:
+            self.attributes = {
+                "object_position": characters_to_attack,
+            }
+            self.character.add_to_action_queue(self)
+            return "**Tool Action Accepted**"
+        
+        else:
+            message = "**Tool Action Rejected**: Invalid object choice. Perhaps ask the player for clarification on which characters they wish to attack?"
+            for choice in acceptable_choices:
+                message += f"Name: {choice['name']}\nDescription: {choice['description']}\nObject Type: {choice["type"]}\n\n"
+            return message
+    
+    def activate(
+            self,
+            game
+    ):
+        characters = [x for x in game.environment.character_locations 
+         if x.name == self.attributes["character_position"] and x.hidden is False][0].characters
+
+        game.add_to_characters(
+            characters=characters,
+        )
+
+        if len(characters)>1:
+            characters_str = ", ".join([char.name for char in characters][:-1]) + " and " + characters[-1].name
+
+        game.add_to_player_narrator(
+                text=f"You approach {characters_str}, ready for a fight! What will you do?",
+                text_tag=NarrationType.stage.value,
+                ai_generate=False,
+        )
+
+        game.switch_turn(Turn.PLAYER.value)
+        game.switch_game_mode(GameMode.COMBAT.value)
 
         return TriggerResponse(
             log_path=game.data_paths.logs_path,
