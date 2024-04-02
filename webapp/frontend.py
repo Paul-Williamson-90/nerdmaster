@@ -78,8 +78,8 @@ def page_structure_by_mode(
 def add_text_to_content(
     words, 
     text_inputs: list[dict[str, str]], 
-    msg_limit: int = 5)
-:
+    msg_limit: int = 5
+):
     for text in text_inputs[-msg_limit:]:
         insert_text_content(words, text["text"], text["source"])
 
