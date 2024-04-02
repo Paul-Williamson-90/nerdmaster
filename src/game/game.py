@@ -92,7 +92,7 @@ class Game:
             trigger_loader: TriggerLoader = TriggerLoader,
             narrator_collector: Narrator = Narrator,
             game_mode: GameMode = GameMode.EXPLORE.value,
-            image_generator: ImageGenerator = ImageGenerator,
+            # image_generator: ImageGenerator = ImageGenerator,
     ):  
         # loaders
         self.environment_loader: EnvironmentLoader = environment_loader
@@ -111,7 +111,7 @@ class Game:
         self.narrator_collector: Narrator = narrator_collector()
         self.environment_turn: GameEnvironmentTurn = environment_turn(self)
         self.next_turn: Turn = Turn.GAME.value
-        self.image_generator: ImageGenerator = image_generator(output_dir=self.data_paths.temp_image_data_path)
+        # self.image_generator: ImageGenerator = image_generator(output_dir=self.data_paths.temp_image_data_path)
         self.action_queue: List[Trigger] = []
 
     
@@ -266,9 +266,6 @@ class Game:
             text: str,
             text_tag: str = NarrationType.stage.value,
             voice: Voice = None,
-            characters: List[str] = [],
-            items: str = None,
-            image: bool = True,
             ai_generate: bool = False,
     ):  
         if ai_generate:
@@ -282,22 +279,9 @@ class Game:
 
         text = f"<{text_tag}>{text}</{text_tag}>"
 
-        if image:
-            if "player" in characters:
-                characters = [self.get_in_focus_character(x) for x  in characters
-                            if x in [name for name in self.characters]]
-                characters.append(self.player)
-            else:
-                characters = [self.get_in_focus_character(x) for x  in characters
-                            if x in [name for name in self.characters]]
-            image_path = self._get_narration_image(characters=characters, items=items, text=text)
-        else:
-            image_path = None
-
         self.narrator_collector.add_narration(
             text=text, 
             audio_path=audio_path,
-            image_path=image_path,
         )
         self.player.add_short_term_memory(text)
 
@@ -306,7 +290,6 @@ class Game:
             self,
             text: str,
             character: Character,
-            image: bool = True,
     ):
         if text[0] != "\"":
             text = "\""+text
@@ -314,63 +297,12 @@ class Game:
             text = text+"\""
 
         text = f"<{character.name}>{text}</{character.name}>"
-
-        if image:
-            image_path = self._get_narration_image(characters=character.avatar.get_avatar(), text=text)
-        else:
-            image_path = None
         
         audio_path = character.voice.generate(text)
         self.narrator_collector.add_narration(
             text=text, 
             audio_path=audio_path,
-            image_path=image_path,
-        )
-
-    def _get_narration_image(
-            self,
-            text: str,
-            characters: List[Character]=[],
-            items: str=None,
-    ):
-        env_description = self.environment.get_visual_description()
-        events = self.player.get_short_term_memory() + '\n\n' + text
-
-        if len(characters)>0:
-            character_images = [character.get_avatar() for character in characters if isinstance(character, NPC) or isinstance(character, Player)]
-            system_message = ART_DIRECTOR_CHARACTERS
-            prompt = ART_DIRECTOR_PROMPT.format(
-                env_description=env_description,
-                events=events
-            )
-            art_prompt = self.model.generate(prompt=prompt, system_prompt=system_message, max_tokens=50)
-            return self.image_generator._generate_character_art(
-                prompt=art_prompt,
-                character_images=character_images,
-            )
-        elif items != "":
-            system_message = ART_DIRECTOR_ITEMS
-            prompt = ART_DIRECTOR_PROMPT_ITEMS.format(
-                env_description=env_description,
-                events=events,
-                items=items
-            )
-            art_prompt = self.model.generate(prompt=prompt, system_prompt=system_message, max_tokens=50)
-            return self.image_generator._generate_stage_art(
-                prompt=art_prompt
-            )
-        else:
-            system_message = ART_DIRECTOR_STAGE
-            prompt = ART_DIRECTOR_PROMPT.format(
-                env_description=env_description,
-                events=events
-            )
-            art_prompt = self.model.generate(prompt=prompt, system_prompt=system_message, max_tokens=50)
-            return self.image_generator._generate_stage_art(
-                prompt=art_prompt
-            )
-
-        
+        )    
 
     
     def get_in_focus_character(

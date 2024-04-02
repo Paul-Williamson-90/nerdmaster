@@ -284,7 +284,6 @@ class DescribeLocationTrigger(EnvironmentTrigger):
         game.add_to_player_narrator(
             text=self.attributes["location_description"],
             text_tag=NarrationType.stage.value,
-            characters = [],
             ai_generate=False,
         )
         game.player.quest_log.add_completed_trigger(self.ids_to_exclude)
@@ -459,7 +458,6 @@ class RevealTrigger(EnvironmentTrigger):
             game.add_to_player_narrator(
                 text=narrative,
                 text_tag=NarrationType.stage.value,
-                characters = [character],
                 ai_generate=False,
             )
 
@@ -576,7 +574,6 @@ class TriggerEventAnyCharacter(EnvironmentTrigger):
         game.add_to_player_narrator(
             text=self.narrative_prompt_player,
             text_tag=NarrationType.stage.value,
-            characters = self.attributes["characters"],
             ai_generate=True,
         )
         
@@ -682,7 +679,6 @@ class TriggerEventAllCharacter(EnvironmentTrigger):
         game.add_to_player_narrator(
             text=self.narrative_prompt_player, 
             text_tag=NarrationType.stage.value, 
-            characters = self.attributes["characters"],
             ai_generate=False
         )
         game.add_to_characters(
