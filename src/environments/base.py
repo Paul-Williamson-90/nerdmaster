@@ -1,9 +1,11 @@
-from typing import List
+from typing import List, Dict
+from pathlib import Path
 from src.environments.positions import CharacterPosition, ObjectPosition
 from src.environments.local_locations import LocalLocation
 from src.environments.environment_map import EnvironmentMap
 from src.triggers.base import Trigger
 from src.quests.base import QuestLog
+from src.game.terms import GameMode
 
 
 class Environment:
@@ -12,6 +14,7 @@ class Environment:
             self,
             name: str,
             location_id: str,
+            images: Dict[str, Path],
             connecting_locations: EnvironmentMap, 
             local_locations: List[LocalLocation], 
             character_locations: List[CharacterPosition], 
@@ -24,6 +27,7 @@ class Environment:
     )->None:
         self.name = name
         self.location_id = location_id
+        self.image = images
         self.connecting_locations = connecting_locations
         self.local_locations = local_locations
         self.character_locations = character_locations
@@ -198,7 +202,16 @@ class Environment:
             "type": str(loc.__class__.__name__)
         }
 
-    # def add_characters(self, characters: List[CharacterPosition], trigger: Trigger|None=None):
-    #     self.character_locations.extend(characters)
-    #     if trigger:
-    #         pass
+    def get_image(
+            self,
+            mode: GameMode = GameMode.EXPLORE.value,
+    ) -> Path:
+        if mode in [GameMode.EXPLORE.value, GameMode.COMBAT.value, GameMode.DIALOGUE.value]:
+            return self.image[mode]
+        elif mode in [GameMode.INTERACT.value]:
+            return self.get_object_of_interest_image()
+    
+    def get_object_of_interest_image(
+            self,
+    )->Path:
+        return self.object_of_interest.get_image()

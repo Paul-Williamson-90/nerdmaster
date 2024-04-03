@@ -6,6 +6,7 @@ from abc import ABC, abstractmethod
 from src.game.terms import GameMode, Turn
 
 from typing import List, Dict
+from pathlib import Path
 import numpy as np
 
 class EnvironmentTrigger(Trigger, ABC):
@@ -27,6 +28,7 @@ class EnvironmentTrigger(Trigger, ABC):
             exl_trigger_ids: List[str] = [], # Triggers that can't have been active for trigger
             req_characters: List[str] = [], # Characters that need to be present in the location
             attributes: Dict[str, str] = {},
+            image: Path = None,
     ):
         super().__init__(trigger_id)
         self.narrative_prompt = narrative_prompt
@@ -40,6 +42,7 @@ class EnvironmentTrigger(Trigger, ABC):
         self.req_characters = req_characters
         self.random_chance = random_chance
         self.ids_to_exclude = ids_to_exclude
+        self.image = image
         self.attributes: Dict[str, str] = attributes
     
     def prepare(
@@ -310,6 +313,7 @@ class TurnsInLocationTrigger(EnvironmentTrigger):
             req_trigger_ids: List[str] = [], # Triggers that need to have been active for trigger
             exl_trigger_ids: List[str] = [], # Triggers that can't have been active for trigger
             req_characters: List[str] = [], # Characters that need to be present in the location
+            image: Path = None,
             turns_in_location: int = 0,
             sign: str = "==",
     ):
@@ -325,6 +329,7 @@ class TurnsInLocationTrigger(EnvironmentTrigger):
             req_trigger_ids=req_trigger_ids,
             exl_trigger_ids=exl_trigger_ids,
             req_characters=req_characters,
+            image=image,
         )
         self.turns_in_location = turns_in_location
         self.sign = sign
@@ -408,6 +413,7 @@ class RevealTrigger(EnvironmentTrigger):
             exl_trigger_ids: List[str] = [], # Triggers that can't have been active for trigger
             req_characters: List[str] = [], # Characters that need to be present in the location
             attributes: Dict[str, str] = {},
+            image: Path = None,
             game_mode_switch: GameMode|None = None,
             turn_switch: Turn|None = None,
     ):
@@ -425,6 +431,7 @@ class RevealTrigger(EnvironmentTrigger):
             req_characters=req_characters,
             ids_to_exclude=ids_to_exclude,
             attributes=attributes,
+            image=image,
         )
         self.game_mode_switch = game_mode_switch
         self.turn_switch = turn_switch
@@ -523,6 +530,7 @@ class TriggerEventAnyCharacter(EnvironmentTrigger):
             exl_trigger_ids: List[str] = [], # Triggers that can't have been active for trigger
             req_characters: List[str] = [], # Characters that need to be present in the location
             ids_to_exclude: List[str] = [], # Triggers to exclude from the quest log
+            image: Path = None,
             add_character_description: bool = False,
             add_player_description: bool = False,
     ):
@@ -539,6 +547,7 @@ class TriggerEventAnyCharacter(EnvironmentTrigger):
             exl_trigger_ids=exl_trigger_ids,
             req_characters=req_characters,
             ids_to_exclude=ids_to_exclude,   
+            image=image,
         )
         self.narrative_prompt_player = narrative_prompt_player
         self.narrative_prompt_npc = narrative_prompt_npc
@@ -630,6 +639,7 @@ class TriggerEventAllCharacter(EnvironmentTrigger):
             exl_trigger_ids: List[str] = [], # Triggers that can't have been active for trigger
             req_characters: List[str] = [], # Characters that need to be present in the location
             ids_to_exclude: List[str] = [],
+            image: Path = None,
             add_character_description: bool = False,
             add_player_description: bool = False,
     ):
@@ -646,6 +656,7 @@ class TriggerEventAllCharacter(EnvironmentTrigger):
             exl_trigger_ids=exl_trigger_ids,
             req_characters=req_characters,
             ids_to_exclude=ids_to_exclude,
+            image=image,
         )
         self.narrative_prompt_player = narrative_prompt_player
         self.narrative_prompt_npc = narrative_prompt_npc

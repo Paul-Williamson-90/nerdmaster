@@ -1,1 +1,0 @@
-AVATAR_PROMPT = """"""

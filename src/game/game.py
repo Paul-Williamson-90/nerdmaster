@@ -13,19 +13,14 @@ from src.characters.base import Character
 from src.endpoints.gpt import StandardGPT
 from src.game.prompts import (
     PLAYER_NARRATION_SYSTEM_MESSAGE, 
-    ART_DIRECTOR_CHARACTERS, 
-    ART_DIRECTOR_ITEMS, 
-    ART_DIRECTOR_STAGE,
-    ART_DIRECTOR_PROMPT_ITEMS,
-    ART_DIRECTOR_PROMPT
 )
 from src.voices.voice import Voice
 from src.narrator.narrator import Narrator
 from src.game.terms import GameMode, Turn, NarrationType
 from src.characters.types.player.load_player import PlayerLoader
-from src.endpoints.image_generation import Dalle as ImageGenerator
 
 from typing import List, Dict
+from pathlib import Path
     
 class GameError(Exception):
     pass
@@ -132,6 +127,7 @@ class Game:
 
         self.narrator_collector.add_narration(
             text="Game saved.",
+            source="stage"
         )
         # TODO: Save game state
 
@@ -267,6 +263,7 @@ class Game:
             text_tag: str = NarrationType.stage.value,
             voice: Voice = None,
             ai_generate: bool = False,
+            image: Path = None,
     ):  
         if ai_generate:
             text = self.model.generate(
@@ -279,9 +276,13 @@ class Game:
 
         text = f"<{text_tag}>{text}</{text_tag}>"
 
+        source = "stage" if text_tag == NarrationType.stage.value else "player" if text_tag == self.player.name else "character"
+
         self.narrator_collector.add_narration(
             text=text, 
             audio_path=audio_path,
+            image_path=image,
+            source=source
         )
         self.player.add_short_term_memory(text)
 
@@ -290,6 +291,7 @@ class Game:
             self,
             text: str,
             character: Character,
+            image: Path=None,
     ):
         if text[0] != "\"":
             text = "\""+text
@@ -297,11 +299,15 @@ class Game:
             text = text+"\""
 
         text = f"<{character.name}>{text}</{character.name}>"
+
+        source = "player" if character.name == self.player.name else "character"
         
         audio_path = character.voice.generate(text)
         self.narrator_collector.add_narration(
             text=text, 
             audio_path=audio_path,
+            image_path=image,
+            source=source
         )    
 
     
@@ -451,6 +457,15 @@ class Game:
             player_input: str,
     ):
         self.get_player_reaction(player_input)
+
+    def get_images(
+            self,
+    ):
+        return {
+            "player": self.player.get_image(),
+            "environment": self.environment.get_image(),
+            "characters": [character.get_image() for character in self.characters]
+        }
     
     
     def play(
@@ -463,7 +478,7 @@ class Game:
             self.player_turn(player_input)
 
         self.turn_order()
-        return self.narrator_collector.get_narration_queue()
+        return self.narrator_collector.get_narration_queue(), self.get_images()
     
 
     

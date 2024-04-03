@@ -24,6 +24,11 @@
         ],
         "triggers": [
             "the_room_on_entry_description", "wyatt_on_reveal"
-        ]
+        ],
+        "images": {
+            "explore": "./data/images/man_in_chair.png",
+            "combat": "./data/images/man_in_chair.png",
+            "dialogue": "./data/images/man_in_chair.png"
+        }
     }
 }

@@ -84,6 +84,9 @@ class PositionLoader:
             items = [self.item_loader.get_item(item_id) for item_id in items_data]
             position_data["items"] = items
 
+        if "image" in position_data.keys():
+            position_data["image"] = Path(position_data["image"])
+
         position_object = self.position_map[position_type].value
         return position_object(**{k:v for k,v in position_data.items() if k not in ["position_type_id"]})
     
@@ -119,7 +122,8 @@ class EnvironmentLoader:
         visual_description = env_data["visual_description"]
         scenario_description_tags = env_data["scenario_description_tags"]
         turns_in_location = env_data["turns_in_location"]
-        return name, description, visual_description, scenario_description_tags, turns_in_location
+        images = {k: Path(v) if v else v for k,v in env_data["images"].items() }
+        return name, description, visual_description, scenario_description_tags, turns_in_location, images
     
     def _get_local_locations(self, env_data: dict):
         local_locations_data = env_data["local_locations"]
@@ -165,7 +169,8 @@ class EnvironmentLoader:
             description, 
             visual_description, 
             scenario_description_tags, 
-            turns_in_location
+            turns_in_location,
+            images
          ) = self._get_environment_attributes(env_data)
         
         connecting_locations = self._get_connecting_locations(environment_id)
@@ -176,6 +181,7 @@ class EnvironmentLoader:
 
         environment = Environment(
             location_id=environment_id,
+            images=images,
             name=name,
             connecting_locations=connecting_locations,
             local_locations=local_locations,

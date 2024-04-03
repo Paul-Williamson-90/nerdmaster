@@ -53,6 +53,11 @@ class Character(ABC):
         self.reactions: ReActionMap = reactions(self)
         self.action_queue: List[Trigger] = []
 
+    def get_image(
+            self,
+    ):
+        return self.avatar.get_avatar()
+
     def get_short_term_memory(
             self,
     ):

@@ -8,16 +8,19 @@ class Narration:
             text: str|None,
             audio_path: str|None,
             image_path: str|None,
+            source: str = None
     ):
         self.text = text
         self.audio_path = audio_path
         self.image_path = image_path
+        self.source = source
 
     def to_dict(self):
         return {
             "text": self.text,
             "audio_path": self.audio_path,
             "image_path": self.image_path,
+            "source": self.source
         }
     
 
@@ -33,13 +36,14 @@ class Narrator:
             text: str|None = None,
             audio_path: str|None = None,
             image_path: str|None = None,
+            source: str = None,
     ):
         narration = Narration(
             text=text,
             audio_path=audio_path,
             image_path=image_path,
+            source=source
         )
-        print(narration.to_dict())
         self.narration_queue.append(narration)
 
     def get_narration_queue(

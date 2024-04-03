@@ -3,6 +3,7 @@ from src.items.base import Item
 from src.triggers.base import Trigger
 from typing import List
 from src.quests.base import QuestLog
+from pathlib import Path
 
 
 class Position:
@@ -57,6 +58,7 @@ class ObjectPosition(Position):
     def __init__(
             self,
             name: str,
+            image: Path,
             object_id: str,
             items: List[Item],
             position_description: str,
@@ -72,6 +74,7 @@ class ObjectPosition(Position):
             triggers=triggers
         )
         self.items = items
+        self.image = image
         self.object_id = object_id
 
     def get_items(self):
@@ -101,4 +104,7 @@ class ObjectPosition(Position):
                         environment=environment,
                     )
         return self.get_items()
+    
+    def get_image(self):
+        return self.image
 
